@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Force dynamic so Next.js never tries to statically analyze this route
+export const dynamic = 'force-dynamic';
 
 const schema = z.object({
   name: z.string().min(2),
@@ -15,6 +16,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const data = schema.parse(body);
+
+    // Instantiate inside the handler so it only runs at request time
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { error } = await resend.emails.send({
       from: 'Portfolio <onboarding@resend.dev>',
