@@ -2,82 +2,66 @@
 
 import { useEffect, useRef } from 'react';
 
-interface Particle {
-  x: number;
-  y: number;
-  opacity: number;
-  phase: number;
-  speed: number;
-}
-
-const GRID_SIZE = 40;
-const DOT_RADIUS = 1.2;
-const BASE_OPACITY = 0.12;
+const GRID = 52;
+const DOT_R = 1;
+const BASE_OP = 0.1;
 
 export default function ParticleGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef = useRef<number>(0);
-  const particlesRef = useRef<Particle[]>([]);
-  const timeRef = useRef(0);
+  const rafRef = useRef<number>(0);
+  const tRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+
+    // Disable on mobile / reduced-motion
+    if (
+      window.matchMedia('(max-width: 768px)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) return;
+
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    // Disable on mobile for performance
-    if (window.matchMedia('(max-width: 768px)').matches) return;
+    type Dot = { x: number; y: number; phase: number; speed: number };
+    let dots: Dot[] = [];
 
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      buildParticles();
-    };
-
-    const buildParticles = () => {
-      particlesRef.current = [];
-      const cols = Math.ceil(canvas.width / GRID_SIZE) + 1;
-      const rows = Math.ceil(canvas.height / GRID_SIZE) + 1;
-
-      for (let col = 0; col < cols; col++) {
-        for (let row = 0; row < rows; row++) {
-          particlesRef.current.push({
-            x: col * GRID_SIZE,
-            y: row * GRID_SIZE,
-            opacity: BASE_OPACITY,
-            phase: Math.random() * Math.PI * 2,
-            speed: 0.3 + Math.random() * 0.7,
-          });
-        }
-      }
+      dots = [];
+      const cols = Math.ceil(canvas.width / GRID) + 1;
+      const rows = Math.ceil(canvas.height / GRID) + 1;
+      for (let c = 0; c < cols; c++)
+        for (let r = 0; r < rows; r++)
+          dots.push({ x: c * GRID, y: r * GRID, phase: Math.random() * Math.PI * 2, speed: 0.4 + Math.random() * 0.6 });
     };
 
     const draw = () => {
       if (!ctx || !canvas) return;
+      tRef.current += 0.008;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      timeRef.current += 0.01;
-
-      for (const p of particlesRef.current) {
-        const pulse = Math.sin(timeRef.current * p.speed + p.phase);
-        const opacity = BASE_OPACITY + pulse * 0.06;
-
+      ctx.fillStyle = '#1F4D3A';
+      for (const d of dots) {
+        const op = BASE_OP + Math.sin(tRef.current * d.speed + d.phase) * 0.05;
+        ctx.globalAlpha = Math.max(0, op);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, DOT_RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(31, 77, 58, ${opacity})`; // --accent
+        ctx.arc(d.x, d.y, DOT_R, 0, Math.PI * 2);
         ctx.fill();
       }
-
-      animRef.current = requestAnimationFrame(draw);
+      ctx.globalAlpha = 1;
+      rafRef.current = requestAnimationFrame(draw);
     };
 
     resize();
     draw();
-    window.addEventListener('resize', resize);
 
+    const onResize = () => { cancelAnimationFrame(rafRef.current); resize(); draw(); };
+    window.addEventListener('resize', onResize);
     return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animRef.current);
+      window.removeEventListener('resize', onResize);
+      cancelAnimationFrame(rafRef.current);
     };
   }, []);
 

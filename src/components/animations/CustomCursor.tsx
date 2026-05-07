@@ -1,53 +1,48 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useSpring, useMotionValue } from 'framer-motion';
 
 export default function CustomCursor() {
   const [isDesktop, setIsDesktop] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const cursorRef = useRef<HTMLDivElement>(null);
 
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  const springConfig = { stiffness: 400, damping: 30, mass: 0.5 };
-  const cursorX = useSpring(mouseX, springConfig);
-  const cursorY = useSpring(mouseY, springConfig);
+  // Dot: very snappy
+  const dotX = useSpring(mouseX, { stiffness: 1000, damping: 40, mass: 0.1 });
+  const dotY = useSpring(mouseY, { stiffness: 1000, damping: 40, mass: 0.1 });
 
-  const trailX = useSpring(mouseX, { stiffness: 120, damping: 25 });
-  const trailY = useSpring(mouseY, { stiffness: 120, damping: 25 });
+  // Trail: slightly softer but still fast
+  const trailX = useSpring(mouseX, { stiffness: 400, damping: 35, mass: 0.2 });
+  const trailY = useSpring(mouseY, { stiffness: 400, damping: 35, mass: 0.2 });
 
   useEffect(() => {
-    // Only enable on pointer devices (desktops)
-    const mediaQuery = window.matchMedia('(pointer: fine)');
-    setIsDesktop(mediaQuery.matches);
+    const mq = window.matchMedia('(pointer: fine)');
+    setIsDesktop(mq.matches);
+    if (!mq.matches) return;
 
-    if (!mediaQuery.matches) return;
-
-    const onMouseMove = (e: MouseEvent) => {
+    const onMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
     };
 
-    const onMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const isInteractive =
-        target.closest('a') ||
-        target.closest('button') ||
-        target.closest('[role="button"]') ||
-        target.closest('input') ||
-        target.closest('textarea');
-      setIsHovering(!!isInteractive);
+    const onOver = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      setIsHovering(
+        !!(t.closest('a') || t.closest('button') || t.closest('[role="button"]') ||
+           t.closest('input') || t.closest('textarea'))
+      );
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseover', onMouseOver);
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('mouseover', onOver, { passive: true });
     document.documentElement.classList.add('hide-cursor');
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseover', onMouseOver);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseover', onOver);
       document.documentElement.classList.remove('hide-cursor');
     };
   }, [mouseX, mouseY]);
@@ -56,35 +51,32 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Trail (slow follower) */}
+      {/* Trail */}
       <motion.div
-        ref={cursorRef}
         className="pointer-events-none fixed z-[9998] rounded-full mix-blend-difference"
         style={{
           x: trailX,
           y: trailY,
           translateX: '-50%',
           translateY: '-50%',
-          width: isHovering ? 44 : 28,
-          height: isHovering ? 44 : 28,
+          width: isHovering ? 40 : 24,
+          height: isHovering ? 40 : 24,
           backgroundColor: isHovering ? '#00FF88' : '#1F4D3A',
-          opacity: 0.25,
-          transition: 'width 0.2s, height 0.2s, background-color 0.2s',
+          opacity: 0.3,
+          transition: 'width 0.15s, height 0.15s, background-color 0.15s',
         }}
       />
-
-      {/* Main cursor dot */}
+      {/* Dot */}
       <motion.div
-        className="pointer-events-none fixed z-[9999] rounded-full mix-blend-difference"
+        className="pointer-events-none fixed z-[9999] rounded-full"
         style={{
-          x: cursorX,
-          y: cursorY,
+          x: dotX,
+          y: dotY,
           translateX: '-50%',
           translateY: '-50%',
-          width: isHovering ? 8 : 6,
-          height: isHovering ? 8 : 6,
+          width: 5,
+          height: 5,
           backgroundColor: isHovering ? '#00FF88' : '#2D7A5C',
-          transition: 'width 0.15s, height 0.15s, background-color 0.15s',
         }}
       />
     </>
