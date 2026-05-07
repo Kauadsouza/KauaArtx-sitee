@@ -1,0 +1,188 @@
+{
+  "nav": {
+    "about": "Sobre",
+    "projects": "Projetos",
+    "now": "Agora",
+    "blog": "Blog",
+    "faq": "FAQ",
+    "contact": "Contato"
+  },
+  "hero": {
+    "name": "Kauã Souza",
+    "role": "Full-Stack Developer & Founder",
+    "tagline": "Construindo o futuro da tech brasileira, um projeto de cada vez.",
+    "cta_projects": "Ver Projetos",
+    "cta_contact": "Contato",
+    "based_in": "Uberlândia, Brasil",
+    "open_to": "Aberto a oportunidades globais"
+  },
+  "stats": {
+    "years_coding": "Anos Programando",
+    "github_repos": "Repos Públicos",
+    "github_commits": "Commits",
+    "youtube_subs": "Inscritos no YouTube"
+  },
+  "featured_projects": {
+    "title": "Projetos em Destaque",
+    "subtitle": "Coisas que construí e continuo construindo.",
+    "view_all": "Ver Todos os Projetos",
+    "view_case_study": "Ver Case Study",
+    "visit_site": "Visitar Site"
+  },
+  "tech_stack": {
+    "title": "Stack Técnica",
+    "subtitle": "Tecnologias que domino e uso no dia a dia."
+  },
+  "cta_section": {
+    "title": "Vamos conversar?",
+    "subtitle": "Aberto a oportunidades, parcerias e conversas interessantes.",
+    "button": "Entrar em Contato"
+  },
+  "about": {
+    "title": "Sobre Mim",
+    "subtitle": "A história de um dev brasileiro com ambição global.",
+    "bio_1": "Comecei a programar em 2022 quase por acidente — precisava de sites para lojas de dropshipping e decidi aprender a fazer eu mesmo. O que era uma solução prática virou uma obsessão. Em poucos meses, já estava reconstruindo aquilo que havia aprendido do zero, entendendo cada linha de código.",
+    "bio_2": "Em 2023, levei esse conhecimento para a Construtora Pacaembu, onde construí sistemas internos de gestão de leads, landing pages de alta conversão e gerenciei campanhas de tráfego pago. Foi meu primeiro contato com tecnologia em escala real — onde um bug não é só um problema técnico, é prejuízo financeiro.",
+    "bio_3": "Em 2024, migrei completamente para o desenvolvimento full-stack. Co-fundei o The Kaden — um SaaS de automação WhatsApp para clínicas estéticas e salões de beleza —, construí o CONDOR (assistente IA local focado em privacidade), e fundei a Null Forge como iniciativa de impacto social em tecnologia.",
+    "bio_4": "Hoje trabalho na Loog.ai, uma plataforma logística AI-first brasileira, onde aplico tudo que aprendi na frontline da inovação. Minha ambição não tem fronteiras geográficas: quero estudar em Harvard, MIT ou Oxford, e provar que tech de classe mundial pode nascer no Brasil.",
+    "timeline_title": "Jornada",
+    "values_title": "Valores & Princípios",
+    "cta_now": "O que estou fazendo agora",
+    "cta_contact": "Entrar em Contato"
+  },
+  "timeline": {
+    "2022": {
+      "title": "Primeiro contato com código",
+      "description": "Descobri programação fazendo sites para lojas de dropshipping. O que era necessidade virou paixão."
+    },
+    "2023": {
+      "title": "Construtora Pacaembu",
+      "description": "Sistemas internos de leads, landing pages de alta conversão e gestão de tráfego pago em escala real."
+    },
+    "2024": {
+      "title": "Migração total para Full-Stack",
+      "description": "Deixei o marketing digital para trás e mergulhei de cabeça no desenvolvimento. Sem olhar para trás."
+    },
+    "2025a": {
+      "title": "The Kaden & CONDOR nascem",
+      "description": "Co-fundei um SaaS de automação WhatsApp e construí um assistente IA local com foco em privacidade."
+    },
+    "2025b": {
+      "title": "Null Forge — Tech com propósito",
+      "description": "Fundei a Null Forge para democratizar educação tecnológica no Brasil, começando pelas escolas."
+    },
+    "2026": {
+      "title": "Loog.ai",
+      "description": "Full-stack developer na frontline da logística AI-first brasileira. Inovação em escala nacional."
+    },
+    "today": {
+      "title": "Construindo o próximo capítulo",
+      "description": "Ambição global. Tech brasileira. O melhor ainda está por vir."
+    }
+  },
+  "values": {
+    "build_in_public": {
+      "title": "Build in Public",
+      "description": "Transparência como vantagem competitiva. Compartilhar a jornada, não só os resultados."
+    },
+    "move_fast": {
+      "title": "Move Fast, Ship Clean",
+      "description": "Velocidade sem abrir mão da qualidade. Código que dura e produto que funciona."
+    },
+    "tech_with_purpose": {
+      "title": "Tech with Purpose",
+      "description": "Tecnologia é ferramenta de transformação social. Cada linha de código tem potencial de mudar vidas."
+    },
+    "global_mindset": {
+      "title": "Global Mindset",
+      "description": "Pensar globalmente, construir localmente. A próxima grande startup pode nascer em Uberlândia."
+    }
+  },
+  "projects": {
+    "title": "Projetos",
+    "subtitle": "Coisas que construí, produtos que fundei, problemas que resolvi.",
+    "filter_all": "Todos",
+    "filter_saas": "SaaS",
+    "filter_ai": "IA",
+    "filter_education": "Educação",
+    "status_production": "Em Produção",
+    "status_development": "Em Desenvolvimento",
+    "status_building": "Estruturando",
+    "view_case_study": "Ver Case Study",
+    "visit_site": "Visitar Site",
+    "view_github": "Ver no GitHub"
+  },
+  "case_study": {
+    "overview": "Visão Geral",
+    "problem": "O Problema",
+    "solution": "A Solução",
+    "stack": "Stack & Arquitetura",
+    "lessons": "Lições Aprendidas",
+    "lessons_worked": "O que funcionou",
+    "lessons_failed": "O que não funcionou",
+    "lessons_different": "O que faria diferente",
+    "next_steps": "Próximos Passos",
+    "screenshots": "Screenshots",
+    "links": "Links"
+  },
+  "now": {
+    "title": "Agora",
+    "intro": "Esta é uma página /now — uma snapshot honesta do que estou fazendo neste momento da minha vida. Inspirado no movimento nownownow.com de Derek Sivers.",
+    "working_title": "Trabalhando em",
+    "learning_title": "Aprendendo",
+    "reading_title": "Lendo & Consumindo",
+    "life_title": "Vida Pessoal",
+    "updated": "Atualizado em"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Reflexões sobre tech, empreendedorismo e a jornada de construir no Brasil.",
+    "coming_soon": "Em breve",
+    "coming_soon_desc": "Primeiros artigos sobre tech, empreendedorismo e a jornada de construir no Brasil.",
+    "read_more": "Ler artigo",
+    "min_read": "min de leitura"
+  },
+  "contact": {
+    "title": "Contato",
+    "subtitle": "Aberto a oportunidades, parcerias e conversas. Geralmente respondo em 24h.",
+    "form_name": "Nome",
+    "form_email": "Email",
+    "form_subject": "Assunto",
+    "form_message": "Mensagem",
+    "form_send": "Enviar Mensagem",
+    "form_sending": "Enviando...",
+    "form_success_title": "Mensagem enviada!",
+    "form_success_desc": "Obrigado pelo contato. Responderei em breve.",
+    "form_error": "Erro ao enviar. Tente novamente.",
+    "social_title": "Redes Sociais"
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "subtitle": "Dúvidas comuns sobre meu trabalho e colaborações.",
+    "q1": "Quais serviços você oferece?",
+    "a1": "Desenvolvimento full-stack (Next.js, Node.js, React), consultoria de produto, desenvolvimento de MVPs, automação WhatsApp, e sistemas SaaS. Também aceito projetos de impacto social via Null Forge.",
+    "q2": "Está aberto a oportunidades de trabalho remoto fora do Brasil?",
+    "a2": "Sim, absolutamente. Tenho inglês conversacional e estou ativamente buscando exposição internacional. Sonho em estudar e trabalhar globalmente — oportunidades sérias são sempre bem-vindas.",
+    "q3": "Trabalha como freelancer ou só em projetos próprios?",
+    "a3": "Trabalho com as duas modalidades. Tenho projetos próprios (The Kaden, CONDOR, Null Forge) e estou aberto a contratos freelancer ou emprego remoto para projetos que me desafiem.",
+    "q4": "Quanto tempo leva para construir um projeto como o The Kaden?",
+    "a4": "O The Kaden foi construído em aproximadamente 4 meses da ideia ao MVP funcional em produção. O tempo varia enormemente conforme escopo, stack e número de pessoas envolvidas.",
+    "q5": "Que stack você recomenda para SaaS hoje?",
+    "a5": "Para a maioria dos SaaS: Next.js (App Router) + Supabase (PostgreSQL + Auth + Storage) + Stripe + Vercel. Rápido, escalável e com ótima DX. Para casos específicos, adapto a recomendação.",
+    "q6": "Aceita parcerias ou co-founding?",
+    "a6": "Dependendo do projeto e da afinidade com a missão, sim. Preciso acreditar no problema e no time. Se você tem uma ideia com potencial real, me conta — posso me interessar.",
+    "q7": "Faz mentoria para devs iniciantes?",
+    "a7": "Esporadicamente, via Null Forge. Se você está começando em tech e quer orientação, me manda uma mensagem explicando onde está na jornada. Não prometo disponibilidade, mas leio tudo.",
+    "q8": "Como você começou na programação?",
+    "a8": "Em 2022, precisava de sites para lojas de dropshipping e não queria pagar uma agência. Aprendi HTML/CSS/JS do zero. Fui mordido pelo bug do código e não parei mais.",
+    "q9": "Posso usar o CONDOR, Null Forge ou The Kaden?",
+    "a9": "The Kaden: acesse thekaden.com.br para informações sobre planos. CONDOR: projeto em desenvolvimento, sem release público ainda. Null Forge: entre em contato se você é escola ou organização educacional interessada em parceria.",
+    "q10": "Como entrar em contato mais rapidamente?",
+    "a10": "Email (kauadsouza@gmail.com) ou Instagram (@kauaartx) são os canais mais rápidos. LinkedIn é mais formal. Geralmente respondo em 24h nos dias úteis."
+  },
+  "footer": {
+    "tagline": "Full-Stack Developer & Founder baseado em Uberlândia, Brasil.",
+    "built_with": "Construído com Next.js, TypeScript e muito café.",
+    "rights": "Todos os direitos reservados."
+  }
+}
