@@ -146,10 +146,10 @@ html.dark {
   .hide-cursor * { cursor: none !important; }
 
   /* Circuit canvas */
-  html.dark       .circuit-bg { opacity: 0.7; }
-  html:not(.dark) .circuit-bg { opacity: 0.25; }
+  html.dark       .circuit-bg { opacity: 1; }
+  html:not(.dark) .circuit-bg { opacity: 0.30; }
 
-  /* Véu entre circuito e conteúdo — garante legibilidade */
-  html.dark       .circuit-veil { background: rgba(5,5,5,0.72); }
-  html:not(.dark) .circuit-veil { background: rgba(247,247,247,0.80); }
+  /* Véu leve — legibilidade sem matar o efeito */
+  html.dark       .circuit-veil { background: rgba(5,5,5,0.50); }
+  html:not(.dark) .circuit-veil { background: rgba(247,247,247,0.72); }
 }
