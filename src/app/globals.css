@@ -144,4 +144,8 @@ html.dark {
 
   .hide-cursor  { cursor: none !important; }
   .hide-cursor * { cursor: none !important; }
+
+  /* Circuit background: mais visível no dark, sutil no light */
+  html.dark  .circuit-bg { opacity: 1; }
+  html:not(.dark) .circuit-bg { opacity: 0.35; }
 }

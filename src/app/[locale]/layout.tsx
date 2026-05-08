@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer';
 import PageTransition from '@/components/layout/PageTransition';
 import BootSequence from '@/components/animations/BootSequence';
 import CustomCursor from '@/components/animations/CustomCursor';
+import CircuitBackground from '@/components/animations/CircuitBackground';
 import CommandPalette from '@/components/commands/CommandPalette';
 
 export async function generateStaticParams() {
@@ -47,13 +48,19 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
+      {/* Background em todas as páginas */}
+      <CircuitBackground />
+
       <BootSequence />
       <CustomCursor />
       <CommandPalette />
       <Header locale={locale} />
-      <main className="min-h-screen">
+
+      {/* z-10 garante que o conteúdo fica acima do canvas */}
+      <main className="relative z-10 min-h-screen">
         <PageTransition>{children}</PageTransition>
       </main>
+
       <Footer />
     </NextIntlClientProvider>
   );

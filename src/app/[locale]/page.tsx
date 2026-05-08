@@ -6,7 +6,6 @@ import StatsSection from '@/components/sections/StatsSection';
 import FeaturedProjects from '@/components/sections/FeaturedProjects';
 import TechStack from '@/components/sections/TechStack';
 import CTASection from '@/components/sections/CTASection';
-import ParticleGrid from '@/components/animations/ParticleGrid';
 
 export async function generateMetadata({
   params,
@@ -23,16 +22,13 @@ export async function generateMetadata({
 
 export default function HomePage() {
   return (
-    <div className="relative">
-      <ParticleGrid />
-      <div className="relative z-10">
-        <Hero />
-        <TerminalSection />
-        <StatsSection />
-        <FeaturedProjects />
-        <TechStack />
-        <CTASection />
-      </div>
-    </div>
+    <>
+      <Hero />
+      <TerminalSection />
+      <StatsSection />
+      <FeaturedProjects />
+      <TechStack />
+      <CTASection />
+    </>
   );
 }
