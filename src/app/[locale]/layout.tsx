@@ -48,20 +48,22 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      {/* Background em todas as páginas */}
+      {/* z-0: circuito animado */}
       <CircuitBackground />
+      {/* z-[1]: véu semitransparente — protege legibilidade sem matar o efeito */}
+      <div className="circuit-veil fixed inset-0 z-[1] pointer-events-none" />
 
       <BootSequence />
       <CustomCursor />
       <CommandPalette />
       <Header locale={locale} />
 
-      {/* z-10 garante que o conteúdo fica acima do canvas */}
+      {/* z-10: todo o conteúdo acima */}
       <main className="relative z-10 min-h-screen">
         <PageTransition>{children}</PageTransition>
       </main>
 
-      <Footer />
+      <div className="relative z-10"><Footer /></div>
     </NextIntlClientProvider>
   );
 }

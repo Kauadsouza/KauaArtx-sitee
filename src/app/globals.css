@@ -145,7 +145,11 @@ html.dark {
   .hide-cursor  { cursor: none !important; }
   .hide-cursor * { cursor: none !important; }
 
-  /* Circuit background: mais visível no dark, sutil no light */
-  html.dark  .circuit-bg { opacity: 1; }
-  html:not(.dark) .circuit-bg { opacity: 0.35; }
+  /* Circuit canvas */
+  html.dark       .circuit-bg { opacity: 0.7; }
+  html:not(.dark) .circuit-bg { opacity: 0.25; }
+
+  /* Véu entre circuito e conteúdo — garante legibilidade */
+  html.dark       .circuit-veil { background: rgba(5,5,5,0.72); }
+  html:not(.dark) .circuit-veil { background: rgba(247,247,247,0.80); }
 }
