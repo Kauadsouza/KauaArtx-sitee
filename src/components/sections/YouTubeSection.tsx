@@ -23,7 +23,7 @@ export default function YouTubeSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative rounded-3xl overflow-hidden p-10 sm:p-16 bg-surface border border-border shadow-sm"
+          className="relative rounded-3xl overflow-hidden p-7 sm:p-12 lg:p-16 bg-surface border border-border shadow-sm"
         >
           {/* Aurora interna */}
           <div className="orb w-[380px] h-[380px] -top-24 -right-20 bg-accent-2/20 animate-float-slow" />

@@ -10,11 +10,10 @@ export const metadata: Metadata = {
     template: '%s | Kauã Souza',
   },
   description:
-    'Vendedor na Loog.ai, CEO do Facility e criador de conteúdo no YouTube sobre viagens e crescimento pessoal. Uberlândia, Brasil.',
+    'Vendedor na Loog.ai, CEO do Facility e criador de conteúdo no YouTube sobre viagens e crescimento pessoal.',
   keywords: [
     'Kauã Souza', 'Vendedor', 'Empreendedor', 'Facility',
     'Loog.ai', 'YouTube', 'Viagens', 'Crescimento pessoal',
-    'Uberlândia', 'Brasil',
   ],
   authors: [{ name: 'Kauã Souza' }],
   creator: 'Kauã Souza',
@@ -31,7 +30,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Kauã Souza — Vendedor & Empreendedor',
     description:
-      'Vendedor, CEO do Facility e criador de conteúdo sobre viagens e crescimento. Uberlândia, Brasil.',
+      'Vendedor, CEO do Facility e criador de conteúdo sobre viagens e crescimento.',
   },
   robots: { index: true, follow: true },
 };

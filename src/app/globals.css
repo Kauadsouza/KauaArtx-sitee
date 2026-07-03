@@ -219,7 +219,21 @@
     color: var(--fg-muted);
     line-height: 1.8;
     font-size: 1.0625rem;
+    overflow-wrap: break-word;
   }
+  .prose-post table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+  .prose-post th, .prose-post td {
+    border: 1px solid var(--border-col);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .prose-post th { background: var(--surface-el); color: var(--fg); }
   .prose-post h1, .prose-post h2, .prose-post h3 {
     color: var(--fg);
     margin: 2rem 0 0.75rem;

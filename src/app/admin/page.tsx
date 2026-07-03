@@ -71,23 +71,23 @@ export default function AdminDashboard() {
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-all"
             >
               <ExternalLink size={14} />
-              Ver site
+              <span className="hidden sm:inline">Ver site</span>
             </a>
             <button
               onClick={handleLogout}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm text-foreground-muted hover:text-red-600 hover:bg-red-500/10 transition-all"
             >
               <LogOut size={14} />
-              Sair
+              <span className="hidden sm:inline">Sair</span>
             </button>
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground mb-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-1">
               Seus posts
             </h1>
             <p className="text-sm text-foreground-muted">

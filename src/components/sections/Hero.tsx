@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
-import { ArrowRight, MapPin, Youtube, Briefcase, Rocket, Compass } from 'lucide-react';
+import { ArrowRight, Youtube, Briefcase, Rocket, Compass } from 'lucide-react';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
@@ -47,9 +47,6 @@ export default function Hero() {
           <motion.div variants={item} className="inline-flex items-center gap-2 mb-8">
             <div className="flex items-center gap-2.5 px-4 py-2 rounded-full glass shadow-sm text-xs text-foreground-muted font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-bright animate-pulse-dot" />
-              <MapPin size={11} className="text-accent-deep" />
-              <span>{t('based_in')}</span>
-              <span className="text-foreground-subtle">·</span>
               <Compass size={11} className="text-accent-2-deep" />
               <span>{t('open_to')}</span>
             </div>
@@ -58,7 +55,7 @@ export default function Hero() {
           {/* Name */}
           <motion.h1
             variants={item}
-            className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tighter text-foreground leading-[0.95] mb-5"
+            className="text-5xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tighter text-foreground leading-[0.95] mb-5 break-words"
           >
             {t('name')}
           </motion.h1>
@@ -93,7 +90,7 @@ export default function Hero() {
           </motion.div>
 
           {/* CTAs */}
-          <motion.div variants={item} className="flex flex-wrap gap-4">
+          <motion.div variants={item} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
             <a
               href={YOUTUBE_URL}
               target="_blank"

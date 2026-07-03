@@ -11,7 +11,6 @@
     "tagline": "Eu acredito que tudo na vida é sobre pessoas. Vendo, crio, viajo e compartilho cada passo dessa jornada de crescimento.",
     "cta_youtube": "Meu canal no YouTube",
     "cta_contact": "Fale comigo",
-    "based_in": "Uberlândia, Brasil",
     "open_to": "Sempre em movimento",
     "chip_sales": "Vendas na Loog.ai",
     "chip_ceo": "CEO do Facility",
@@ -22,7 +21,7 @@
     "subtitle": "Três frentes, um mesmo propósito: conectar pessoas e gerar crescimento.",
     "loog_title": "Vendas na Loog.ai",
     "loog_tag": "Vendedor",
-    "loog_desc": "Faço parte do time comercial da Loog.ai, plataforma brasileira de logística com inteligência artificial. Meu trabalho é ouvir, entender e mostrar como a tecnologia resolve problemas reais.",
+    "loog_desc": "Faço parte do time comercial da Loog.ai, plataforma brasileira de logística com inteligência artificial. Discovery, qualificação de leads, follow-up e apresentações — meu trabalho é ouvir e mostrar como a tecnologia resolve problemas reais.",
     "facility_title": "Facility",
     "facility_tag": "CEO & Fundador",
     "facility_desc": "No Facility, a gente conversa com o cliente, entende a necessidade dele e entrega o sistema sob medida que ele pediu. Sem enrolação: escutar, resolver e entregar.",
@@ -55,40 +54,68 @@
   "about": {
     "title": "Sobre mim",
     "subtitle": "Vendedor por vocação, empreendedor por escolha e eterno aprendiz.",
-    "bio_1": "Meu nome é Kauã Souza e, antes de qualquer cargo ou título, eu sou uma pessoa que gosta de gente. Desde cedo entendi que vender não é empurrar produto — é escutar, entender o que a pessoa precisa e ajudar de verdade. Foi essa visão que moldou tudo o que faço hoje.",
-    "bio_2": "Comecei cedo no mundo digital: montei lojas online, aprendi marketing na prática e em 2023 trabalhei na Construtora Pacaembu cuidando de leads, campanhas e conversão. Ali eu vi de perto que resultado vem de relacionamento — não de sorte.",
-    "bio_3": "Hoje eu vivo três frentes: sou vendedor na Loog.ai, uma plataforma brasileira de logística com IA; sou CEO do Facility, onde entendemos a necessidade de cada cliente e entregamos o sistema que ele precisa; e crio conteúdo no YouTube sobre viagens e crescimento pessoal.",
-    "bio_4": "Programação? É um hobby que eu curto — me ajuda a entender produto e conversar de igual pra igual com qualquer time técnico. Mas o meu jogo é outro: pessoas, negócios e evolução constante. Meu foco é crescer 1% todos os dias e levar o máximo de gente junto comigo.",
-    "timeline_title": "Minha jornada",
+    "bio_1": "Meu nome é Kauã, tenho 18 anos e, antes de qualquer cargo ou título, eu sou uma pessoa que gosta de gente. Desde cedo entendi que vender não é empurrar produto — é escutar, entender o que a pessoa precisa e ajudar de verdade. Hoje, ser vendedor é o meu foco e é o que eu amo fazer.",
+    "bio_2": "Comecei no marketing digital como gestor de tráfego: passei por agências e empresas gerenciando campanhas no Google Ads e Meta Ads, gerando leads e otimizando resultados. Numa dessas empresas, a HLTS, o time vivia travado esperando terceiros criarem landing pages — então eu mesmo resolvi: criei do zero um sistema de páginas e captação de leads que a empresa passou a usar. Ali eu aprendi minha maior lição: entender o problema vale mais do que qualquer ferramenta.",
+    "bio_3": "Hoje eu vivo três frentes: sou vendedor na Loog.ai, plataforma brasileira de logística com IA, onde faço discovery, qualificação e reuniões comerciais; sou CEO do Facility, onde entendemos a necessidade de cada cliente e entregamos o sistema que ele precisa; e crio conteúdo no YouTube sobre viagens e crescimento pessoal.",
+    "bio_4": "Tecnologia pra mim é ferramenta, não identidade: eu gosto de automatizar, criar sistemas e estudar IA — mas sempre a serviço de resolver problemas de negócio. Meu jogo é gente, vendas e evolução constante: crescer 1% todos os dias e levar o máximo de pessoas junto comigo.",
+    "experience_title": "Por onde já passei",
+    "projects_title": "Projetos que tirei do papel",
+    "goals_title": "Pra onde eu vou",
     "values_title": "No que eu acredito",
     "cta_contact": "Fale comigo",
     "cta_youtube": "Conheça o canal"
   },
-  "timeline": {
-    "2022": {
-      "title": "Primeiros passos no digital",
-      "description": "Montei minhas primeiras lojas online e descobri minha paixão: vender e me conectar com pessoas."
+  "experience": {
+    "current_badge": "Atual",
+    "loog": {
+      "role": "Vendas",
+      "place": "Loog.ai",
+      "desc": "Time comercial da plataforma de logística com IA: reuniões comerciais, discovery, pesquisa e qualificação de empresas, follow-up, levantamento de requisitos e apresentações."
     },
-    "2023": {
-      "title": "Construtora Pacaembu",
-      "description": "Trabalhei com leads, campanhas e conversão. Aprendi que resultado em escala vem de processo e relacionamento."
+    "facility": {
+      "role": "CEO & Fundador",
+      "place": "Facility",
+      "desc": "Meu projeto como empreendedor: conversamos com o cliente, entendemos a operação dele e entregamos o sistema sob medida que resolve o problema de verdade."
     },
-    "2024": {
-      "title": "Projetos próprios",
-      "description": "Tirei ideias do papel e aprendi na prática o que é construir algo do zero — errando, ajustando e evoluindo."
+    "diamond": {
+      "role": "Gestor de Tráfego",
+      "place": "Diamond Imóveis de Luxo",
+      "desc": "Campanhas para o mercado imobiliário de alto padrão: Google Ads, Meta Ads, captação de leads qualificados e geração de oportunidades comerciais."
     },
-    "2025": {
-      "title": "Nasce o Facility",
-      "description": "Fundei o Facility: ouvimos o cliente, entendemos a necessidade e entregamos o sistema sob medida."
+    "hlts": {
+      "role": "Gestor de Tráfego",
+      "place": "HLTS",
+      "desc": "Entrei pra cuidar do tráfego e acabei resolvendo um gargalo do time: criei do zero um sistema de landing pages com captação e exportação de leads que a empresa passou a usar no dia a dia."
     },
-    "2026": {
-      "title": "Loog.ai + YouTube",
-      "description": "Entrei para o time de vendas da Loog.ai e levei minha jornada pro YouTube: viagens, crescimento e vida real."
-    },
-    "today": {
-      "title": "Construindo o próximo capítulo",
-      "description": "Crescendo 1% por dia. O melhor ainda está por vir."
+    "agencies": {
+      "role": "Gestor de Tráfego",
+      "place": "Agências de marketing",
+      "desc": "Onde tudo começou: gestão de campanhas pagas no Google Ads e Meta Ads, geração de leads, análise de métricas, relatórios e otimização de ROI para clientes de vários segmentos."
     }
+  },
+  "side_projects": {
+    "kadenduo": {
+      "name": "Kadenduo",
+      "tag": "Projeto atual",
+      "desc": "Automação de prospecção comercial: encontra empresas em qualquer cidade do Brasil, separa quem tem e quem não tem site, e organiza os contatos prontos pra abordagem."
+    },
+    "finance_card": {
+      "name": "Finance Card",
+      "tag": "Feira escolar",
+      "desc": "Banco digital educativo que idealizei e criei pra uma feira da escola: simulação de investimentos, educação financeira e até plataforma pra contratar professores. Foi muito elogiado na apresentação."
+    },
+    "null_forge": {
+      "name": "Null Forge",
+      "tag": "Projeto pessoal",
+      "desc": "Plataforma gratuita pra ajudar quem está começando na programação — porque conhecimento bom é conhecimento compartilhado."
+    }
+  },
+  "goals": {
+    "subtitle": "Metas que me tiram da cama todos os dias:",
+    "international": "Trabalhar em empresas internacionais",
+    "abroad": "Morar fora do Brasil",
+    "usa": "Estudar e fazer faculdade nos EUA",
+    "youtube": "Viver também do canal no YouTube"
   },
   "values": {
     "people_first": {
@@ -132,7 +159,7 @@
     "social_title": "Onde me encontrar"
   },
   "footer": {
-    "tagline": "Vendedor, CEO do Facility e criador de conteúdo sobre viagens e crescimento. Uberlândia, Brasil.",
+    "tagline": "Vendedor, CEO do Facility e criador de conteúdo sobre viagens e crescimento.",
     "built_with": "Feito com muito café e boas conversas.",
     "rights": "Todos os direitos reservados.",
     "nav_title": "Navegação",

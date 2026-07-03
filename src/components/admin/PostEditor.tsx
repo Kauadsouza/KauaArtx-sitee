@@ -158,7 +158,7 @@ export default function PostEditor({ post }: PostEditorProps) {
                     setSlugTouched(true);
                   }}
                   placeholder="meu-post"
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-sm font-mono outline-none focus:border-accent transition-colors"
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base font-mono outline-none focus:border-accent transition-colors"
                 />
               </div>
               <div>
@@ -169,7 +169,7 @@ export default function PostEditor({ post }: PostEditorProps) {
                   value={coverUrl}
                   onChange={(e) => setCoverUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-sm outline-none focus:border-accent transition-colors"
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base outline-none focus:border-accent transition-colors"
                 />
               </div>
             </div>
@@ -182,7 +182,7 @@ export default function PostEditor({ post }: PostEditorProps) {
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 placeholder="Uma frase que resume o post..."
-                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-sm outline-none focus:border-accent transition-colors"
+                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base outline-none focus:border-accent transition-colors"
               />
             </div>
 
@@ -195,7 +195,7 @@ export default function PostEditor({ post }: PostEditorProps) {
                 onChange={(e) => setContent(e.target.value)}
                 rows={20}
                 placeholder={'Escreve aqui seu post...\n\n## Um título de seção\n\nUm parágrafo normal com **negrito** e *itálico*.\n\n- Um item de lista\n- Outro item'}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-sm leading-relaxed outline-none focus:border-accent transition-colors resize-y"
+                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base leading-relaxed outline-none focus:border-accent transition-colors resize-y"
               />
             </div>
 

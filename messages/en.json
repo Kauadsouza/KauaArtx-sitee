@@ -11,7 +11,6 @@
     "tagline": "I believe everything in life is about people. I sell, I build, I travel, and I share every step of this growth journey.",
     "cta_youtube": "My YouTube channel",
     "cta_contact": "Talk to me",
-    "based_in": "Uberlândia, Brazil",
     "open_to": "Always on the move",
     "chip_sales": "Sales at Loog.ai",
     "chip_ceo": "CEO of Facility",
@@ -22,7 +21,7 @@
     "subtitle": "Three fronts, one purpose: connecting people and creating growth.",
     "loog_title": "Sales at Loog.ai",
     "loog_tag": "Salesperson",
-    "loog_desc": "I'm part of the sales team at Loog.ai, a Brazilian AI-powered logistics platform. My job is to listen, understand, and show how technology solves real problems.",
+    "loog_desc": "I'm part of the sales team at Loog.ai, a Brazilian AI-powered logistics platform. Discovery, lead qualification, follow-up, and presentations — my job is to listen and show how technology solves real problems.",
     "facility_title": "Facility",
     "facility_tag": "CEO & Founder",
     "facility_desc": "At Facility, we talk to each client, understand their needs, and deliver the tailor-made system they asked for. No fluff: listen, solve, deliver.",
@@ -55,40 +54,68 @@
   "about": {
     "title": "About me",
     "subtitle": "Salesperson by vocation, entrepreneur by choice, and forever a learner.",
-    "bio_1": "My name is Kauã Souza and, before any role or title, I'm someone who loves people. Early on I learned that selling isn't pushing a product — it's listening, understanding what someone needs, and truly helping. That vision shaped everything I do today.",
-    "bio_2": "I started early in the digital world: I built online stores, learned marketing hands-on, and in 2023 I worked at Construtora Pacaembu handling leads, campaigns, and conversion. There I saw up close that results come from relationships — not luck.",
-    "bio_3": "Today I live on three fronts: I'm a salesperson at Loog.ai, a Brazilian AI-powered logistics platform; I'm the CEO of Facility, where we understand each client's needs and deliver the system they're looking for; and I create YouTube content about travel and personal growth.",
-    "bio_4": "Programming? It's a hobby I enjoy — it helps me understand product and talk shop with any technical team. But my game is different: people, business, and constant evolution. My focus is growing 1% every day and bringing as many people along as I can.",
-    "timeline_title": "My journey",
+    "bio_1": "My name is Kauã, I'm 18 years old and, before any role or title, I'm someone who loves people. Early on I learned that selling isn't pushing a product — it's listening, understanding what someone needs, and truly helping. Today, sales is my focus and what I love doing.",
+    "bio_2": "I started in digital marketing as a traffic manager: I worked at agencies and companies running Google Ads and Meta Ads campaigns, generating leads, and optimizing results. At one of them, HLTS, the team was stuck waiting on third parties to build landing pages — so I solved it myself: I built from scratch a landing page and lead capture system the company started using. That's where I learned my biggest lesson: understanding the problem is worth more than any tool.",
+    "bio_3": "Today I live on three fronts: I'm a salesperson at Loog.ai, a Brazilian AI-powered logistics platform, doing discovery, qualification, and sales meetings; I'm the CEO of Facility, where we understand each client's needs and deliver the system they're looking for; and I create YouTube content about travel and personal growth.",
+    "bio_4": "Technology for me is a tool, not an identity: I enjoy automating, building systems, and studying AI — but always in service of solving business problems. My game is people, sales, and constant evolution: growing 1% every day and bringing as many people along as I can.",
+    "experience_title": "Where I've been",
+    "projects_title": "Projects I brought to life",
+    "goals_title": "Where I'm going",
     "values_title": "What I believe in",
     "cta_contact": "Talk to me",
     "cta_youtube": "Visit the channel"
   },
-  "timeline": {
-    "2022": {
-      "title": "First steps in digital",
-      "description": "Built my first online stores and discovered my passion: selling and connecting with people."
+  "experience": {
+    "current_badge": "Current",
+    "loog": {
+      "role": "Sales",
+      "place": "Loog.ai",
+      "desc": "Sales team of the AI-powered logistics platform: sales meetings, discovery, company research and qualification, follow-up, requirements gathering, and presentations."
     },
-    "2023": {
-      "title": "Construtora Pacaembu",
-      "description": "Worked with leads, campaigns, and conversion. Learned that results at scale come from process and relationships."
+    "facility": {
+      "role": "CEO & Founder",
+      "place": "Facility",
+      "desc": "My venture as an entrepreneur: we talk to the client, understand their operation, and deliver the tailor-made system that truly solves the problem."
     },
-    "2024": {
-      "title": "My own projects",
-      "description": "Took ideas off paper and learned firsthand what it takes to build from scratch — failing, adjusting, evolving."
+    "diamond": {
+      "role": "Traffic Manager",
+      "place": "Diamond Luxury Real Estate",
+      "desc": "Campaigns for the high-end real estate market: Google Ads, Meta Ads, qualified lead generation, and creating business opportunities."
     },
-    "2025": {
-      "title": "Facility is born",
-      "description": "Founded Facility: we listen to the client, understand the need, and deliver a tailor-made system."
+    "hlts": {
+      "role": "Traffic Manager",
+      "place": "HLTS",
+      "desc": "I joined to run paid traffic and ended up solving a team bottleneck: I built from scratch a landing page system with lead capture and export that the company adopted in its daily work."
     },
-    "2026": {
-      "title": "Loog.ai + YouTube",
-      "description": "Joined the Loog.ai sales team and took my journey to YouTube: travel, growth, and real life."
-    },
-    "today": {
-      "title": "Building the next chapter",
-      "description": "Growing 1% a day. The best is yet to come."
+    "agencies": {
+      "role": "Traffic Manager",
+      "place": "Marketing agencies",
+      "desc": "Where it all started: managing paid campaigns on Google Ads and Meta Ads, lead generation, metrics analysis, reporting, and ROI optimization for clients across industries."
     }
+  },
+  "side_projects": {
+    "kadenduo": {
+      "name": "Kadenduo",
+      "tag": "Current project",
+      "desc": "Sales prospecting automation: finds companies in any city in Brazil, separates those with and without a website, and organizes contacts ready for outreach."
+    },
+    "finance_card": {
+      "name": "Finance Card",
+      "tag": "School fair",
+      "desc": "An educational digital bank I designed and built for a school fair: investment simulations, financial education, and even a platform to hire teachers. It got a lot of praise at the presentation."
+    },
+    "null_forge": {
+      "name": "Null Forge",
+      "tag": "Personal project",
+      "desc": "A free platform to help people getting started in programming — because good knowledge is shared knowledge."
+    }
+  },
+  "goals": {
+    "subtitle": "Goals that get me out of bed every day:",
+    "international": "Work at international companies",
+    "abroad": "Live abroad",
+    "usa": "Study and attend college in the USA",
+    "youtube": "Also make a living from my YouTube channel"
   },
   "values": {
     "people_first": {
@@ -132,7 +159,7 @@
     "social_title": "Where to find me"
   },
   "footer": {
-    "tagline": "Salesperson, CEO of Facility, and content creator about travel and growth. Uberlândia, Brazil.",
+    "tagline": "Salesperson, CEO of Facility, and content creator about travel and growth.",
     "built_with": "Made with lots of coffee and good conversations.",
     "rights": "All rights reserved.",
     "nav_title": "Navigation",

@@ -16,7 +16,7 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative rounded-3xl overflow-hidden p-12 sm:p-20 text-center bg-surface border border-border shadow-sm"
+          className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-20 text-center bg-surface border border-border shadow-sm"
         >
           {/* Hairline gradiente no topo */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px hairline-gradient" />

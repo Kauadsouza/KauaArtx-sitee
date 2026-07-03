@@ -3,11 +3,35 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
-import { ArrowRight, Youtube, Heart, TrendingUp, PackageCheck, Share2 } from 'lucide-react';
+import {
+  ArrowRight, Youtube, Heart, TrendingUp, PackageCheck, Share2,
+  Briefcase, Rocket, Megaphone, Building2, Globe2, Plane, GraduationCap,
+  Sparkles, Wrench, School,
+} from 'lucide-react';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
-const TIMELINE_KEYS = ['2022', '2023', '2024', '2025', '2026', 'today'] as const;
+// Ordem: mais recente primeiro
+const EXPERIENCES = [
+  { key: 'loog', icon: Briefcase, current: true },
+  { key: 'facility', icon: Rocket, current: true },
+  { key: 'diamond', icon: Building2, current: false },
+  { key: 'hlts', icon: Wrench, current: false },
+  { key: 'agencies', icon: Megaphone, current: false },
+] as const;
+
+const PROJECTS = [
+  { key: 'kadenduo', icon: Sparkles, color: 'bg-accent/10 text-accent-deep' },
+  { key: 'finance_card', icon: School, color: 'bg-accent-2/10 text-accent-2-deep' },
+  { key: 'null_forge', icon: Share2, color: 'bg-accent/10 text-accent-deep' },
+] as const;
+
+const GOALS = [
+  { key: 'international', icon: Globe2 },
+  { key: 'abroad', icon: Plane },
+  { key: 'usa', icon: GraduationCap },
+  { key: 'youtube', icon: Youtube },
+] as const;
 
 const VALUES = [
   { key: 'people_first', icon: Heart, color: 'bg-accent-2/10 text-accent-2-deep' },
@@ -18,7 +42,9 @@ const VALUES = [
 
 export default function AboutPage() {
   const t = useTranslations('about');
-  const timeline = useTranslations('timeline');
+  const exp = useTranslations('experience');
+  const projects = useTranslations('side_projects');
+  const goals = useTranslations('goals');
   const values = useTranslations('values');
 
   return (
@@ -31,12 +57,12 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="py-16 sm:py-20"
+          className="py-12 sm:py-20"
         >
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground mb-5">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground mb-5">
             {t('title')}
           </h1>
-          <p className="text-xl sm:text-2xl font-semibold mb-2">
+          <p className="text-lg sm:text-2xl font-semibold mb-2">
             <span className="text-gradient">{t('subtitle')}</span>
           </p>
         </motion.div>
@@ -46,7 +72,7 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="space-y-6 text-lg text-foreground-muted leading-relaxed mb-20"
+          className="space-y-6 text-base sm:text-lg text-foreground-muted leading-relaxed mb-16 sm:mb-20"
         >
           <p>{t('bio_1')}</p>
           <p>{t('bio_2')}</p>
@@ -54,58 +80,150 @@ export default function AboutPage() {
           <p>{t('bio_4')}</p>
         </motion.div>
 
-        {/* Timeline */}
-        <section className="mb-20">
+        {/* Experiências */}
+        <section className="mb-16 sm:mb-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-10"
+            className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-8 sm:mb-10"
           >
-            {t('timeline_title')}
+            {t('experience_title')}
           </motion.h2>
 
-          <div className="relative pl-8 border-l-2 border-border space-y-10">
-            {TIMELINE_KEYS.map((key, i) => (
+          <div className="space-y-4">
+            {EXPERIENCES.map(({ key, icon: Icon, current }, i) => (
               <motion.div
                 key={key}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.06 }}
-                className="relative"
+                className="group flex flex-col sm:flex-row gap-4 p-5 sm:p-6 rounded-2xl bg-surface border border-border shadow-sm hover:shadow-lg hover:border-border-strong transition-all duration-300"
               >
-                {/* Ponto na linha */}
-                <span
-                  className={`absolute -left-[41px] top-1 w-4 h-4 rounded-full border-4 border-background ${
-                    key === 'today'
-                      ? 'bg-gradient-to-r from-accent-bright to-accent-2'
-                      : 'bg-border-strong'
+                <div
+                  className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${
+                    current
+                      ? 'bg-accent/10 text-accent-deep'
+                      : 'bg-surface-elevated text-foreground-subtle'
                   }`}
-                />
-                <span className="text-xs font-bold text-accent-deep uppercase tracking-widest">
-                  {key === 'today' ? '•' : key}
-                </span>
-                <h3 className="text-xl font-bold text-foreground mt-1 mb-1.5">
-                  {timeline(`${key}.title`)}
-                </h3>
-                <p className="text-foreground-muted leading-relaxed">
-                  {timeline(`${key}.description`)}
+                >
+                  <Icon size={20} />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-foreground">
+                      {exp(`${key}.place`)}
+                    </h3>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-surface-elevated border border-border text-foreground-muted font-semibold">
+                      {exp(`${key}.role`)}
+                    </span>
+                    {current && (
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-accent/10 border border-accent/25 text-accent-deep font-bold">
+                        {exp('current_badge')}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-foreground-muted leading-relaxed">
+                    {exp(`${key}.desc`)}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Projetos próprios */}
+        <section className="mb-16 sm:mb-20">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-8 sm:mb-10"
+          >
+            {t('projects_title')}
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {PROJECTS.map(({ key, icon: Icon, color }, i) => (
+              <motion.div
+                key={key}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="group flex flex-col p-6 rounded-2xl bg-surface border border-border shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${color}`}>
+                  <Icon size={20} />
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <h3 className="text-lg font-bold text-foreground">
+                    {projects(`${key}.name`)}
+                  </h3>
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-elevated border border-border text-foreground-muted font-semibold">
+                    {projects(`${key}.tag`)}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground-muted leading-relaxed">
+                  {projects(`${key}.desc`)}
                 </p>
               </motion.div>
             ))}
           </div>
         </section>
 
+        {/* Objetivos */}
+        <section className="mb-16 sm:mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative rounded-3xl overflow-hidden p-7 sm:p-12 bg-surface border border-border shadow-sm"
+          >
+            <div className="orb w-[280px] h-[280px] -top-20 -right-16 bg-accent-2/15 animate-float-slow" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px hairline-gradient" />
+
+            <div className="relative">
+              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight mb-2">
+                <span className="text-gradient">{t('goals_title')}</span>
+              </h2>
+              <p className="text-foreground-muted mb-8">{goals('subtitle')}</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {GOALS.map(({ key, icon: Icon }, i) => (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.1 + i * 0.08 }}
+                    className="flex items-center gap-3 p-4 rounded-2xl bg-surface-elevated/70 border border-border"
+                  >
+                    <div className="w-9 h-9 shrink-0 rounded-xl bg-accent/10 text-accent-deep flex items-center justify-center">
+                      <Icon size={17} />
+                    </div>
+                    <span className="text-sm font-semibold text-foreground">
+                      {goals(key)}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
         {/* Values */}
-        <section className="mb-20">
+        <section className="mb-16 sm:mb-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-10"
+            className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-8 sm:mb-10"
           >
             {t('values_title')}
           </motion.h2>
@@ -135,7 +253,7 @@ export default function AboutPage() {
         </section>
 
         {/* CTAs */}
-        <section className="pb-24 flex flex-wrap gap-4">
+        <section className="pb-24 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
           <a
             href={YOUTUBE_URL}
             target="_blank"

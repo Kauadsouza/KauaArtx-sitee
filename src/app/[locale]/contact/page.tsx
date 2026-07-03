@@ -54,7 +54,7 @@ export default function ContactPage() {
 
   const inputClass = (hasError?: boolean) =>
     cn(
-      'w-full px-4 py-3 rounded-lg border bg-surface text-foreground text-sm placeholder:text-foreground-subtle outline-none transition-all',
+      'w-full px-4 py-3 rounded-xl border bg-surface text-foreground text-base placeholder:text-foreground-subtle outline-none transition-all',
       hasError
         ? 'border-red-500/50 focus:border-red-500'
         : 'border-border focus:border-accent-bright hover:border-border-strong'
