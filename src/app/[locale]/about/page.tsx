@@ -208,14 +208,14 @@ export default function AboutPage() {
         <section className="pb-24 flex flex-wrap gap-4">
           <Link
             href="/now"
-            className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-surface hover:border-border-strong hover:bg-surface-elevated text-foreground-muted hover:text-foreground font-medium text-sm transition-all"
+            className="group btn-pill-secondary text-sm"
           >
             {t('cta_now')}
             <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <Link
             href="/contact"
-            className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent hover:bg-accent-bright text-foreground font-medium text-sm transition-all"
+            className="group btn-pill-primary text-sm"
           >
             {t('cta_contact')}
             <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />

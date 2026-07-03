@@ -33,7 +33,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="group inline-block">
-              <span className="font-mono text-3xl font-bold text-foreground group-hover:text-accent-glow transition-colors">
+              <span className="font-mono text-3xl font-bold text-gradient">
                 K.
               </span>
             </Link>

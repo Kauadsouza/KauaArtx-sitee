@@ -1,30 +1,45 @@
 @import "tailwindcss";
 
+/* dark: segue a classe .dark (next-themes), não o prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ── Dynamic theme tokens ─────────────────────────────── */
 :root {
-  /* Light mode (default) */
-  --bg:              #f7f7f7;
+  /* Light mode (default) — Apple-like neutrals */
+  --bg:              #fbfbfd;
   --surface:         #ffffff;
-  --surface-el:      #f0f0f0;
-  --border-col:      #e4e4e4;
-  --border-str:      #cccccc;
-  --fg:              #111111;
-  --fg-muted:        #555555;
-  --fg-subtle:       #999999;
-  --accent:          #1F4D3A;
-  --accent-bright:   #2D7A5C;
-  --accent-glow:     #00FF88;
+  --surface-el:      #f2f2f7;
+  --border-col:      #e5e5ea;
+  --border-str:      #d1d1d6;
+  --fg:              #0a0a0c;
+  --fg-muted:        #55555c;
+  --fg-subtle:       #98989f;
+
+  /* Duo: verde + ciano */
+  --accent:          #0e9f6e;
+  --accent-bright:   #059669;
+  --accent-glow:     #00b368;
+  --accent2:         #0891b2;
+  --accent2-bright:  #0e7490;
+  --accent2-glow:    #06a6cc;
 }
 
 html.dark {
-  --bg:              #050505;
-  --surface:         #0A0A0A;
-  --surface-el:      #111111;
-  --border-col:      #1A1A1A;
-  --border-str:      #222222;
-  --fg:              #EDEDED;
-  --fg-muted:        #888888;
-  --fg-subtle:       #555555;
+  --bg:              #030304;
+  --surface:         #0a0a0c;
+  --surface-el:      #121215;
+  --border-col:      #1c1c1f;
+  --border-str:      #2a2a2e;
+  --fg:              #f5f5f7;
+  --fg-muted:        #8e8e96;
+  --fg-subtle:       #5a5a62;
+
+  --accent:          #00d96f;
+  --accent-bright:   #34e89e;
+  --accent-glow:     #00ff88;
+  --accent2:         #00d4ff;
+  --accent2-bright:  #67e8f9;
+  --accent2-glow:    #22d3ee;
 }
 
 /* ── Tailwind v4 theme (inline = runtime CSS vars) ──── */
@@ -40,6 +55,9 @@ html.dark {
   --color-accent:            var(--accent);
   --color-accent-bright:     var(--accent-bright);
   --color-accent-glow:       var(--accent-glow);
+  --color-accent-2:          var(--accent2);
+  --color-accent-2-bright:   var(--accent2-bright);
+  --color-accent-2-glow:     var(--accent2-glow);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -56,6 +74,32 @@ html.dark {
 @keyframes cursor-blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(30px, -30px) scale(1.08); }
+}
+
+@keyframes float-slower {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-40px, 20px) scale(1.12); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-glow) 50%, transparent); }
+  50%      { opacity: 0.7; box-shadow: 0 0 0 5px transparent; }
 }
 
 /* ── Base ─────────────────────────────────────────────── */
@@ -108,7 +152,8 @@ html.dark {
   .gradient-radial-green {
     background: radial-gradient(
       ellipse at center,
-      color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent) 0%,
+      color-mix(in srgb, var(--accent2) 4%, transparent) 45%,
       transparent 70%
     );
   }
@@ -116,30 +161,124 @@ html.dark {
   .gradient-radial-top {
     background: radial-gradient(
       ellipse at top,
-      color-mix(in srgb, var(--accent) 6%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 7%, transparent) 0%,
+      color-mix(in srgb, var(--accent2) 3%, transparent) 40%,
       transparent 60%
     );
   }
 
+  /* Glass — mais blur + saturação, estilo macOS */
   .glass {
-    background: color-mix(in srgb, var(--surface) 80%, transparent);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--border-col);
   }
 
   .glass-strong {
-    background: color-mix(in srgb, var(--surface-el) 90%, transparent);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background: color-mix(in srgb, var(--surface-el) 85%, transparent);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
     border: 1px solid var(--border-str);
   }
 
-  .text-gradient-green {
-    background: linear-gradient(135deg, var(--accent-glow), var(--accent-bright));
+  /* Texto gradiente verde → ciano, com shimmer animado */
+  .text-gradient {
+    background: linear-gradient(
+      100deg,
+      var(--accent-glow) 0%,
+      var(--accent2-glow) 45%,
+      var(--accent-glow) 90%
+    );
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: shimmer 6s ease-in-out infinite;
+  }
+
+  .text-gradient-green {
+    background: linear-gradient(135deg, var(--accent-glow), var(--accent2-glow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Orbes de luz difusa (aurora) */
+  .orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(110px);
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .animate-float-slow   { animation: float-slow 14s ease-in-out infinite; }
+  .animate-float-slower { animation: float-slower 18s ease-in-out infinite; }
+
+  /* Grid técnico sutil de fundo */
+  .bg-grid {
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--fg) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--fg) 4%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%);
+  }
+
+  /* Hairline gradiente (topo de cards) */
+  .hairline-gradient {
+    background: linear-gradient(90deg, transparent, var(--accent-glow), var(--accent2-glow), transparent);
+  }
+
+  /* Marquee infinito */
+  .animate-marquee         { animation: marquee 42s linear infinite; }
+  .animate-marquee-reverse { animation: marquee 42s linear infinite reverse; }
+  .marquee-mask {
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+
+  .animate-pulse-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
+
+  /* Botão primário — pill gradiente verde→ciano */
+  .btn-pill-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: 9999px;
+    background: linear-gradient(100deg, var(--accent-glow), var(--accent2-glow));
+    color: #04120b;
+    font-weight: 600;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+  }
+  .btn-pill-primary:hover {
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--accent-glow) 35%, transparent),
+      0 0 48px color-mix(in srgb, var(--accent2-glow) 20%, transparent);
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+
+  .btn-pill-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--border-str);
+    color: var(--fg-muted);
+    font-weight: 500;
+    transition: color 0.2s ease, border-color 0.2s ease, transform 0.3s ease;
+  }
+  .btn-pill-secondary:hover {
+    color: var(--fg);
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border-str));
+    transform: translateY(-1px);
   }
 
   .hide-cursor  { cursor: none !important; }
@@ -150,6 +289,6 @@ html.dark {
   html:not(.dark) .circuit-bg { opacity: 0.30; }
 
   /* Véu leve — legibilidade sem matar o efeito */
-  html.dark       .circuit-veil { background: rgba(5,5,5,0.50); }
-  html:not(.dark) .circuit-veil { background: rgba(247,247,247,0.72); }
+  html.dark       .circuit-veil { background: rgba(3,3,4,0.55); }
+  html:not(.dark) .circuit-veil { background: rgba(251,251,253,0.75); }
 }

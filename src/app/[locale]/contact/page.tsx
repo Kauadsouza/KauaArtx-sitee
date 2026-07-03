@@ -182,11 +182,11 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="group w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-60 disabled:cursor-not-allowed text-foreground font-medium text-sm transition-all"
+                  className="group w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-accent-glow to-accent-2-glow text-[#04120b] hover:brightness-105 hover:shadow-[0_0_24px_rgba(0,255,136,0.25)] disabled:opacity-60 disabled:cursor-not-allowed font-semibold text-sm transition-all"
                 >
                   {status === 'loading' ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-[#04120b]/30 border-t-[#04120b] rounded-full animate-spin" />
                       {t('form_sending')}
                     </>
                   ) : (

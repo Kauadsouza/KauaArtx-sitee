@@ -16,21 +16,23 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative rounded-2xl border border-border bg-surface overflow-hidden p-12 sm:p-16 text-center"
+          className="relative rounded-3xl glass overflow-hidden p-12 sm:p-20 text-center"
         >
-          {/* Radial glow */}
+          {/* Hairline gradiente no topo */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px hairline-gradient" />
+
+          {/* Aurora interna */}
+          <div className="orb w-[340px] h-[340px] -top-24 -left-16 bg-accent/20 dark:bg-accent/15 animate-float-slow" />
+          <div className="orb w-[300px] h-[300px] -bottom-20 -right-12 bg-accent-2/15 dark:bg-accent-2/12 animate-float-slower" />
           <div className="absolute inset-0 gradient-radial-green pointer-events-none" />
 
-          <h2 className="relative text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-4 tracking-tight">
-            {t('title')}
+          <h2 className="relative text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter mb-5">
+            <span className="text-gradient">{t('title')}</span>
           </h2>
-          <p className="relative text-foreground-muted mb-10 text-lg max-w-lg mx-auto">
+          <p className="relative text-foreground-muted mb-12 text-lg max-w-lg mx-auto leading-relaxed">
             {t('subtitle')}
           </p>
-          <Link
-            href="/contact"
-            className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-accent hover:bg-accent-bright text-foreground font-semibold text-base transition-all duration-200 hover:shadow-xl hover:shadow-accent/20"
-          >
+          <Link href="/contact" className="group relative btn-pill-primary text-base">
             {t('button')}
             <ArrowRight
               size={16}

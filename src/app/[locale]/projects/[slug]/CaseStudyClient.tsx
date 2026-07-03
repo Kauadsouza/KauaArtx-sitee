@@ -83,7 +83,7 @@ export default function CaseStudyClient({ project }: { project: Project }) {
                 href={project.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent-bright text-foreground text-sm font-medium transition-all"
+                className="btn-pill-primary text-sm"
               >
                 <ExternalLink size={13} />
                 {t('links')} ↗

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useMotionTemplate, useSpring, useTransform } from 'framer-motion';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { useRef, MouseEvent } from 'react';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,8 @@ const PROJECTS = [
     status: 'production' as const,
     externalUrl: 'https://thekaden.com.br',
     category: 'SaaS',
-    gradient: 'from-accent/20 to-transparent',
+    gradient: 'from-accent/15 to-transparent',
+    glow: 'rgba(0,255,136,0.10)',
   },
   {
     slug: 'condor',
@@ -26,7 +27,8 @@ const PROJECTS = [
     status: 'development' as const,
     externalUrl: null,
     category: 'AI',
-    gradient: 'from-purple-900/20 to-transparent',
+    gradient: 'from-accent-2/15 to-transparent',
+    glow: 'rgba(0,212,255,0.10)',
   },
   {
     slug: 'null-forge',
@@ -36,14 +38,15 @@ const PROJECTS = [
     status: 'building' as const,
     externalUrl: null,
     category: 'Educação',
-    gradient: 'from-blue-900/20 to-transparent',
+    gradient: 'from-accent/10 via-accent-2/10 to-transparent',
+    glow: 'rgba(0,230,190,0.10)',
   },
 ];
 
 const STATUS_STYLES = {
-  production: 'text-accent-bright bg-accent/20 border-accent/30',
-  development: 'text-purple-400 bg-purple-900/20 border-purple-800/30',
-  building: 'text-blue-400 bg-blue-900/20 border-blue-800/30',
+  production: 'text-accent-bright bg-accent/15 border-accent/30',
+  development: 'text-accent-2 bg-accent-2/10 border-accent-2/30',
+  building: 'text-foreground-muted bg-surface-elevated border-border-strong',
 };
 
 const STATUS_LABELS = {
@@ -63,6 +66,7 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS[0]; index: n
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-4, 4]), { stiffness: 300, damping: 30 });
   const glowX = useTransform(mouseX, [-0.5, 0.5], [0, 100]);
   const glowY = useTransform(mouseY, [-0.5, 0.5], [0, 100]);
+  const spotlight = useMotionTemplate`radial-gradient(320px circle at ${glowX}% ${glowY}%, ${project.glow}, transparent 70%)`;
 
   const onMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const rect = cardRef.current?.getBoundingClientRect();
@@ -83,36 +87,38 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS[0]; index: n
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       style={{ perspective: 1000 }}
+      className="h-full"
     >
       <motion.div
         ref={cardRef}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         style={{ rotateX, rotateY }}
-        className="relative group flex flex-col p-6 rounded-lg border border-border bg-surface hover:border-border-strong transition-colors duration-300 overflow-hidden h-full"
+        className="relative group flex flex-col p-7 rounded-2xl glass hover:border-border-strong transition-colors duration-300 overflow-hidden h-full"
       >
-        {/* Spotlight glow */}
+        {/* Hairline gradiente no topo */}
+        <div className="absolute top-0 left-0 right-0 h-px hairline-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Spotlight que segue o mouse */}
         <motion.div
           className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: `radial-gradient(300px circle at ${glowX}% ${glowY}%, rgba(31,77,58,0.08), transparent 70%)`,
-          }}
+          style={{ background: spotlight }}
         />
 
-        {/* Gradient */}
-        <div className={cn('absolute inset-0 bg-gradient-to-br opacity-40', project.gradient)} />
+        {/* Gradiente de fundo */}
+        <div className={cn('absolute inset-0 bg-gradient-to-br opacity-50', project.gradient)} />
 
-        <div className="relative">
+        <div className="relative flex flex-col h-full">
           {/* Status + Category */}
-          <div className="flex items-center justify-between mb-4">
-            <span className={cn('text-xs px-2 py-0.5 rounded border font-mono', STATUS_STYLES[project.status])}>
+          <div className="flex items-center justify-between mb-5">
+            <span className={cn('text-xs px-3 py-1 rounded-full border font-mono', STATUS_STYLES[project.status])}>
               {STATUS_LABELS[project.status]}
             </span>
-            <span className="text-xs text-foreground-subtle">{project.category}</span>
+            <span className="text-xs text-foreground-subtle font-mono">{project.category}</span>
           </div>
 
           {/* Name */}
-          <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-accent-bright transition-colors">
+          <h3 className="text-2xl font-bold tracking-tight text-foreground mb-2 group-hover:text-accent-bright transition-colors">
             {project.name}
           </h3>
 
@@ -126,7 +132,7 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS[0]; index: n
             {project.stack.map((tech) => (
               <span
                 key={tech}
-                className="text-xs px-2 py-0.5 rounded bg-surface-elevated border border-border text-foreground-subtle font-mono"
+                className="text-xs px-2.5 py-1 rounded-full bg-surface-elevated/80 border border-border text-foreground-subtle font-mono"
               >
                 {tech}
               </span>
@@ -147,7 +153,7 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS[0]; index: n
                 href={project.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-auto p-2 rounded-md text-foreground-subtle hover:text-accent-bright hover:bg-surface-elevated transition-all"
+                className="ml-auto p-2 rounded-full text-foreground-subtle hover:text-accent-bright hover:bg-surface-elevated transition-all"
                 aria-label={`Visitar ${project.name}`}
               >
                 <ExternalLink size={14} />
@@ -175,14 +181,14 @@ export default function FeaturedProjects() {
           className="flex items-end justify-between mb-12"
         >
           <div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3">
               {t('title')}
             </h2>
             <p className="text-foreground-muted">{t('subtitle')}</p>
           </div>
           <Link
             href="/projects"
-            className="hidden sm:inline-flex items-center gap-1.5 text-sm text-foreground-muted hover:text-foreground transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm text-foreground-muted hover:text-accent-bright transition-colors"
           >
             {t('view_all')}
             <ArrowRight size={13} />
