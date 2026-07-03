@@ -6,14 +6,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
-import { Github, Instagram, Linkedin, Youtube, Mail, SendHorizonal, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Instagram, Linkedin, Youtube, Mail, SendHorizonal, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SOCIALS = [
   { href: 'mailto:kauadsouza@gmail.com', icon: Mail, label: 'Email', handle: 'kauadsouza@gmail.com' },
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram', handle: '@kauaartx' },
   { href: 'https://www.linkedin.com/in/kauadsouza', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
-  { href: 'https://github.com/Kauadsouza', icon: Github, label: 'GitHub', handle: 'Kauadsouza' },
   { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube', handle: '@KauartX' },
 ];
 
@@ -72,8 +71,7 @@ export default function ContactPage() {
           transition={{ duration: 0.7 }}
           className="py-16 sm:py-24"
         >
-          <p className="text-accent-bright font-mono text-sm mb-4">/ contato</p>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tracking-tighter mb-6">
             {t('title')}
           </h1>
           <p className="text-xl text-foreground-muted max-w-2xl">{t('subtitle')}</p>
@@ -182,11 +180,11 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="group w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-accent-glow to-accent-2-glow text-[#04120b] hover:brightness-105 hover:shadow-[0_0_24px_rgba(0,255,136,0.25)] disabled:opacity-60 disabled:cursor-not-allowed font-semibold text-sm transition-all"
+                  className="group w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-accent-bright to-accent-2 text-[#201304] hover:brightness-105 hover:shadow-[0_8px_24px_rgba(0,200,83,0.3)] disabled:opacity-60 disabled:cursor-not-allowed font-bold text-sm transition-all"
                 >
                   {status === 'loading' ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-[#04120b]/30 border-t-[#04120b] rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-[#201304]/30 border-t-[#201304] rounded-full animate-spin" />
                       {t('form_sending')}
                     </>
                   ) : (

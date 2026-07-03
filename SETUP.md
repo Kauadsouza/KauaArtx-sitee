@@ -1,37 +1,40 @@
-# Portfolio Kauã Souza — Setup Guide
+# Site pessoal — Kauã Souza
+
+Site sobre o Kauã: vendedor na Loog.ai, CEO do Facility e criador de conteúdo
+no YouTube sobre viagens e crescimento pessoal.
 
 ## Stack
 
 - **Next.js 15** (App Router) + **TypeScript**
-- **Tailwind CSS v4** + utilitários customizados
-- **Framer Motion** — todas as animações
-- **next-intl** — i18n PT / EN / ES
+- **Tailwind CSS v4** — design claro com verde vivo + laranja
+- **Framer Motion** — animações
+- **next-intl** — PT / EN
+- **Supabase** — blog + login do painel admin
 - **Resend** — formulário de contato
-- **Lucide Icons** — ícones
 
-## Requisitos
+## Páginas
 
-- Node.js 18+
-- npm 9+
-- Conta no [Resend](https://resend.com) (gratuita para até 3.000 emails/mês)
+| Rota | O que é |
+|------|---------|
+| `/` | Home: quem é o Kauã, o que faz, YouTube e últimos posts |
+| `/about` | História, jornada e valores |
+| `/blog` | Posts publicados (vêm do Supabase) |
+| `/blog/[slug]` | Página de cada post |
+| `/contact` | Formulário + redes sociais |
+| `/admin` | Painel do blog (precisa de login) |
 
----
-
-## Variáveis de Ambiente
-
-Copie `.env.local` e preencha:
+## Variáveis de ambiente
 
 ```env
-# Obtenha em resend.com/api-keys
+# Formulário de contato — resend.com/api-keys
 RESEND_API_KEY=re_xxxxxxxxxxxx
 
-# Seu username do GitHub (já preenchido)
-NEXT_PUBLIC_GITHUB_USERNAME=Kauadsouza
+# Blog + admin — veja SETUP-SUPABASE.md
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxxx
 ```
 
----
-
-## Como Rodar Localmente
+## Como rodar localmente
 
 ```bash
 npm install
@@ -39,103 +42,17 @@ npm run dev
 # → http://localhost:3000
 ```
 
-## Build de Produção
+## Blog / Admin
 
-```bash
-npm run build
-npm run start
-```
+Siga o **[SETUP-SUPABASE.md](SETUP-SUPABASE.md)** (passo a passo completo).
+Depois é só acessar `/admin`, logar e postar.
 
----
+## Como editar conteúdo
 
-## Deploy na Vercel
+- **Textos do site**: [messages/pt.json](messages/pt.json) e [messages/en.json](messages/en.json)
+- **Links de redes sociais**: `src/components/layout/Footer.tsx` e `src/app/[locale]/contact/page.tsx`
+- **Posts do blog**: pelo painel `/admin` (não precisa mexer em código)
 
-1. Conecte o repositório `Site-Kauadsouza` na Vercel
-2. Vá em **Settings → Environment Variables** e adicione:
-   - `RESEND_API_KEY` = sua chave do Resend
-3. Deploy automático em cada push para `main`
+## Deploy
 
----
-
-## Como Editar Conteúdo
-
-### Página `/now`
-Edite diretamente em [src/app/[locale]/now/page.tsx](src/app/[locale]/now/page.tsx).
-O array `NOW_DATA` contém as 4 seções. Troque os items quando quiser.
-Atualize também a data no texto `"atualizado em..."`.
-
-### Projetos (case studies)
-Edite [src/lib/projects.ts](src/lib/projects.ts).
-Cada projeto tem: `overview`, `problem`, `solution`, `stack`, `lessons`, `nextSteps`.
-
-### Textos / Traduções
-- Português: [messages/pt.json](messages/pt.json)
-- Inglês: [messages/en.json](messages/en.json)
-- Espanhol: [messages/es.json](messages/es.json)
-
-### Blog (MDX)
-Crie arquivos em `src/content/blog/`:
-
-```
-src/content/blog/
-  meu-primeiro-post.mdx
-  construindo-o-the-kaden.mdx
-```
-
-Frontmatter sugerido:
-```mdx
----
-title: "Meu primeiro post"
-date: "2026-05-07"
-tags: ["tech", "startup"]
-description: "Uma breve descrição para SEO."
----
-
-Conteúdo em Markdown aqui.
-```
-
-Depois implemente o loader em `src/app/[locale]/blog/[slug]/page.tsx`.
-
----
-
-## Easter Eggs
-
-| Ação | Resultado |
-|------|-----------|
-| `Ctrl + K` / `Cmd + K` | Abre o Command Palette |
-| Clica em **[sudo]** no terminal da Home | Abre terminal interativo full-screen |
-| Digite `matrix` no terminal interativo | Efeito Matrix por 5 segundos |
-| 1ª visita ao site | Boot sequence estilo Linux |
-
----
-
-## Estrutura de Pastas
-
-```
-src/
-  app/
-    [locale]/          → Páginas com suporte a i18n
-      page.tsx         → Home
-      about/           → Sobre
-      projects/        → Lista + case studies
-      now/             → Página /now
-      blog/            → Blog (MDX)
-      contact/         → Formulário + redes
-      faq/             → Perguntas frequentes
-    api/
-      contact/         → POST → envia email via Resend
-      github-stats/    → GET → stats do GitHub (cache 1h)
-  components/
-    layout/            → Header, Footer
-    sections/          → Hero, Terminal, Stats, etc.
-    animations/        → BootSequence, CustomCursor, ParticleGrid
-    commands/          → CommandPalette, InteractiveTerminal
-  lib/
-    projects.ts        → Dados dos case studies
-    utils.ts           → Funções utilitárias
-  i18n/
-    routing.ts         → Configuração de locales
-    request.ts         → Loader de mensagens
-messages/
-  pt.json / en.json / es.json
-```
+Push na branch `main` → a Vercel faz o deploy automático.

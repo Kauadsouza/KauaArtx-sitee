@@ -6,10 +6,6 @@ import { routing } from '@/i18n/routing';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PageTransition from '@/components/layout/PageTransition';
-import BootSequence from '@/components/animations/BootSequence';
-import CustomCursor from '@/components/animations/CustomCursor';
-import CircuitBackground from '@/components/animations/CircuitBackground';
-import CommandPalette from '@/components/commands/CommandPalette';
 
 export async function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -40,7 +36,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as 'pt' | 'en' | 'es')) {
+  if (!routing.locales.includes(locale as 'pt' | 'en')) {
     notFound();
   }
 
@@ -48,22 +44,11 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      {/* z-0: circuito animado */}
-      <CircuitBackground />
-      {/* z-[1]: véu semitransparente — protege legibilidade sem matar o efeito */}
-      <div className="circuit-veil fixed inset-0 z-[1] pointer-events-none" />
-
-      <BootSequence />
-      <CustomCursor />
-      <CommandPalette />
       <Header locale={locale} />
-
-      {/* z-10: todo o conteúdo acima */}
-      <main className="relative z-10 min-h-screen">
+      <main className="relative min-h-screen">
         <PageTransition>{children}</PageTransition>
       </main>
-
-      <div className="relative z-10"><Footer /></div>
+      <Footer />
     </NextIntlClientProvider>
   );
 }

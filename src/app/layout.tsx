@@ -1,57 +1,45 @@
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
-import { ThemeProvider } from 'next-themes';
 import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kauadsouzaal.vercel.app'),
   title: {
-    default: 'Kauã Souza — Full-Stack Developer & Founder',
+    default: 'Kauã Souza — Vendedor & Empreendedor',
     template: '%s | Kauã Souza',
   },
   description:
-    'Full-Stack Developer & Founder. Co-fundador do The Kaden, criador do CONDOR e da Null Forge. Construindo o futuro da tech brasileira.',
+    'Vendedor na Loog.ai, CEO do Facility e criador de conteúdo no YouTube sobre viagens e crescimento pessoal. Uberlândia, Brasil.',
   keywords: [
-    'Kauã Souza', 'Full-Stack Developer', 'Founder',
-    'Next.js', 'React', 'TypeScript',
-    'The Kaden', 'CONDOR', 'Null Forge', 'Uberlândia', 'Brasil',
+    'Kauã Souza', 'Vendedor', 'Empreendedor', 'Facility',
+    'Loog.ai', 'YouTube', 'Viagens', 'Crescimento pessoal',
+    'Uberlândia', 'Brasil',
   ],
-  authors: [{ name: 'Kauã Souza', url: 'https://github.com/Kauadsouza' }],
+  authors: [{ name: 'Kauã Souza' }],
   creator: 'Kauã Souza',
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
     url: 'https://kauadsouzaal.vercel.app',
-    title: 'Kauã Souza — Full-Stack Developer & Founder',
-    description: 'Full-Stack Developer & Founder. Co-fundador do The Kaden, criador do CONDOR e da Null Forge.',
+    title: 'Kauã Souza — Vendedor & Empreendedor',
+    description:
+      'Vendedor na Loog.ai, CEO do Facility e criador de conteúdo sobre viagens e crescimento pessoal.',
     siteName: 'Kauã Souza',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kauã Souza — Full-Stack Developer & Founder',
-    description: 'Full-Stack Developer & Founder baseado em Uberlândia, Brasil.',
+    title: 'Kauã Souza — Vendedor & Empreendedor',
+    description:
+      'Vendedor, CEO do Facility e criador de conteúdo sobre viagens e crescimento. Uberlândia, Brasil.',
   },
   robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="pt"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
-      suppressHydrationWarning
-    >
-      <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange={false}
-        >
-          {children}
-        </ThemeProvider>
-      </body>
+    <html lang="pt" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

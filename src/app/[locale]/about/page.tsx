@@ -2,221 +2,151 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { ArrowRight, Zap, Globe2, BookOpen, Target } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { ArrowRight, Youtube, Heart, TrendingUp, PackageCheck, Share2 } from 'lucide-react';
 
-const TIMELINE_KEYS = ['2022', '2023', '2024', '2025a', '2025b', '2026', 'today'] as const;
+const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
-const TIMELINE_YEARS: Record<typeof TIMELINE_KEYS[number], string> = {
-  '2022': '2022',
-  '2023': '2023',
-  '2024': '2024',
-  '2025a': 'Jan 2025',
-  '2025b': 'Jun 2025',
-  '2026': '2026',
-  'today': '→ Hoje',
-};
+const TIMELINE_KEYS = ['2022', '2023', '2024', '2025', '2026', 'today'] as const;
 
-const VALUE_ICONS = {
-  build_in_public: BookOpen,
-  move_fast: Zap,
-  tech_with_purpose: Target,
-  global_mindset: Globe2,
-};
-
-const VALUE_KEYS = ['build_in_public', 'move_fast', 'tech_with_purpose', 'global_mindset'] as const;
+const VALUES = [
+  { key: 'people_first', icon: Heart, color: 'bg-accent-2/10 text-accent-2-deep' },
+  { key: 'always_growing', icon: TrendingUp, color: 'bg-accent/10 text-accent-deep' },
+  { key: 'real_delivery', icon: PackageCheck, color: 'bg-accent/10 text-accent-deep' },
+  { key: 'share_the_journey', icon: Share2, color: 'bg-accent-2/10 text-accent-2-deep' },
+] as const;
 
 export default function AboutPage() {
   const t = useTranslations('about');
   const timeline = useTranslations('timeline');
   const values = useTranslations('values');
-  const [activeKey, setActiveKey] = useState<typeof TIMELINE_KEYS[number] | null>(null);
 
   return (
-    <div className="min-h-screen pt-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen pt-24 relative overflow-hidden">
+      <div className="orb w-[420px] h-[420px] top-[-6%] right-[-8%] bg-accent-2/20 animate-float-slow" />
 
+      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-8">
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="py-16 sm:py-24 max-w-3xl"
+          className="py-16 sm:py-20"
         >
-          <p className="text-accent-bright font-mono text-sm mb-4">/ sobre</p>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground mb-5">
             {t('title')}
           </h1>
-          <p className="text-xl text-foreground-muted">{t('subtitle')}</p>
+          <p className="text-xl sm:text-2xl font-semibold mb-2">
+            <span className="text-gradient">{t('subtitle')}</span>
+          </p>
         </motion.div>
 
         {/* Bio */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-16 pb-24 border-b border-border"
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="space-y-6 text-lg text-foreground-muted leading-relaxed mb-20"
         >
-          <div className="space-y-6">
-            {[t('bio_1'), t('bio_2')].map((bio, i) => (
-              <p key={i} className="text-foreground-muted leading-relaxed">{bio}</p>
-            ))}
-          </div>
-          <div className="space-y-6">
-            {[t('bio_3'), t('bio_4')].map((bio, i) => (
-              <p key={i} className="text-foreground-muted leading-relaxed">{bio}</p>
-            ))}
-          </div>
+          <p>{t('bio_1')}</p>
+          <p>{t('bio_2')}</p>
+          <p>{t('bio_3')}</p>
+          <p>{t('bio_4')}</p>
         </motion.div>
 
         {/* Timeline */}
-        <section className="py-24">
+        <section className="mb-20">
           <motion.h2
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-4xl font-bold text-foreground mb-16"
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-10"
           >
             {t('timeline_title')}
           </motion.h2>
 
-          <div className="relative">
-            {/* Vertical line (desktop) */}
-            <div className="hidden lg:block absolute left-[180px] top-0 bottom-0 w-px bg-border" />
-
-            <div className="space-y-6">
-              {TIMELINE_KEYS.map((key, i) => {
-                const isActive = activeKey === key;
-                const isLast = key === 'today';
-                return (
-                  <motion.div
-                    key={key}
-                    initial={{ opacity: 0, x: -24 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: '-50px' }}
-                    transition={{ duration: 0.5, delay: i * 0.07 }}
-                  >
-                    <button
-                      onClick={() => setActiveKey(isActive ? null : key)}
-                      className="w-full text-left group"
-                    >
-                      <div className="flex items-start gap-8 lg:gap-0">
-                        {/* Year label */}
-                        <div className="lg:w-[180px] shrink-0 pt-1">
-                          <span className={cn(
-                            'font-mono text-sm transition-colors',
-                            isActive ? 'text-accent-bright' : 'text-foreground-subtle group-hover:text-foreground-muted'
-                          )}>
-                            {TIMELINE_YEARS[key]}
-                          </span>
-                        </div>
-
-                        {/* Dot */}
-                        <div className="hidden lg:flex items-center justify-center w-0 relative">
-                          <div className={cn(
-                            'absolute w-3 h-3 rounded-full border-2 transition-all duration-200 -translate-x-1/2',
-                            isActive
-                              ? 'border-accent-bright bg-accent-bright scale-125'
-                              : 'border-border-strong bg-background group-hover:border-accent'
-                          )} />
-                        </div>
-
-                        {/* Content */}
-                        <div className="lg:pl-12 flex-1">
-                          <div className="flex items-center gap-3">
-                            <h3 className={cn(
-                              'font-semibold text-lg transition-colors',
-                              isActive ? 'text-foreground' : 'text-foreground-muted group-hover:text-foreground',
-                              isLast && 'text-accent-bright'
-                            )}>
-                              {timeline(`${key}.title` as 'today.title')}
-                            </h3>
-                            {isLast && (
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-accent-bright border border-accent/30 font-mono animate-pulse">
-                                live
-                              </span>
-                            )}
-                          </div>
-
-                          <AnimatePresence>
-                            {isActive && (
-                              <motion.p
-                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
-                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                                transition={{ duration: 0.25 }}
-                                className="text-foreground-subtle text-sm leading-relaxed overflow-hidden"
-                              >
-                                {timeline(`${key}.description` as 'today.description')}
-                              </motion.p>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      </div>
-                    </button>
-                  </motion.div>
-                );
-              })}
-            </div>
+          <div className="relative pl-8 border-l-2 border-border space-y-10">
+            {TIMELINE_KEYS.map((key, i) => (
+              <motion.div
+                key={key}
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.06 }}
+                className="relative"
+              >
+                {/* Ponto na linha */}
+                <span
+                  className={`absolute -left-[41px] top-1 w-4 h-4 rounded-full border-4 border-background ${
+                    key === 'today'
+                      ? 'bg-gradient-to-r from-accent-bright to-accent-2'
+                      : 'bg-border-strong'
+                  }`}
+                />
+                <span className="text-xs font-bold text-accent-deep uppercase tracking-widest">
+                  {key === 'today' ? '•' : key}
+                </span>
+                <h3 className="text-xl font-bold text-foreground mt-1 mb-1.5">
+                  {timeline(`${key}.title`)}
+                </h3>
+                <p className="text-foreground-muted leading-relaxed">
+                  {timeline(`${key}.description`)}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </section>
 
         {/* Values */}
-        <section className="py-24 border-t border-border">
+        <section className="mb-20">
           <motion.h2
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-4xl font-bold text-foreground mb-12"
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-10"
           >
             {t('values_title')}
           </motion.h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {VALUE_KEYS.map((key, i) => {
-              const Icon = VALUE_ICONS[key];
-              return (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="p-6 rounded-lg border border-border bg-surface hover:border-border-strong hover:bg-surface-elevated transition-all group"
-                >
-                  <Icon
-                    size={20}
-                    className="text-accent mb-4 group-hover:text-accent-bright transition-colors"
-                  />
-                  <h3 className="font-semibold text-foreground mb-2">
-                    {values(`${key}.title` as 'build_in_public.title')}
-                  </h3>
-                  <p className="text-sm text-foreground-subtle leading-relaxed">
-                    {values(`${key}.description` as 'build_in_public.description')}
-                  </p>
-                </motion.div>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {VALUES.map(({ key, icon: Icon, color }, i) => (
+              <motion.div
+                key={key}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="group p-6 rounded-2xl bg-surface border border-border shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${color}`}>
+                  <Icon size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  {values(`${key}.title`)}
+                </h3>
+                <p className="text-sm text-foreground-muted leading-relaxed">
+                  {values(`${key}.description`)}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </section>
 
         {/* CTAs */}
         <section className="pb-24 flex flex-wrap gap-4">
-          <Link
-            href="/now"
-            className="group btn-pill-secondary text-sm"
-          >
-            {t('cta_now')}
-            <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link
-            href="/contact"
+          <a
+            href={YOUTUBE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="group btn-pill-primary text-sm"
           >
+            <Youtube size={15} />
+            {t('cta_youtube')}
+            <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
+          </a>
+          <Link href="/contact" className="group btn-pill-secondary text-sm">
             {t('cta_contact')}
             <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
           </Link>

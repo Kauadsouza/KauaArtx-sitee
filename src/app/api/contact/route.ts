@@ -6,52 +6,92 @@ import { z } from 'zod';
 export const dynamic = 'force-dynamic';
 
 const schema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  subject: z.string().min(3),
-  message: z.string().min(20),
+  name: z.string().min(2).max(100),
+  email: z.string().email().max(200),
+  subject: z.string().min(3).max(150),
+  message: z.string().min(20).max(5000),
 });
+
+// Escapa HTML pra ninguém injetar código no email
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Rate limit simples por IP: máx. 5 envios a cada 10 minutos por instância
+const WINDOW_MS = 10 * 60 * 1000;
+const MAX_PER_WINDOW = 5;
+const hits = new Map<string, { count: number; start: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = hits.get(ip);
+  if (!entry || now - entry.start > WINDOW_MS) {
+    hits.set(ip, { count: 1, start: now });
+    return false;
+  }
+  entry.count++;
+  return entry.count > MAX_PER_WINDOW;
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas. Aguarde alguns minutos.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const data = schema.parse(body);
+
+    const name = escapeHtml(data.name);
+    const subject = escapeHtml(data.subject);
+    const message = escapeHtml(data.message);
+    const email = escapeHtml(data.email);
 
     // Instantiate inside the handler so it only runs at request time
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { error } = await resend.emails.send({
-      from: 'Portfolio <onboarding@resend.dev>',
+      from: 'Site Kauã <onboarding@resend.dev>',
       to: ['kauadsouza@gmail.com'],
       replyTo: data.email,
-      subject: `[Portfolio] ${data.subject}`,
+      subject: `[Site] ${data.subject}`,
       html: `
-        <div style="font-family: monospace; background: #050505; color: #EDEDED; padding: 32px; border-radius: 8px;">
-          <h2 style="color: #2D7A5C; margin: 0 0 24px;">Nova mensagem do portfolio</h2>
+        <div style="font-family: sans-serif; background: #fffdf8; color: #1c1917; padding: 32px; border-radius: 12px; border: 1px solid #ece7dc;">
+          <h2 style="color: #047857; margin: 0 0 24px;">Nova mensagem do site</h2>
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
-              <td style="color: #888; padding: 8px 0; width: 80px;">De:</td>
-              <td style="color: #EDEDED;">${data.name} &lt;${data.email}&gt;</td>
+              <td style="color: #a8a29e; padding: 8px 0; width: 80px;">De:</td>
+              <td style="color: #1c1917;">${name} &lt;${email}&gt;</td>
             </tr>
             <tr>
-              <td style="color: #888; padding: 8px 0;">Assunto:</td>
-              <td style="color: #EDEDED;">${data.subject}</td>
+              <td style="color: #a8a29e; padding: 8px 0;">Assunto:</td>
+              <td style="color: #1c1917;">${subject}</td>
             </tr>
           </table>
-          <hr style="border: 1px solid #1A1A1A; margin: 24px 0;">
-          <div style="color: #EDEDED; line-height: 1.6; white-space: pre-wrap;">${data.message}</div>
+          <hr style="border: none; border-top: 1px solid #ece7dc; margin: 24px 0;">
+          <div style="color: #1c1917; line-height: 1.6; white-space: pre-wrap;">${message}</div>
         </div>
       `,
     });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Falha no envio' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Dados inválidos', details: err.errors }, { status: 400 });
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

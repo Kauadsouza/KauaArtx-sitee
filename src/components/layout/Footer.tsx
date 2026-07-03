@@ -2,11 +2,10 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Github, Instagram, Linkedin, Youtube, Mail } from 'lucide-react';
+import { Instagram, Linkedin, Youtube, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const SOCIAL_LINKS = [
-  { href: 'https://github.com/Kauadsouza', icon: Github, label: 'GitHub' },
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram' },
   { href: 'https://www.linkedin.com/in/kauadsouza', icon: Linkedin, label: 'LinkedIn' },
   { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube' },
@@ -15,26 +14,26 @@ const SOCIAL_LINKS = [
 
 const NAV_LINKS = [
   { href: '/about', key: 'about' },
-  { href: '/projects', key: 'projects' },
-  { href: '/now', key: 'now' },
   { href: '/blog', key: 'blog' },
-  { href: '/faq', key: 'faq' },
   { href: '/contact', key: 'contact' },
-];
+] as const;
 
 export default function Footer() {
   const t = useTranslations('footer');
   const nav = useTranslations('nav');
 
   return (
-    <footer className="border-t border-border mt-32">
+    <footer className="relative border-t border-border mt-32 bg-surface">
+      {/* Hairline gradiente no topo */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px hairline-gradient" />
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="group inline-block">
-              <span className="font-mono text-3xl font-bold text-gradient">
-                K.
+              <span className="text-2xl font-bold tracking-tight text-foreground">
+                Kauã<span className="text-gradient">.</span>
               </span>
             </Link>
             <p className="text-sm text-foreground-muted leading-relaxed max-w-xs">
@@ -50,7 +49,7 @@ export default function Footer() {
                   rel={href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
                   aria-label={label}
                   whileHover={{ y: -2 }}
-                  className="p-2 rounded-md text-foreground-subtle hover:text-accent-bright hover:bg-surface-elevated transition-all"
+                  className="p-2 rounded-full text-foreground-subtle hover:text-accent-deep hover:bg-surface-elevated transition-all"
                 >
                   <Icon size={16} />
                 </motion.a>
@@ -61,7 +60,7 @@ export default function Footer() {
           {/* Navigation */}
           <div>
             <h3 className="text-xs font-semibold text-foreground-subtle uppercase tracking-widest mb-4">
-              Navegação
+              {t('nav_title')}
             </h3>
             <ul className="space-y-2">
               {NAV_LINKS.map(({ href, key }) => (
@@ -70,31 +69,33 @@ export default function Footer() {
                     href={href}
                     className="text-sm text-foreground-muted hover:text-foreground transition-colors"
                   >
-                    {nav(key as 'about' | 'projects' | 'now' | 'blog' | 'faq' | 'contact')}
+                    {nav(key)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Projects */}
+          {/* Links */}
           <div>
             <h3 className="text-xs font-semibold text-foreground-subtle uppercase tracking-widest mb-4">
-              Projetos
+              {t('links_title')}
             </h3>
             <ul className="space-y-2">
               {[
-                { href: '/projects/the-kaden', label: 'The Kaden' },
-                { href: '/projects/condor', label: 'CONDOR' },
-                { href: '/projects/null-forge', label: 'Null Forge' },
+                { href: 'https://www.youtube.com/@KauartX', label: 'YouTube — @KauartX' },
+                { href: 'https://loog.ai', label: 'Loog.ai' },
+                { href: 'https://www.instagram.com/kauaartx/', label: 'Instagram — @kauaartx' },
               ].map(({ href, label }) => (
                 <li key={href}>
-                  <Link
+                  <a
                     href={href}
-                    className="text-sm text-foreground-muted hover:text-accent-bright transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-foreground-muted hover:text-accent-deep transition-colors"
                   >
                     {label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

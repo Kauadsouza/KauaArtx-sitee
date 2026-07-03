@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, Sun, Moon } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Menu, X, Globe, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const LOCALES = [
   { code: 'pt', label: 'PT', flag: '🇧🇷' },
   { code: 'en', label: 'EN', flag: '🇺🇸' },
-  { code: 'es', label: 'ES', flag: '🇪🇸' },
 ];
+
+const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
 interface HeaderProps {
   locale: string;
@@ -23,14 +23,11 @@ export default function Header({ locale }: HeaderProps) {
   // usePathname from @/i18n/navigation returns path WITHOUT locale prefix
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const onScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -38,10 +35,7 @@ export default function Header({ locale }: HeaderProps) {
 
   const navLinks = [
     { href: '/about', label: t('about') },
-    { href: '/projects', label: t('projects') },
-    { href: '/now', label: t('now') },
     { href: '/blog', label: t('blog') },
-    { href: '/faq', label: t('faq') },
     { href: '/contact', label: t('contact') },
   ];
 
@@ -64,15 +58,15 @@ export default function Header({ locale }: HeaderProps) {
         className={cn(
           'mx-auto max-w-7xl transition-all duration-300',
           isScrolled
-            ? 'mt-3 rounded-2xl glass-strong shadow-lg shadow-black/10 dark:shadow-black/40 px-3 sm:px-5'
+            ? 'mt-3 rounded-2xl glass-strong shadow-lg shadow-black/5 px-3 sm:px-5'
             : 'mt-0 px-1 sm:px-0 border border-transparent'
         )}
       >
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="group flex items-center gap-2">
-            <span className="font-mono text-2xl font-bold tracking-tight text-gradient">
-              K.
+            <span className="text-xl font-bold tracking-tight text-foreground">
+              Kauã<span className="text-gradient">.</span>
             </span>
           </Link>
 
@@ -99,28 +93,25 @@ export default function Header({ locale }: HeaderProps) {
                 <span className="relative z-10">{link.label}</span>
               </Link>
             ))}
+            <a
+              href={YOUTUBE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full text-foreground-muted hover:text-accent-2-deep transition-colors"
+            >
+              <Youtube size={15} />
+              {t('youtube')}
+            </a>
           </nav>
 
           {/* Right side */}
           <div className="flex items-center gap-2">
-            {/* Theme toggle */}
-            {mounted && (
-              <button
-                type="button"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-full text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-all"
-                aria-label="Alternar tema"
-              >
-                {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-              </button>
-            )}
-
             {/* Language switcher */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setIsLangOpen(!isLangOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-all text-sm font-mono"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-all text-sm font-medium"
                 aria-label="Trocar idioma"
               >
                 <Globe size={14} />
@@ -144,12 +135,12 @@ export default function Header({ locale }: HeaderProps) {
                         className={cn(
                           'flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors',
                           locale === l.code
-                            ? 'text-accent-bright bg-surface-elevated cursor-default'
+                            ? 'text-accent-deep bg-surface-elevated cursor-default'
                             : 'text-foreground-muted hover:text-foreground hover:bg-surface-elevated'
                         )}
                       >
                         <span>{l.flag}</span>
-                        <span className="font-mono">{l.label}</span>
+                        <span className="font-medium">{l.label}</span>
                       </button>
                     ))}
                   </motion.div>
@@ -169,7 +160,7 @@ export default function Header({ locale }: HeaderProps) {
           </div>
         </div>
 
-        {/* Mobile Menu — dentro da pill para manter o visual coeso */}
+        {/* Mobile Menu */}
         <AnimatePresence>
           {isMobileOpen && (
             <motion.div
@@ -196,7 +187,7 @@ export default function Header({ locale }: HeaderProps) {
                       className={cn(
                         'block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors',
                         isActive(link.href)
-                          ? 'text-accent-bright bg-surface-elevated'
+                          ? 'text-accent-deep bg-surface-elevated'
                           : 'text-foreground-muted hover:text-foreground hover:bg-surface-elevated'
                       )}
                     >
@@ -204,6 +195,15 @@ export default function Header({ locale }: HeaderProps) {
                     </Link>
                   </motion.div>
                 ))}
+                <a
+                  href={YOUTUBE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground-muted hover:text-accent-2-deep transition-colors"
+                >
+                  <Youtube size={15} />
+                  {t('youtube')}
+                </a>
               </nav>
             </motion.div>
           )}

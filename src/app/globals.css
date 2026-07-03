@@ -1,45 +1,23 @@
 @import "tailwindcss";
 
-/* dark: segue a classe .dark (next-themes), não o prefers-color-scheme */
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* ── Dynamic theme tokens ─────────────────────────────── */
+/* ── Design tokens — claro, vivo e quente ─────────────── */
 :root {
-  /* Light mode (default) — Apple-like neutrals */
-  --bg:              #fbfbfd;
+  --bg:              #fffdf8;
   --surface:         #ffffff;
-  --surface-el:      #f2f2f7;
-  --border-col:      #e5e5ea;
-  --border-str:      #d1d1d6;
-  --fg:              #0a0a0c;
-  --fg-muted:        #55555c;
-  --fg-subtle:       #98989f;
+  --surface-el:      #f7f4ed;
+  --border-col:      #ece7dc;
+  --border-str:      #ddd5c6;
+  --fg:              #1c1917;
+  --fg-muted:        #57534e;
+  --fg-subtle:       #a8a29e;
 
-  /* Duo: verde + ciano */
-  --accent:          #0e9f6e;
-  --accent-bright:   #059669;
-  --accent-glow:     #00b368;
-  --accent2:         #0891b2;
-  --accent2-bright:  #0e7490;
-  --accent2-glow:    #06a6cc;
-}
-
-html.dark {
-  --bg:              #030304;
-  --surface:         #0a0a0c;
-  --surface-el:      #121215;
-  --border-col:      #1c1c1f;
-  --border-str:      #2a2a2e;
-  --fg:              #f5f5f7;
-  --fg-muted:        #8e8e96;
-  --fg-subtle:       #5a5a62;
-
-  --accent:          #00d96f;
-  --accent-bright:   #34e89e;
-  --accent-glow:     #00ff88;
-  --accent2:         #00d4ff;
-  --accent2-bright:  #67e8f9;
-  --accent2-glow:    #22d3ee;
+  /* Dupla: verde vivo + laranja quente */
+  --accent:          #00a94f;
+  --accent-bright:   #00c853;
+  --accent-deep:     #047857;
+  --accent2:         #ff8a00;
+  --accent2-bright:  #ffa733;
+  --accent2-deep:    #c2410c;
 }
 
 /* ── Tailwind v4 theme (inline = runtime CSS vars) ──── */
@@ -54,10 +32,10 @@ html.dark {
   --color-foreground-subtle: var(--fg-subtle);
   --color-accent:            var(--accent);
   --color-accent-bright:     var(--accent-bright);
-  --color-accent-glow:       var(--accent-glow);
+  --color-accent-deep:       var(--accent-deep);
   --color-accent-2:          var(--accent2);
   --color-accent-2-bright:   var(--accent2-bright);
-  --color-accent-2-glow:     var(--accent2-glow);
+  --color-accent-2-deep:     var(--accent2-deep);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -67,18 +45,6 @@ html.dark {
   --breakpoint-lg:  1024px;
   --breakpoint-xl:  1280px;
   --breakpoint-2xl: 1536px;
-
-  --animate-cursor-blink: cursor-blink 1s step-end infinite;
-}
-
-@keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-}
-
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
 }
 
 @keyframes float-slow {
@@ -98,7 +64,7 @@ html.dark {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-glow) 50%, transparent); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-bright) 50%, transparent); }
   50%      { opacity: 0.7; box-shadow: 0 0 0 5px transparent; }
 }
 
@@ -108,7 +74,7 @@ html.dark {
 
   html {
     scroll-behavior: smooth;
-    color-scheme: dark light;
+    color-scheme: light;
   }
 
   body {
@@ -118,21 +84,20 @@ html.dark {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  ::-webkit-scrollbar       { width: 4px; }
+  ::-webkit-scrollbar       { width: 5px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border-str); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-str); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
   ::selection {
-    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    background: color-mix(in srgb, var(--accent-bright) 30%, transparent);
     color: var(--fg);
   }
 
   :focus-visible {
-    outline: 1px solid var(--accent-bright);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -149,66 +114,41 @@ html.dark {
 
 /* ── Utilities ────────────────────────────────────────── */
 @layer utilities {
-  .gradient-radial-green {
-    background: radial-gradient(
-      ellipse at center,
-      color-mix(in srgb, var(--accent) 10%, transparent) 0%,
-      color-mix(in srgb, var(--accent2) 4%, transparent) 45%,
-      transparent 70%
-    );
-  }
-
-  .gradient-radial-top {
-    background: radial-gradient(
-      ellipse at top,
-      color-mix(in srgb, var(--accent) 7%, transparent) 0%,
-      color-mix(in srgb, var(--accent2) 3%, transparent) 40%,
-      transparent 60%
-    );
-  }
-
-  /* Glass — mais blur + saturação, estilo macOS */
+  /* Glass claro estilo macOS */
   .glass {
-    background: color-mix(in srgb, var(--surface) 72%, transparent);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
     border: 1px solid var(--border-col);
   }
 
   .glass-strong {
-    background: color-mix(in srgb, var(--surface-el) 85%, transparent);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
     border: 1px solid var(--border-str);
   }
 
-  /* Texto gradiente verde → ciano, com shimmer animado */
+  /* Texto gradiente verde → laranja (nascer do sol) */
   .text-gradient {
     background: linear-gradient(
       100deg,
-      var(--accent-glow) 0%,
-      var(--accent2-glow) 45%,
-      var(--accent-glow) 90%
+      var(--accent) 0%,
+      var(--accent2) 55%,
+      var(--accent) 100%
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: shimmer 6s ease-in-out infinite;
+    animation: shimmer 7s ease-in-out infinite;
   }
 
-  .text-gradient-green {
-    background: linear-gradient(135deg, var(--accent-glow), var(--accent2-glow));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Orbes de luz difusa (aurora) */
+  /* Orbes de luz difusa */
   .orb {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(110px);
+    filter: blur(100px);
     pointer-events: none;
     will-change: transform;
   }
@@ -216,79 +156,111 @@ html.dark {
   .animate-float-slow   { animation: float-slow 14s ease-in-out infinite; }
   .animate-float-slower { animation: float-slower 18s ease-in-out infinite; }
 
-  /* Grid técnico sutil de fundo */
-  .bg-grid {
-    background-image:
-      linear-gradient(color-mix(in srgb, var(--fg) 4%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in srgb, var(--fg) 4%, transparent) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%);
-  }
+  .animate-pulse-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
 
   /* Hairline gradiente (topo de cards) */
   .hairline-gradient {
-    background: linear-gradient(90deg, transparent, var(--accent-glow), var(--accent2-glow), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-bright), var(--accent2), transparent);
   }
 
-  /* Marquee infinito */
-  .animate-marquee         { animation: marquee 42s linear infinite; }
-  .animate-marquee-reverse { animation: marquee 42s linear infinite reverse; }
-  .marquee-mask {
-    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  /* Fundo suave com brilho radial */
+  .gradient-radial-top {
+    background: radial-gradient(
+      ellipse at top,
+      color-mix(in srgb, var(--accent-bright) 9%, transparent) 0%,
+      color-mix(in srgb, var(--accent2) 5%, transparent) 40%,
+      transparent 65%
+    );
   }
 
-  .animate-pulse-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
-
-  /* Botão primário — pill gradiente verde→ciano */
+  /* Botão primário — pill gradiente verde→laranja */
   .btn-pill-primary {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.875rem 1.75rem;
     border-radius: 9999px;
-    background: linear-gradient(100deg, var(--accent-glow), var(--accent2-glow));
-    color: #04120b;
-    font-weight: 600;
+    background: linear-gradient(100deg, var(--accent-bright), var(--accent2));
+    color: #201304;
+    font-weight: 700;
     transition: box-shadow 0.3s ease, transform 0.3s ease, filter 0.3s ease;
   }
   .btn-pill-primary:hover {
     box-shadow:
-      0 0 24px color-mix(in srgb, var(--accent-glow) 35%, transparent),
-      0 0 48px color-mix(in srgb, var(--accent2-glow) 20%, transparent);
-    filter: brightness(1.05);
-    transform: translateY(-1px);
+      0 8px 24px color-mix(in srgb, var(--accent-bright) 35%, transparent),
+      0 4px 40px color-mix(in srgb, var(--accent2) 25%, transparent);
+    filter: brightness(1.04);
+    transform: translateY(-2px);
   }
 
   .btn-pill-secondary {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.875rem 1.75rem;
     border-radius: 9999px;
-    background: color-mix(in srgb, var(--surface) 72%, transparent);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--border-str);
+    background: var(--surface);
+    border: 1.5px solid var(--border-str);
     color: var(--fg-muted);
-    font-weight: 500;
-    transition: color 0.2s ease, border-color 0.2s ease, transform 0.3s ease;
+    font-weight: 600;
+    transition: color 0.2s ease, border-color 0.2s ease, transform 0.3s ease, box-shadow 0.3s ease;
   }
   .btn-pill-secondary:hover {
     color: var(--fg);
-    border-color: color-mix(in srgb, var(--accent) 50%, var(--border-str));
-    transform: translateY(-1px);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 12%, transparent);
   }
 
-  .hide-cursor  { cursor: none !important; }
-  .hide-cursor * { cursor: none !important; }
-
-  /* Circuit canvas */
-  html.dark       .circuit-bg { opacity: 1; }
-  html:not(.dark) .circuit-bg { opacity: 0.30; }
-
-  /* Véu leve — legibilidade sem matar o efeito */
-  html.dark       .circuit-veil { background: rgba(3,3,4,0.55); }
-  html:not(.dark) .circuit-veil { background: rgba(251,251,253,0.75); }
+  /* Prosa dos posts do blog */
+  .prose-post {
+    color: var(--fg-muted);
+    line-height: 1.8;
+    font-size: 1.0625rem;
+  }
+  .prose-post h1, .prose-post h2, .prose-post h3 {
+    color: var(--fg);
+    margin: 2rem 0 0.75rem;
+  }
+  .prose-post h1 { font-size: 1.875rem; }
+  .prose-post h2 { font-size: 1.5rem; }
+  .prose-post h3 { font-size: 1.25rem; }
+  .prose-post p  { margin: 1rem 0; }
+  .prose-post a  {
+    color: var(--accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-post a:hover { color: var(--accent); }
+  .prose-post ul, .prose-post ol { margin: 1rem 0; padding-left: 1.5rem; }
+  .prose-post ul { list-style: disc; }
+  .prose-post ol { list-style: decimal; }
+  .prose-post li { margin: 0.375rem 0; }
+  .prose-post blockquote {
+    border-left: 3px solid var(--accent-bright);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: var(--fg-muted);
+    font-style: italic;
+  }
+  .prose-post img { border-radius: 1rem; margin: 1.5rem 0; max-width: 100%; }
+  .prose-post code {
+    background: var(--surface-el);
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.375rem;
+    font-size: 0.9em;
+  }
+  .prose-post pre {
+    background: var(--surface-el);
+    border: 1px solid var(--border-col);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+  .prose-post pre code { background: none; padding: 0; }
+  .prose-post hr { border: none; border-top: 1px solid var(--border-col); margin: 2rem 0; }
+  .prose-post strong { color: var(--fg); }
 }

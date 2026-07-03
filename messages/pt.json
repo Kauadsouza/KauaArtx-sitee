@@ -1,188 +1,141 @@
 {
   "nav": {
     "about": "Sobre",
-    "projects": "Projetos",
-    "now": "Agora",
     "blog": "Blog",
-    "faq": "FAQ",
-    "contact": "Contato"
+    "contact": "Contato",
+    "youtube": "YouTube"
   },
   "hero": {
     "name": "Kauã Souza",
-    "role": "Full-Stack Developer & Founder",
-    "tagline": "Construindo o futuro da tech brasileira, um projeto de cada vez.",
-    "cta_projects": "Ver Projetos",
-    "cta_contact": "Contato",
+    "role": "Vendedor & Empreendedor",
+    "tagline": "Eu acredito que tudo na vida é sobre pessoas. Vendo, crio, viajo e compartilho cada passo dessa jornada de crescimento.",
+    "cta_youtube": "Meu canal no YouTube",
+    "cta_contact": "Fale comigo",
     "based_in": "Uberlândia, Brasil",
-    "open_to": "Aberto a oportunidades globais"
+    "open_to": "Sempre em movimento",
+    "chip_sales": "Vendas na Loog.ai",
+    "chip_ceo": "CEO do Facility",
+    "chip_youtube": "Criador no YouTube"
   },
-  "stats": {
-    "years_coding": "Anos Programando",
-    "github_repos": "Repos Públicos",
-    "github_commits": "Commits",
-    "youtube_subs": "Inscritos no YouTube"
+  "what_i_do": {
+    "title": "O que eu faço",
+    "subtitle": "Três frentes, um mesmo propósito: conectar pessoas e gerar crescimento.",
+    "loog_title": "Vendas na Loog.ai",
+    "loog_tag": "Vendedor",
+    "loog_desc": "Faço parte do time comercial da Loog.ai, plataforma brasileira de logística com inteligência artificial. Meu trabalho é ouvir, entender e mostrar como a tecnologia resolve problemas reais.",
+    "facility_title": "Facility",
+    "facility_tag": "CEO & Fundador",
+    "facility_desc": "No Facility, a gente conversa com o cliente, entende a necessidade dele e entrega o sistema sob medida que ele pediu. Sem enrolação: escutar, resolver e entregar.",
+    "youtube_title": "Canal no YouTube",
+    "youtube_tag": "Criador de conteúdo",
+    "youtube_desc": "No meu canal eu mostro viagens e falo sobre crescimento pessoal. É onde documento a jornada de verdade — os lugares, os aprendizados e a evolução."
   },
-  "featured_projects": {
-    "title": "Projetos em Destaque",
-    "subtitle": "Coisas que construí e continuo construindo.",
-    "view_all": "Ver Todos os Projetos",
-    "view_case_study": "Ver Case Study",
-    "visit_site": "Visitar Site"
+  "youtube_section": {
+    "title": "Viagens & Crescimento",
+    "subtitle": "No YouTube eu compartilho o que vivo: os lugares que conheço, as lições que aprendo e o foco que me move todos os dias.",
+    "pillar_travel": "Viagens",
+    "pillar_travel_desc": "Explorando lugares novos e mostrando o mundo do meu jeito.",
+    "pillar_growth": "Crescimento",
+    "pillar_growth_desc": "Mentalidade, disciplina e evolução pessoal na prática.",
+    "pillar_journey": "Jornada real",
+    "pillar_journey_desc": "Sem filtro: os bastidores de quem está construindo a própria história.",
+    "button": "Inscreva-se no canal"
   },
-  "tech_stack": {
-    "title": "Stack Técnica",
-    "subtitle": "Tecnologias que domino e uso no dia a dia."
+  "latest_posts": {
+    "title": "Últimas do blog",
+    "subtitle": "Ideias, aprendizados e histórias — escritas por mim.",
+    "view_all": "Ver todos os posts",
+    "empty": "Os primeiros posts estão chegando. Volta logo!"
   },
   "cta_section": {
     "title": "Vamos conversar?",
-    "subtitle": "Aberto a oportunidades, parcerias e conversas interessantes.",
-    "button": "Entrar em Contato"
+    "subtitle": "Seja sobre negócios, uma ideia, o Facility ou só pra trocar uma boa conversa — minha porta está aberta.",
+    "button": "Entrar em contato"
   },
   "about": {
-    "title": "Sobre Mim",
-    "subtitle": "A história de um dev brasileiro com ambição global.",
-    "bio_1": "Comecei a programar em 2022 quase por acidente — precisava de sites para lojas de dropshipping e decidi aprender a fazer eu mesmo. O que era uma solução prática virou uma obsessão. Em poucos meses, já estava reconstruindo aquilo que havia aprendido do zero, entendendo cada linha de código.",
-    "bio_2": "Em 2023, levei esse conhecimento para a Construtora Pacaembu, onde construí sistemas internos de gestão de leads, landing pages de alta conversão e gerenciei campanhas de tráfego pago. Foi meu primeiro contato com tecnologia em escala real — onde um bug não é só um problema técnico, é prejuízo financeiro.",
-    "bio_3": "Em 2024, migrei completamente para o desenvolvimento full-stack. Co-fundei o The Kaden — um SaaS de automação WhatsApp para clínicas estéticas e salões de beleza —, construí o CONDOR (assistente IA local focado em privacidade), e fundei a Null Forge como iniciativa de impacto social em tecnologia.",
-    "bio_4": "Hoje trabalho na Loog.ai, uma plataforma logística AI-first brasileira, onde aplico tudo que aprendi na frontline da inovação. Minha ambição não tem fronteiras geográficas: quero estudar em Harvard, MIT ou Oxford, e provar que tech de classe mundial pode nascer no Brasil.",
-    "timeline_title": "Jornada",
-    "values_title": "Valores & Princípios",
-    "cta_now": "O que estou fazendo agora",
-    "cta_contact": "Entrar em Contato"
+    "title": "Sobre mim",
+    "subtitle": "Vendedor por vocação, empreendedor por escolha e eterno aprendiz.",
+    "bio_1": "Meu nome é Kauã Souza e, antes de qualquer cargo ou título, eu sou uma pessoa que gosta de gente. Desde cedo entendi que vender não é empurrar produto — é escutar, entender o que a pessoa precisa e ajudar de verdade. Foi essa visão que moldou tudo o que faço hoje.",
+    "bio_2": "Comecei cedo no mundo digital: montei lojas online, aprendi marketing na prática e em 2023 trabalhei na Construtora Pacaembu cuidando de leads, campanhas e conversão. Ali eu vi de perto que resultado vem de relacionamento — não de sorte.",
+    "bio_3": "Hoje eu vivo três frentes: sou vendedor na Loog.ai, uma plataforma brasileira de logística com IA; sou CEO do Facility, onde entendemos a necessidade de cada cliente e entregamos o sistema que ele precisa; e crio conteúdo no YouTube sobre viagens e crescimento pessoal.",
+    "bio_4": "Programação? É um hobby que eu curto — me ajuda a entender produto e conversar de igual pra igual com qualquer time técnico. Mas o meu jogo é outro: pessoas, negócios e evolução constante. Meu foco é crescer 1% todos os dias e levar o máximo de gente junto comigo.",
+    "timeline_title": "Minha jornada",
+    "values_title": "No que eu acredito",
+    "cta_contact": "Fale comigo",
+    "cta_youtube": "Conheça o canal"
   },
   "timeline": {
     "2022": {
-      "title": "Primeiro contato com código",
-      "description": "Descobri programação fazendo sites para lojas de dropshipping. O que era necessidade virou paixão."
+      "title": "Primeiros passos no digital",
+      "description": "Montei minhas primeiras lojas online e descobri minha paixão: vender e me conectar com pessoas."
     },
     "2023": {
       "title": "Construtora Pacaembu",
-      "description": "Sistemas internos de leads, landing pages de alta conversão e gestão de tráfego pago em escala real."
+      "description": "Trabalhei com leads, campanhas e conversão. Aprendi que resultado em escala vem de processo e relacionamento."
     },
     "2024": {
-      "title": "Migração total para Full-Stack",
-      "description": "Deixei o marketing digital para trás e mergulhei de cabeça no desenvolvimento. Sem olhar para trás."
+      "title": "Projetos próprios",
+      "description": "Tirei ideias do papel e aprendi na prática o que é construir algo do zero — errando, ajustando e evoluindo."
     },
-    "2025a": {
-      "title": "The Kaden & CONDOR nascem",
-      "description": "Co-fundei um SaaS de automação WhatsApp e construí um assistente IA local com foco em privacidade."
-    },
-    "2025b": {
-      "title": "Null Forge — Tech com propósito",
-      "description": "Fundei a Null Forge para democratizar educação tecnológica no Brasil, começando pelas escolas."
+    "2025": {
+      "title": "Nasce o Facility",
+      "description": "Fundei o Facility: ouvimos o cliente, entendemos a necessidade e entregamos o sistema sob medida."
     },
     "2026": {
-      "title": "Loog.ai",
-      "description": "Full-stack developer na frontline da logística AI-first brasileira. Inovação em escala nacional."
+      "title": "Loog.ai + YouTube",
+      "description": "Entrei para o time de vendas da Loog.ai e levei minha jornada pro YouTube: viagens, crescimento e vida real."
     },
     "today": {
       "title": "Construindo o próximo capítulo",
-      "description": "Ambição global. Tech brasileira. O melhor ainda está por vir."
+      "description": "Crescendo 1% por dia. O melhor ainda está por vir."
     }
   },
   "values": {
-    "build_in_public": {
-      "title": "Build in Public",
-      "description": "Transparência como vantagem competitiva. Compartilhar a jornada, não só os resultados."
+    "people_first": {
+      "title": "Pessoas em primeiro lugar",
+      "description": "Todo negócio, toda venda e todo projeto começa e termina em gente. Relacionamento é o meu maior ativo."
     },
-    "move_fast": {
-      "title": "Move Fast, Ship Clean",
-      "description": "Velocidade sem abrir mão da qualidade. Código que dura e produto que funciona."
+    "always_growing": {
+      "title": "Crescimento constante",
+      "description": "1% melhor todos os dias. Leitura, viagem, conversa boa — tudo é combustível pra evoluir."
     },
-    "tech_with_purpose": {
-      "title": "Tech with Purpose",
-      "description": "Tecnologia é ferramenta de transformação social. Cada linha de código tem potencial de mudar vidas."
+    "real_delivery": {
+      "title": "Entrega de verdade",
+      "description": "Prometeu, cumpriu. No Facility e na vida: escutar, resolver e entregar o que foi combinado."
     },
-    "global_mindset": {
-      "title": "Global Mindset",
-      "description": "Pensar globalmente, construir localmente. A próxima grande startup pode nascer em Uberlândia."
+    "share_the_journey": {
+      "title": "Compartilhar a jornada",
+      "description": "Documento o processo, não só o resultado. Se a minha história ajudar uma pessoa, já valeu."
     }
-  },
-  "projects": {
-    "title": "Projetos",
-    "subtitle": "Coisas que construí, produtos que fundei, problemas que resolvi.",
-    "filter_all": "Todos",
-    "filter_saas": "SaaS",
-    "filter_ai": "IA",
-    "filter_education": "Educação",
-    "status_production": "Em Produção",
-    "status_development": "Em Desenvolvimento",
-    "status_building": "Estruturando",
-    "view_case_study": "Ver Case Study",
-    "visit_site": "Visitar Site",
-    "view_github": "Ver no GitHub"
-  },
-  "case_study": {
-    "overview": "Visão Geral",
-    "problem": "O Problema",
-    "solution": "A Solução",
-    "stack": "Stack & Arquitetura",
-    "lessons": "Lições Aprendidas",
-    "lessons_worked": "O que funcionou",
-    "lessons_failed": "O que não funcionou",
-    "lessons_different": "O que faria diferente",
-    "next_steps": "Próximos Passos",
-    "screenshots": "Screenshots",
-    "links": "Links"
-  },
-  "now": {
-    "title": "Agora",
-    "intro": "Esta é uma página /now — uma snapshot honesta do que estou fazendo neste momento da minha vida. Inspirado no movimento nownownow.com de Derek Sivers.",
-    "working_title": "Trabalhando em",
-    "learning_title": "Aprendendo",
-    "reading_title": "Lendo & Consumindo",
-    "life_title": "Vida Pessoal",
-    "updated": "Atualizado em"
   },
   "blog": {
     "title": "Blog",
-    "subtitle": "Reflexões sobre tech, empreendedorismo e a jornada de construir no Brasil.",
+    "subtitle": "Ideias, viagens, vendas e crescimento — escrito por mim, sem filtro.",
     "coming_soon": "Em breve",
-    "coming_soon_desc": "Primeiros artigos sobre tech, empreendedorismo e a jornada de construir no Brasil.",
-    "read_more": "Ler artigo",
-    "min_read": "min de leitura"
+    "coming_soon_desc": "Os primeiros posts estão sendo preparados. Volta logo!",
+    "read_more": "Ler post",
+    "back_to_blog": "Voltar pro blog",
+    "published_on": "Publicado em"
   },
   "contact": {
-    "title": "Contato",
-    "subtitle": "Aberto a oportunidades, parcerias e conversas. Geralmente respondo em 24h.",
+    "title": "Fale comigo",
+    "subtitle": "Negócios, parcerias, Facility, YouTube ou só uma boa conversa. Geralmente respondo em 24h.",
     "form_name": "Nome",
     "form_email": "Email",
     "form_subject": "Assunto",
     "form_message": "Mensagem",
-    "form_send": "Enviar Mensagem",
+    "form_send": "Enviar mensagem",
     "form_sending": "Enviando...",
     "form_success_title": "Mensagem enviada!",
-    "form_success_desc": "Obrigado pelo contato. Responderei em breve.",
+    "form_success_desc": "Obrigado pelo contato. Respondo em breve.",
     "form_error": "Erro ao enviar. Tente novamente.",
-    "social_title": "Redes Sociais"
-  },
-  "faq": {
-    "title": "Perguntas Frequentes",
-    "subtitle": "Dúvidas comuns sobre meu trabalho e colaborações.",
-    "q1": "Quais serviços você oferece?",
-    "a1": "Desenvolvimento full-stack (Next.js, Node.js, React), consultoria de produto, desenvolvimento de MVPs, automação WhatsApp, e sistemas SaaS. Também aceito projetos de impacto social via Null Forge.",
-    "q2": "Está aberto a oportunidades de trabalho remoto fora do Brasil?",
-    "a2": "Sim, absolutamente. Tenho inglês conversacional e estou ativamente buscando exposição internacional. Sonho em estudar e trabalhar globalmente — oportunidades sérias são sempre bem-vindas.",
-    "q3": "Trabalha como freelancer ou só em projetos próprios?",
-    "a3": "Trabalho com as duas modalidades. Tenho projetos próprios (The Kaden, CONDOR, Null Forge) e estou aberto a contratos freelancer ou emprego remoto para projetos que me desafiem.",
-    "q4": "Quanto tempo leva para construir um projeto como o The Kaden?",
-    "a4": "O The Kaden foi construído em aproximadamente 4 meses da ideia ao MVP funcional em produção. O tempo varia enormemente conforme escopo, stack e número de pessoas envolvidas.",
-    "q5": "Que stack você recomenda para SaaS hoje?",
-    "a5": "Para a maioria dos SaaS: Next.js (App Router) + Supabase (PostgreSQL + Auth + Storage) + Stripe + Vercel. Rápido, escalável e com ótima DX. Para casos específicos, adapto a recomendação.",
-    "q6": "Aceita parcerias ou co-founding?",
-    "a6": "Dependendo do projeto e da afinidade com a missão, sim. Preciso acreditar no problema e no time. Se você tem uma ideia com potencial real, me conta — posso me interessar.",
-    "q7": "Faz mentoria para devs iniciantes?",
-    "a7": "Esporadicamente, via Null Forge. Se você está começando em tech e quer orientação, me manda uma mensagem explicando onde está na jornada. Não prometo disponibilidade, mas leio tudo.",
-    "q8": "Como você começou na programação?",
-    "a8": "Em 2022, precisava de sites para lojas de dropshipping e não queria pagar uma agência. Aprendi HTML/CSS/JS do zero. Fui mordido pelo bug do código e não parei mais.",
-    "q9": "Posso usar o CONDOR, Null Forge ou The Kaden?",
-    "a9": "The Kaden: acesse thekaden.com.br para informações sobre planos. CONDOR: projeto em desenvolvimento, sem release público ainda. Null Forge: entre em contato se você é escola ou organização educacional interessada em parceria.",
-    "q10": "Como entrar em contato mais rapidamente?",
-    "a10": "Email (kauadsouza@gmail.com) ou Instagram (@kauaartx) são os canais mais rápidos. LinkedIn é mais formal. Geralmente respondo em 24h nos dias úteis."
+    "social_title": "Onde me encontrar"
   },
   "footer": {
-    "tagline": "Full-Stack Developer & Founder baseado em Uberlândia, Brasil.",
-    "built_with": "Construído com Next.js, TypeScript e muito café.",
-    "rights": "Todos os direitos reservados."
+    "tagline": "Vendedor, CEO do Facility e criador de conteúdo sobre viagens e crescimento. Uberlândia, Brasil.",
+    "built_with": "Feito com muito café e boas conversas.",
+    "rights": "Todos os direitos reservados.",
+    "nav_title": "Navegação",
+    "links_title": "Links"
   }
 }

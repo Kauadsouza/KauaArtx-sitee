@@ -3,13 +3,15 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
-import { ArrowRight, MapPin, Globe } from 'lucide-react';
+import { ArrowRight, MapPin, Youtube, Briefcase, Rocket, Compass } from 'lucide-react';
+
+const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
 const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.15 },
   },
 };
 
@@ -21,12 +23,17 @@ const item = {
 export default function Hero() {
   const t = useTranslations('hero');
 
+  const chips = [
+    { icon: Briefcase, label: t('chip_sales'), color: 'text-accent-deep bg-accent/10 border-accent/25' },
+    { icon: Rocket, label: t('chip_ceo'), color: 'text-accent-2-deep bg-accent-2/10 border-accent-2/25' },
+    { icon: Youtube, label: t('chip_youtube'), color: 'text-red-600 bg-red-500/10 border-red-500/25' },
+  ];
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Backdrop: grid técnico + aurora verde/ciano */}
-      <div className="absolute inset-0 bg-grid pointer-events-none" />
-      <div className="orb w-[480px] h-[480px] top-[-8%] left-[-8%] bg-accent/25 dark:bg-accent/20 animate-float-slow" />
-      <div className="orb w-[420px] h-[420px] bottom-[-5%] right-[-6%] bg-accent-2/20 dark:bg-accent-2/15 animate-float-slower" />
+      {/* Aurora quente: verde + laranja */}
+      <div className="orb w-[520px] h-[520px] top-[-10%] left-[-10%] bg-accent-bright/25 animate-float-slow" />
+      <div className="orb w-[460px] h-[460px] bottom-[-8%] right-[-8%] bg-accent-2/25 animate-float-slower" />
       <div className="absolute inset-0 gradient-radial-top pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16 w-full">
@@ -37,13 +44,13 @@ export default function Hero() {
           className="max-w-4xl"
         >
           {/* Location badge */}
-          <motion.div variants={item} className="inline-flex items-center gap-2 mb-10">
-            <div className="flex items-center gap-2.5 px-4 py-2 rounded-full glass text-xs text-foreground-muted font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-glow animate-pulse-dot" />
-              <MapPin size={11} className="text-accent-bright" />
+          <motion.div variants={item} className="inline-flex items-center gap-2 mb-8">
+            <div className="flex items-center gap-2.5 px-4 py-2 rounded-full glass shadow-sm text-xs text-foreground-muted font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-bright animate-pulse-dot" />
+              <MapPin size={11} className="text-accent-deep" />
               <span>{t('based_in')}</span>
               <span className="text-foreground-subtle">·</span>
-              <Globe size={11} className="text-accent-2" />
+              <Compass size={11} className="text-accent-2-deep" />
               <span>{t('open_to')}</span>
             </div>
           </motion.div>
@@ -56,7 +63,7 @@ export default function Hero() {
             {t('name')}
           </motion.h1>
 
-          {/* Role — gradiente verde→ciano animado */}
+          {/* Role — gradiente verde→laranja */}
           <motion.p
             variants={item}
             className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-6"
@@ -67,20 +74,39 @@ export default function Hero() {
           {/* Tagline */}
           <motion.p
             variants={item}
-            className="text-base sm:text-lg text-foreground-muted max-w-xl mb-12 leading-relaxed"
+            className="text-base sm:text-lg text-foreground-muted max-w-xl mb-8 leading-relaxed"
           >
             {t('tagline')}
           </motion.p>
 
+          {/* Chips: as três frentes */}
+          <motion.div variants={item} className="flex flex-wrap gap-2.5 mb-10">
+            {chips.map(({ icon: Icon, label, color }) => (
+              <span
+                key={label}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-semibold ${color}`}
+              >
+                <Icon size={12} />
+                {label}
+              </span>
+            ))}
+          </motion.div>
+
           {/* CTAs */}
           <motion.div variants={item} className="flex flex-wrap gap-4">
-            <Link href="/projects" className="group btn-pill-primary text-sm">
-              {t('cta_projects')}
+            <a
+              href={YOUTUBE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group btn-pill-primary text-sm"
+            >
+              <Youtube size={15} />
+              {t('cta_youtube')}
               <ArrowRight
                 size={14}
                 className="transition-transform group-hover:translate-x-1"
               />
-            </Link>
+            </a>
             <Link href="/contact" className="btn-pill-secondary text-sm">
               {t('cta_contact')}
             </Link>
@@ -97,7 +123,7 @@ export default function Hero() {
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-px h-12 bg-gradient-to-b from-accent-glow via-accent-2-glow/60 to-transparent"
+            className="w-px h-12 bg-gradient-to-b from-accent-bright via-accent-2/60 to-transparent"
           />
         </motion.div>
       </div>

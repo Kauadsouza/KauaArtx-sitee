@@ -1,7 +1,66 @@
 import createMiddleware from 'next-intl/middleware';
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 import { routing } from './i18n/routing';
 
-export default createMiddleware(routing);
+const intlMiddleware = createMiddleware(routing);
+
+export default async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Área admin: protegida por sessão Supabase, fora do sistema de idiomas
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return adminMiddleware(request);
+  }
+
+  return intlMiddleware(request);
+}
+
+async function adminMiddleware(request: NextRequest) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  let response = NextResponse.next({ request });
+
+  // Supabase ainda não configurado — a página de login mostra o guia de setup
+  if (!url || !key) return response;
+
+  const supabase = createServerClient(url, key, {
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: (cookiesToSet) => {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value)
+        );
+        response = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
+
+  // getUser() valida o token no servidor do Supabase — não confia só no cookie
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isLoginPage = request.nextUrl.pathname.startsWith('/admin/login');
+
+  if (!user && !isLoginPage) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/admin/login';
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (user && isLoginPage) {
+    const adminUrl = request.nextUrl.clone();
+    adminUrl.pathname = '/admin';
+    return NextResponse.redirect(adminUrl);
+  }
+
+  return response;
+}
 
 export const config = {
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
