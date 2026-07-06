@@ -13,7 +13,7 @@ export default function WhatIDo() {
       title: t('loog_title'),
       tag: t('loog_tag'),
       desc: t('loog_desc'),
-      iconBg: 'bg-accent/10 text-accent-deep',
+      iconBg: 'bg-accent/10 text-accent-bright',
       tagStyle: 'text-accent-deep bg-accent/10 border-accent/25',
     },
     {
@@ -21,7 +21,7 @@ export default function WhatIDo() {
       title: t('facility_title'),
       tag: t('facility_tag'),
       desc: t('facility_desc'),
-      iconBg: 'bg-accent-2/10 text-accent-2-deep',
+      iconBg: 'bg-accent-2/10 text-accent-2-bright',
       tagStyle: 'text-accent-2-deep bg-accent-2/10 border-accent-2/25',
     },
     {
@@ -29,8 +29,8 @@ export default function WhatIDo() {
       title: t('youtube_title'),
       tag: t('youtube_tag'),
       desc: t('youtube_desc'),
-      iconBg: 'bg-red-500/10 text-red-600',
-      tagStyle: 'text-red-600 bg-red-500/10 border-red-500/25',
+      iconBg: 'bg-red-500/10 text-red-400',
+      tagStyle: 'text-red-400 bg-red-500/10 border-red-500/25',
     },
   ];
 

@@ -7,11 +7,12 @@
   },
   "hero": {
     "name": "Kauã Souza",
-    "role": "Vendedor & Empreendedor",
-    "tagline": "Eu acredito que tudo na vida é sobre pessoas. Vendo, crio, viajo e compartilho cada passo dessa jornada de crescimento.",
+    "role": "Vendedor & Aventureiro",
+    "tagline": "Vender é o meu ofício e o mundo é o meu mapa. Eu acredito que tudo na vida é sobre pessoas — então eu vendo, crio, viajo e documento cada passo dessa jornada.",
     "cta_youtube": "Meu canal no YouTube",
     "cta_contact": "Fale comigo",
     "open_to": "Sempre em movimento",
+    "route": "BRA → MUNDO",
     "chip_sales": "Vendas na Loog.ai",
     "chip_ceo": "CEO do Facility",
     "chip_youtube": "Criador no YouTube"
@@ -30,8 +31,8 @@
     "youtube_desc": "No meu canal eu mostro viagens e falo sobre crescimento pessoal. É onde documento a jornada de verdade — os lugares, os aprendizados e a evolução."
   },
   "youtube_section": {
-    "title": "Viagens & Crescimento",
-    "subtitle": "No YouTube eu compartilho o que vivo: os lugares que conheço, as lições que aprendo e o foco que me move todos os dias.",
+    "title": "A jornada pelo mundo",
+    "subtitle": "Vendedor de dia, aventureiro o tempo todo. No YouTube eu documento essa jornada: os lugares que conheço, as lições que aprendo e o foco que me move.",
     "pillar_travel": "Viagens",
     "pillar_travel_desc": "Explorando lugares novos e mostrando o mundo do meu jeito.",
     "pillar_growth": "Crescimento",
@@ -53,7 +54,7 @@
   },
   "about": {
     "title": "Sobre mim",
-    "subtitle": "Vendedor por vocação, empreendedor por escolha e eterno aprendiz.",
+    "subtitle": "Vendedor por vocação, aventureiro por natureza e empreendedor por escolha.",
     "bio_1": "Meu nome é Kauã, tenho 18 anos e, antes de qualquer cargo ou título, eu sou uma pessoa que gosta de gente. Desde cedo entendi que vender não é empurrar produto — é escutar, entender o que a pessoa precisa e ajudar de verdade. Hoje, ser vendedor é o meu foco e é o que eu amo fazer.",
     "bio_2": "Comecei no marketing digital como gestor de tráfego: passei por agências e empresas gerenciando campanhas no Google Ads e Meta Ads, gerando leads e otimizando resultados. Numa dessas empresas, a HLTS, o time vivia travado esperando terceiros criarem landing pages — então eu mesmo resolvi: criei do zero um sistema de páginas e captação de leads que a empresa passou a usar. Ali eu aprendi minha maior lição: entender o problema vale mais do que qualquer ferramenta.",
     "bio_3": "Hoje eu vivo três frentes: sou vendedor na Loog.ai, plataforma brasileira de logística com IA, onde faço discovery, qualificação e reuniões comerciais; sou CEO do Facility, onde entendemos a necessidade de cada cliente e entregamos o sistema que ele precisa; e crio conteúdo no YouTube sobre viagens e crescimento pessoal.",
@@ -159,7 +160,7 @@
     "social_title": "Onde me encontrar"
   },
   "footer": {
-    "tagline": "Vendedor, CEO do Facility e criador de conteúdo sobre viagens e crescimento.",
+    "tagline": "Vendedor, CEO do Facility e aventureiro documentando a jornada pelo mundo.",
     "built_with": "Feito com muito café e boas conversas.",
     "rights": "Todos os direitos reservados.",
     "nav_title": "Navegação",

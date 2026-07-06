@@ -7,11 +7,12 @@
   },
   "hero": {
     "name": "Kauã Souza",
-    "role": "Salesperson & Entrepreneur",
-    "tagline": "I believe everything in life is about people. I sell, I build, I travel, and I share every step of this growth journey.",
+    "role": "Salesperson & Adventurer",
+    "tagline": "Selling is my craft and the world is my map. I believe everything in life is about people — so I sell, build, travel, and document every step of the journey.",
     "cta_youtube": "My YouTube channel",
     "cta_contact": "Talk to me",
     "open_to": "Always on the move",
+    "route": "BRA → WORLD",
     "chip_sales": "Sales at Loog.ai",
     "chip_ceo": "CEO of Facility",
     "chip_youtube": "YouTube creator"
@@ -30,8 +31,8 @@
     "youtube_desc": "On my channel I share my travels and talk about personal growth. It's where I document the real journey — the places, the lessons, and the evolution."
   },
   "youtube_section": {
-    "title": "Travel & Growth",
-    "subtitle": "On YouTube I share what I live: the places I visit, the lessons I learn, and the focus that drives me every day.",
+    "title": "The journey around the world",
+    "subtitle": "Salesperson by day, adventurer always. On YouTube I document the journey: the places I visit, the lessons I learn, and the focus that drives me.",
     "pillar_travel": "Travel",
     "pillar_travel_desc": "Exploring new places and showing the world my way.",
     "pillar_growth": "Growth",
@@ -53,7 +54,7 @@
   },
   "about": {
     "title": "About me",
-    "subtitle": "Salesperson by vocation, entrepreneur by choice, and forever a learner.",
+    "subtitle": "Salesperson by vocation, adventurer by nature, entrepreneur by choice.",
     "bio_1": "My name is Kauã, I'm 18 years old and, before any role or title, I'm someone who loves people. Early on I learned that selling isn't pushing a product — it's listening, understanding what someone needs, and truly helping. Today, sales is my focus and what I love doing.",
     "bio_2": "I started in digital marketing as a traffic manager: I worked at agencies and companies running Google Ads and Meta Ads campaigns, generating leads, and optimizing results. At one of them, HLTS, the team was stuck waiting on third parties to build landing pages — so I solved it myself: I built from scratch a landing page and lead capture system the company started using. That's where I learned my biggest lesson: understanding the problem is worth more than any tool.",
     "bio_3": "Today I live on three fronts: I'm a salesperson at Loog.ai, a Brazilian AI-powered logistics platform, doing discovery, qualification, and sales meetings; I'm the CEO of Facility, where we understand each client's needs and deliver the system they're looking for; and I create YouTube content about travel and personal growth.",
@@ -159,7 +160,7 @@
     "social_title": "Where to find me"
   },
   "footer": {
-    "tagline": "Salesperson, CEO of Facility, and content creator about travel and growth.",
+    "tagline": "Salesperson, CEO of Facility, and adventurer documenting the journey around the world.",
     "built_with": "Made with lots of coffee and good conversations.",
     "rights": "All rights reserved.",
     "nav_title": "Navigation",

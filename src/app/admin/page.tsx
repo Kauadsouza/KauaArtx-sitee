@@ -75,7 +75,7 @@ export default function AdminDashboard() {
             </a>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm text-foreground-muted hover:text-red-600 hover:bg-red-500/10 transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm text-foreground-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
             >
               <LogOut size={14} />
               <span className="hidden sm:inline">Sair</span>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
                   <button
                     onClick={() => deletePost(post)}
                     title="Excluir"
-                    className="p-2.5 rounded-full text-foreground-muted hover:text-red-600 hover:bg-red-500/10 transition-all"
+                    className="p-2.5 rounded-full text-foreground-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
                   >
                     <Trash2 size={16} />
                   </button>

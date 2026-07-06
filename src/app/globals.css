@@ -1,23 +1,25 @@
 @import "tailwindcss";
 
-/* ── Design tokens — claro, vivo e quente ─────────────── */
+/* ── Design tokens — noite de aurora boreal ───────────── */
 :root {
-  --bg:              #fffdf8;
-  --surface:         #ffffff;
-  --surface-el:      #f7f4ed;
-  --border-col:      #ece7dc;
-  --border-str:      #ddd5c6;
-  --fg:              #1c1917;
-  --fg-muted:        #57534e;
-  --fg-subtle:       #a8a29e;
+  --bg:              #04100a;
+  --surface:         #081810;
+  --surface-el:      #0d2417;
+  --border-col:      #14301f;
+  --border-str:      #1f4a2e;
+  --fg:              #e9fbef;
+  --fg-muted:        #9fbfaa;
+  --fg-subtle:       #5c8069;
 
-  /* Dupla: verde vivo + laranja quente */
-  --accent:          #00a94f;
-  --accent-bright:   #00c853;
-  --accent-deep:     #047857;
-  --accent2:         #ff8a00;
-  --accent2-bright:  #ffa733;
-  --accent2-deep:    #c2410c;
+  /* Dupla: verde-aurora + ciano-aurora */
+  --accent:          #35e065;
+  --accent-bright:   #63f78d;
+  --accent-deep:     #8ffcb0;  /* no tema escuro, o "deep" é a variante clara legível */
+  --accent2:         #1fd3a7;
+  --accent2-bright:  #4beec6;
+  --accent2-deep:    #86f4d8;
+
+  --ink-on-accent:   #04150c; /* texto sobre botões verdes */
 }
 
 /* ── Tailwind v4 theme (inline = runtime CSS vars) ──── */
@@ -68,13 +70,24 @@
   50%      { opacity: 0.7; box-shadow: 0 0 0 5px transparent; }
 }
 
+/* Cortinas de aurora dançando no céu */
+@keyframes aurora-sway {
+  0%, 100% { transform: rotate(var(--tilt, -16deg)) translateX(0) scaleY(1); opacity: var(--glow, 0.32); }
+  50%      { transform: rotate(var(--tilt, -16deg)) translateX(70px) scaleY(1.18); opacity: calc(var(--glow, 0.32) + 0.1); }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.9; }
+  50%      { opacity: 0.35; }
+}
+
 /* ── Base ─────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
   html {
     scroll-behavior: smooth;
-    color-scheme: light;
+    color-scheme: dark;
   }
 
   body {
@@ -92,7 +105,7 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
   ::selection {
-    background: color-mix(in srgb, var(--accent-bright) 30%, transparent);
+    background: color-mix(in srgb, var(--accent-bright) 35%, transparent);
     color: var(--fg);
   }
 
@@ -114,28 +127,34 @@
 
 /* ── Utilities ────────────────────────────────────────── */
 @layer utilities {
-  /* Glass claro estilo macOS */
+  /* Vidro escuro esverdeado */
   .glass {
-    background: color-mix(in srgb, var(--surface) 78%, transparent);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid var(--border-col);
+    background: color-mix(in srgb, var(--surface-el) 62%, transparent);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid color-mix(in srgb, var(--border-str) 70%, transparent);
   }
 
   .glass-strong {
-    background: color-mix(in srgb, var(--surface) 90%, transparent);
-    backdrop-filter: blur(28px) saturate(160%);
-    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: blur(28px) saturate(150%);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
     border: 1px solid var(--border-str);
   }
 
-  /* Texto gradiente verde → laranja (nascer do sol) */
+  /* Fonte pixel — detalhes estilo "GO FAR" do banner */
+  .font-pixel {
+    font-family: var(--font-pixel), var(--font-mono), monospace;
+    letter-spacing: 0.1em;
+  }
+
+  /* Texto gradiente verde → ciano (luz de aurora) */
   .text-gradient {
     background: linear-gradient(
       100deg,
-      var(--accent) 0%,
-      var(--accent2) 55%,
-      var(--accent) 100%
+      var(--accent-bright) 0%,
+      var(--accent2-bright) 55%,
+      var(--accent-bright) 100%
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
@@ -160,20 +179,80 @@
 
   /* Hairline gradiente (topo de cards) */
   .hairline-gradient {
-    background: linear-gradient(90deg, transparent, var(--accent-bright), var(--accent2), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-bright), var(--accent2-bright), transparent);
   }
 
-  /* Fundo suave com brilho radial */
+  /* Brilho radial no topo da dobra */
   .gradient-radial-top {
     background: radial-gradient(
       ellipse at top,
-      color-mix(in srgb, var(--accent-bright) 9%, transparent) 0%,
-      color-mix(in srgb, var(--accent2) 5%, transparent) 40%,
+      color-mix(in srgb, var(--accent-bright) 10%, transparent) 0%,
+      color-mix(in srgb, var(--accent2) 6%, transparent) 40%,
       transparent 65%
     );
   }
 
-  /* Botão primário — pill gradiente verde→laranja */
+  /* ── Céu de aurora (fundo fixo do site) ───────────────
+     Sem filter/blur: os gradientes já nascem suaves, o que
+     mantém o efeito leve até em máquinas fracas. */
+  .aurora-curtain {
+    position: absolute;
+    pointer-events: none;
+    will-change: transform, opacity;
+    animation: aurora-sway var(--speed, 28s) ease-in-out infinite;
+  }
+
+  .stars-layer {
+    background-image:
+      radial-gradient(1px 1px at 12% 22%, rgba(233, 251, 239, 0.9) 50%, transparent 51%),
+      radial-gradient(1px 1px at 38% 8%,  rgba(233, 251, 239, 0.7) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 64% 30%, rgba(143, 252, 176, 0.8) 50%, transparent 51%),
+      radial-gradient(1px 1px at 82% 12%, rgba(233, 251, 239, 0.75) 50%, transparent 51%),
+      radial-gradient(1px 1px at 51% 45%, rgba(233, 251, 239, 0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 91% 38%, rgba(134, 244, 216, 0.7) 50%, transparent 51%);
+    background-size: 560px 560px;
+  }
+
+  .stars-layer-2 {
+    background-image:
+      radial-gradient(1px 1px at 22% 62%, rgba(233, 251, 239, 0.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 71% 71%, rgba(233, 251, 239, 0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 45% 85%, rgba(143, 252, 176, 0.55) 50%, transparent 51%),
+      radial-gradient(1px 1px at 6% 90%, rgba(233, 251, 239, 0.45) 50%, transparent 51%);
+    background-size: 720px 720px;
+    animation: star-twinkle 5.5s ease-in-out infinite;
+  }
+
+  .horizon-glow {
+    background: radial-gradient(
+      60% 100% at 50% 100%,
+      color-mix(in srgb, var(--accent) 13%, transparent) 0%,
+      color-mix(in srgb, var(--accent2) 6%, transparent) 45%,
+      transparent 75%
+    );
+  }
+
+  .aurora-vignette {
+    background: radial-gradient(
+      120% 90% at 50% 38%,
+      transparent 50%,
+      rgba(2, 8, 5, 0.6) 100%
+    );
+  }
+
+  /* Etiqueta de embarque — detalhe aventureiro */
+  .boarding-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px dashed var(--border-str);
+    background: color-mix(in srgb, var(--surface-el) 55%, transparent);
+    color: var(--fg-muted);
+  }
+
+  /* Botão primário — pill gradiente verde→ciano */
   .btn-pill-primary {
     display: inline-flex;
     align-items: center;
@@ -181,16 +260,16 @@
     gap: 0.5rem;
     padding: 0.875rem 1.75rem;
     border-radius: 9999px;
-    background: linear-gradient(100deg, var(--accent-bright), var(--accent2));
-    color: #201304;
+    background: linear-gradient(100deg, var(--accent-bright), var(--accent2-bright));
+    color: var(--ink-on-accent);
     font-weight: 700;
     transition: box-shadow 0.3s ease, transform 0.3s ease, filter 0.3s ease;
   }
   .btn-pill-primary:hover {
     box-shadow:
-      0 8px 24px color-mix(in srgb, var(--accent-bright) 35%, transparent),
-      0 4px 40px color-mix(in srgb, var(--accent2) 25%, transparent);
-    filter: brightness(1.04);
+      0 8px 24px color-mix(in srgb, var(--accent-bright) 30%, transparent),
+      0 4px 40px color-mix(in srgb, var(--accent2-bright) 22%, transparent);
+    filter: brightness(1.06);
     transform: translateY(-2px);
   }
 
@@ -201,7 +280,7 @@
     gap: 0.5rem;
     padding: 0.875rem 1.75rem;
     border-radius: 9999px;
-    background: var(--surface);
+    background: color-mix(in srgb, var(--surface-el) 70%, transparent);
     border: 1.5px solid var(--border-str);
     color: var(--fg-muted);
     font-weight: 600;
@@ -211,7 +290,7 @@
     color: var(--fg);
     border-color: var(--accent);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 12%, transparent);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 
   /* Prosa dos posts do blog */
@@ -247,7 +326,7 @@
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-  .prose-post a:hover { color: var(--accent); }
+  .prose-post a:hover { color: var(--accent-bright); }
   .prose-post ul, .prose-post ol { margin: 1rem 0; padding-left: 1.5rem; }
   .prose-post ul { list-style: disc; }
   .prose-post ol { list-style: decimal; }
@@ -277,4 +356,15 @@
   .prose-post pre code { background: none; padding: 0; }
   .prose-post hr { border: none; border-top: 1px solid var(--border-col); margin: 2rem 0; }
   .prose-post strong { color: var(--fg); }
+}
+
+/* Respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-curtain,
+  .stars-layer-2,
+  .animate-float-slow,
+  .animate-float-slower,
+  .text-gradient {
+    animation: none;
+  }
 }
