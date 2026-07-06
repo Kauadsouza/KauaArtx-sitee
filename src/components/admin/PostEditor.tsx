@@ -116,7 +116,7 @@ export default function PostEditor({ post }: PostEditorProps) {
 
       <main className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
         {error && (
-          <div className="flex items-center gap-2 text-red-600 text-sm mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+          <div className="flex items-center gap-2 text-red-400 text-sm mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
             <AlertCircle size={15} />
             {error}
           </div>

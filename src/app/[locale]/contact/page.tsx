@@ -6,13 +6,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
-import { Instagram, Linkedin, Youtube, Mail, SendHorizonal, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Instagram, Linkedin, Twitter, Youtube, Mail, SendHorizonal, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SOCIALS = [
   { href: 'mailto:kauadsouza@gmail.com', icon: Mail, label: 'Email', handle: 'kauadsouza@gmail.com' },
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram', handle: '@kauaartx' },
-  { href: 'https://www.linkedin.com/in/kauadsouza', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
+  { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
+  { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X', handle: '@KauaArtx' },
   { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube', handle: '@KauartX' },
 ];
 
@@ -180,11 +181,11 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="group w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-accent-bright to-accent-2 text-[#201304] hover:brightness-105 hover:shadow-[0_8px_24px_rgba(0,200,83,0.3)] disabled:opacity-60 disabled:cursor-not-allowed font-bold text-sm transition-all"
+                  className="group w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-accent-bright to-accent-2-bright text-[#04150c] hover:brightness-105 hover:shadow-[0_8px_24px_rgba(99,247,141,0.3)] disabled:opacity-60 disabled:cursor-not-allowed font-bold text-sm transition-all"
                 >
                   {status === 'loading' ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-[#201304]/30 border-t-[#201304] rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-[#04150c]/30 border-t-[#04150c] rounded-full animate-spin" />
                       {t('form_sending')}
                     </>
                   ) : (

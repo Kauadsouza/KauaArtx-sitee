@@ -32,10 +32,10 @@ export default function YouTubeSection() {
 
           <div className="relative">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-red-500/10 text-red-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center">
                 <Youtube size={24} />
               </div>
-              <span className="text-sm font-semibold text-foreground-muted">@KauartX</span>
+              <span className="font-pixel text-[10px] sm:text-xs text-foreground-muted uppercase">@KauartX</span>
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
@@ -55,7 +55,7 @@ export default function YouTubeSection() {
                   transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
                   className="flex flex-col gap-2 p-5 rounded-2xl bg-surface-elevated/70 border border-border"
                 >
-                  <Icon size={20} className="text-accent-deep" />
+                  <Icon size={20} className="text-accent-bright" />
                   <h3 className="font-bold text-foreground">{title}</h3>
                   <p className="text-sm text-foreground-muted leading-relaxed">{desc}</p>
                 </motion.div>

@@ -58,7 +58,7 @@ export default function Header({ locale }: HeaderProps) {
         className={cn(
           'mx-auto max-w-7xl transition-all duration-300',
           isScrolled
-            ? 'mt-3 rounded-2xl glass-strong shadow-lg shadow-black/5 px-3 sm:px-5'
+            ? 'mt-3 rounded-2xl glass-strong shadow-lg shadow-black/30 px-3 sm:px-5'
             : 'mt-0 px-1 sm:px-0 border border-transparent'
         )}
       >
@@ -66,7 +66,7 @@ export default function Header({ locale }: HeaderProps) {
           {/* Logo */}
           <Link href="/" className="group flex items-center gap-2">
             <span className="text-xl font-bold tracking-tight text-foreground">
-              Kauã<span className="text-gradient">.</span>
+              Kauã <span className="text-gradient">Artx</span>
             </span>
           </Link>
 
@@ -97,7 +97,7 @@ export default function Header({ locale }: HeaderProps) {
               href={YOUTUBE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full text-foreground-muted hover:text-accent-2-deep transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full text-foreground-muted hover:text-accent-bright transition-colors"
             >
               <Youtube size={15} />
               {t('youtube')}
@@ -199,7 +199,7 @@ export default function Header({ locale }: HeaderProps) {
                   href={YOUTUBE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground-muted hover:text-accent-2-deep transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground-muted hover:text-accent-bright transition-colors"
                 >
                   <Youtube size={15} />
                   {t('youtube')}

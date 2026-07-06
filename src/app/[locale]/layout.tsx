@@ -6,6 +6,7 @@ import { routing } from '@/i18n/routing';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PageTransition from '@/components/layout/PageTransition';
+import AuroraBackground from '@/components/layout/AuroraBackground';
 
 export async function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -44,8 +45,9 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <AuroraBackground />
       <Header locale={locale} />
-      <main className="relative min-h-screen">
+      <main className="relative z-10 min-h-screen">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer />

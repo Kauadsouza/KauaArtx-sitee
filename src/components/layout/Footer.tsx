@@ -2,12 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Instagram, Linkedin, Youtube, Mail } from 'lucide-react';
+import { Instagram, Linkedin, Twitter, Youtube, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const SOCIAL_LINKS = [
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram' },
-  { href: 'https://www.linkedin.com/in/kauadsouza', icon: Linkedin, label: 'LinkedIn' },
+  { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn' },
+  { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X' },
   { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube' },
   { href: 'mailto:kauadsouza@gmail.com', icon: Mail, label: 'Email' },
 ];
@@ -23,7 +24,7 @@ export default function Footer() {
   const nav = useTranslations('nav');
 
   return (
-    <footer className="relative border-t border-border mt-32 bg-surface">
+    <footer className="relative z-10 border-t border-border mt-32 bg-surface/80 backdrop-blur-sm">
       {/* Hairline gradiente no topo */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px hairline-gradient" />
 
@@ -33,7 +34,7 @@ export default function Footer() {
           <div className="space-y-4">
             <Link href="/" className="group inline-block">
               <span className="text-2xl font-bold tracking-tight text-foreground">
-                Kauã<span className="text-gradient">.</span>
+                Kauã <span className="text-gradient">Artx</span>
               </span>
             </Link>
             <p className="text-sm text-foreground-muted leading-relaxed max-w-xs">
@@ -84,7 +85,8 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 { href: 'https://www.youtube.com/@KauartX', label: 'YouTube — @KauartX' },
-                { href: 'https://loog.ai', label: 'Loog.ai' },
+                { href: 'https://www.linkedin.com/in/kauadsouza/', label: 'LinkedIn — kauadsouza' },
+                { href: 'https://x.com/KauaArtx', label: 'Twitter / X — @KauaArtx' },
                 { href: 'https://www.instagram.com/kauaartx/', label: 'Instagram — @kauaartx' },
               ].map(({ href, label }) => (
                 <li key={href}>
