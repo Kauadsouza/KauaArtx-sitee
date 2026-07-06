@@ -2,12 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Instagram, Linkedin, Youtube, Mail } from 'lucide-react';
+import { Instagram, Linkedin, Twitter, Youtube, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const SOCIAL_LINKS = [
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram' },
-  { href: 'https://www.linkedin.com/in/kauadsouza', icon: Linkedin, label: 'LinkedIn' },
+  { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn' },
+  { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X' },
   { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube' },
   { href: 'mailto:kauadsouza@gmail.com', icon: Mail, label: 'Email' },
 ];
@@ -84,7 +85,8 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 { href: 'https://www.youtube.com/@KauartX', label: 'YouTube — @KauartX' },
-                { href: 'https://loog.ai', label: 'Loog.ai' },
+                { href: 'https://www.linkedin.com/in/kauadsouza/', label: 'LinkedIn — kauadsouza' },
+                { href: 'https://x.com/KauaArtx', label: 'Twitter / X — @KauaArtx' },
                 { href: 'https://www.instagram.com/kauaartx/', label: 'Instagram — @kauaartx' },
               ].map(({ href, label }) => (
                 <li key={href}>

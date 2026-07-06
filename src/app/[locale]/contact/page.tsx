@@ -6,13 +6,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
-import { Instagram, Linkedin, Youtube, Mail, SendHorizonal, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Instagram, Linkedin, Twitter, Youtube, Mail, SendHorizonal, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SOCIALS = [
   { href: 'mailto:kauadsouza@gmail.com', icon: Mail, label: 'Email', handle: 'kauadsouza@gmail.com' },
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram', handle: '@kauaartx' },
-  { href: 'https://www.linkedin.com/in/kauadsouza', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
+  { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
+  { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X', handle: '@KauaArtx' },
   { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube', handle: '@KauartX' },
 ];
 
