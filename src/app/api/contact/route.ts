@@ -82,9 +82,9 @@ export async function POST(req: NextRequest) {
 
     const { error } = await resend.emails.send({
       from: 'Site Kauã <onboarding@resend.dev>',
-      to: ['kauadsouza@gmail.com'],
+      to: ['kauaartx@gmail.com'],
       replyTo: data.email,
-      subject: `[Site] ${data.subject}`,
+      subject: `[Site] ${data.subject} — ${name}`,
       html: `
         <div style="font-family: sans-serif; background: #fffdf8; color: #1c1917; padding: 32px; border-radius: 12px; border: 1px solid #ece7dc;">
           <h2 style="color: #047857; margin: 0 0 24px;">Nova mensagem do site</h2>

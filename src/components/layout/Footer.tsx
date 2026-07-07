@@ -10,7 +10,7 @@ const SOCIAL_LINKS = [
   { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn' },
   { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X' },
   { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube' },
-  { href: 'mailto:kauadsouza@gmail.com', icon: Mail, label: 'Email' },
+  { href: 'mailto:kauaartx@gmail.com', icon: Mail, label: 'Email' },
 ];
 
 const NAV_LINKS = [
