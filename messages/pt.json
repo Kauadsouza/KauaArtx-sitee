@@ -15,7 +15,8 @@
     "route": "BRA → MUNDO",
     "chip_sales": "Vendas na Loog.ai",
     "chip_ceo": "CEO do Facility",
-    "chip_youtube": "Criador no YouTube"
+    "chip_youtube": "Criador no YouTube",
+    "portrait_alt": "Retrato do Kauã em pixel art — cabelo cacheado, capuz verde e mochila de aventureiro"
   },
   "what_i_do": {
     "title": "O que eu faço",
@@ -39,7 +40,8 @@
     "pillar_growth_desc": "Mentalidade, disciplina e evolução pessoal na prática.",
     "pillar_journey": "Jornada real",
     "pillar_journey_desc": "Sem filtro: os bastidores de quem está construindo a própria história.",
-    "button": "Inscreva-se no canal"
+    "button": "Inscreva-se no canal",
+    "image_alt": "Arte em pixel do Kauã de mochila nas costas, caminhando por uma trilha rumo ao horizonte"
   },
   "latest_posts": {
     "title": "Últimas do blog",
@@ -55,6 +57,7 @@
   "about": {
     "title": "Sobre mim",
     "subtitle": "Vendedor por vocação, aventureiro por natureza e empreendedor por escolha.",
+    "portrait_alt": "Retrato do Kauã em pixel art — cabelo cacheado, capuz verde e mochila de aventureiro",
     "bio_1": "Meu nome é Kauã, tenho 18 anos e, antes de qualquer cargo ou título, eu sou uma pessoa que gosta de gente. Desde cedo entendi que vender não é empurrar produto — é escutar, entender o que a pessoa precisa e ajudar de verdade. Hoje, ser vendedor é o meu foco e é o que eu amo fazer.",
     "bio_2": "Comecei no marketing digital como gestor de tráfego: passei por agências e empresas gerenciando campanhas no Google Ads e Meta Ads, gerando leads e otimizando resultados. Numa dessas empresas, a HLTS, o time vivia travado esperando terceiros criarem landing pages — então eu mesmo resolvi: criei do zero um sistema de páginas e captação de leads que a empresa passou a usar. Ali eu aprendi minha maior lição: entender o problema vale mais do que qualquer ferramenta.",
     "bio_3": "Hoje eu vivo três frentes: sou vendedor na Loog.ai, plataforma brasileira de logística com IA, onde faço discovery, qualificação e reuniões comerciais; sou CEO do Facility, onde entendemos a necessidade de cada cliente e entregamos o sistema que ele precisa; e crio conteúdo no YouTube sobre viagens e crescimento pessoal.",

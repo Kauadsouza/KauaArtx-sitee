@@ -22,6 +22,8 @@ const schema = z.object({
   email: z.string().email('Email inválido'),
   subject: z.string().min(3, 'Assunto muito curto'),
   message: z.string().min(20, 'Mensagem muito curta (mín. 20 caracteres)'),
+  // Honeypot anti-bot: humanos nunca veem nem preenchem este campo
+  website: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -128,6 +130,15 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                {/* Honeypot: invisível pra humanos, bots caem aqui */}
+                <input
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                  {...register('website')}
+                />
                 <div className="grid grid-cols-2 gap-5">
                   <div className="col-span-2 sm:col-span-1">
                     <label className="block text-xs text-foreground-subtle mb-1.5 font-mono">{t('form_name')}</label>

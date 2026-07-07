@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   ArrowRight, Youtube, Heart, TrendingUp, PackageCheck, Share2,
@@ -57,14 +58,31 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="py-12 sm:py-20"
+          className="py-12 sm:py-20 flex flex-col-reverse sm:flex-row sm:items-center gap-8 sm:gap-12"
         >
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground mb-5">
-            {t('title')}
-          </h1>
-          <p className="text-lg sm:text-2xl font-semibold mb-2">
-            <span className="text-gradient">{t('subtitle')}</span>
-          </p>
+          <div className="flex-1">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground mb-5">
+              {t('title')}
+            </h1>
+            <p className="text-lg sm:text-2xl font-semibold mb-2">
+              <span className="text-gradient">{t('subtitle')}</span>
+            </p>
+          </div>
+          <div className="relative shrink-0 self-center">
+            <div
+              aria-hidden
+              className="absolute inset-2 rounded-full bg-accent/15 blur-2xl"
+            />
+            <Image
+              src="/images/kaua-pixel.png"
+              alt={t('portrait_alt')}
+              width={720}
+              height={735}
+              priority
+              sizes="(min-width: 640px) 13rem, 10rem"
+              className="relative w-40 sm:w-52 h-auto drop-shadow-[0_12px_32px_rgba(53,224,101,0.2)]"
+            />
+          </div>
         </motion.div>
 
         {/* Bio */}

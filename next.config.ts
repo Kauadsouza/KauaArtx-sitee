@@ -3,7 +3,27 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
+const isDev = process.env.NODE_ENV === 'development';
+
+// Content Security Policy: só permite carregar recursos de origens conhecidas.
+// 'unsafe-inline' em script-src é exigido pelo runtime do Next.js;
+// 'unsafe-eval' só entra em desenvolvimento (React Fast Refresh).
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  'upgrade-insecure-requests',
+].join('; ');
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.supabase.co' },
@@ -15,6 +35,7 @@ const nextConfig: NextConfig = {
         // Headers de segurança em todas as rotas
         source: '/(.*)',
         headers: [
+          { key: 'Content-Security-Policy', value: csp },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

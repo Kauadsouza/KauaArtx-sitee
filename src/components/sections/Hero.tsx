@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight, Youtube, Briefcase, Rocket, Compass, Plane } from 'lucide-react';
 
@@ -37,6 +38,7 @@ export default function Hero() {
       <div className="absolute inset-0 gradient-radial-top pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-6 items-center">
         <motion.div
           variants={container}
           initial="hidden"
@@ -119,6 +121,36 @@ export default function Hero() {
             </a>
           </motion.div>
         </motion.div>
+
+        {/* Retrato em pixel art — o Kauã em pessoa */}
+        <motion.div
+          initial={{ opacity: 0, y: 28, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.9, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="relative flex justify-center lg:justify-end"
+        >
+          <div className="relative w-56 sm:w-72 lg:w-full lg:max-w-md">
+            {/* Luz de aurora atrás do retrato */}
+            <div
+              aria-hidden
+              className="absolute inset-x-4 top-8 bottom-0 rounded-full bg-accent/15 blur-3xl"
+            />
+            <div
+              aria-hidden
+              className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-12 rounded-full bg-accent-2/20 blur-2xl"
+            />
+            <Image
+              src="/images/kaua-pixel.png"
+              alt={t('portrait_alt')}
+              width={720}
+              height={735}
+              priority
+              sizes="(min-width: 1024px) 28rem, (min-width: 640px) 18rem, 14rem"
+              className="relative w-full h-auto drop-shadow-[0_18px_50px_rgba(53,224,101,0.22)]"
+            />
+          </div>
+        </motion.div>
+        </div>
 
         {/* Scroll indicator */}
         <motion.div

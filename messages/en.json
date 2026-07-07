@@ -15,7 +15,8 @@
     "route": "BRA → WORLD",
     "chip_sales": "Sales at Loog.ai",
     "chip_ceo": "CEO of Facility",
-    "chip_youtube": "YouTube creator"
+    "chip_youtube": "YouTube creator",
+    "portrait_alt": "Pixel art portrait of Kauã — curly hair, green hood, and an adventurer's backpack"
   },
   "what_i_do": {
     "title": "What I do",
@@ -39,7 +40,8 @@
     "pillar_growth_desc": "Mindset, discipline, and personal evolution in practice.",
     "pillar_journey": "Real journey",
     "pillar_journey_desc": "Unfiltered: behind the scenes of someone building their own story.",
-    "button": "Subscribe to the channel"
+    "button": "Subscribe to the channel",
+    "image_alt": "Pixel art of Kauã with a backpack, walking down a trail toward the horizon"
   },
   "latest_posts": {
     "title": "Latest from the blog",
@@ -55,6 +57,7 @@
   "about": {
     "title": "About me",
     "subtitle": "Salesperson by vocation, adventurer by nature, entrepreneur by choice.",
+    "portrait_alt": "Pixel art portrait of Kauã — curly hair, green hood, and an adventurer's backpack",
     "bio_1": "My name is Kauã, I'm 18 years old and, before any role or title, I'm someone who loves people. Early on I learned that selling isn't pushing a product — it's listening, understanding what someone needs, and truly helping. Today, sales is my focus and what I love doing.",
     "bio_2": "I started in digital marketing as a traffic manager: I worked at agencies and companies running Google Ads and Meta Ads campaigns, generating leads, and optimizing results. At one of them, HLTS, the team was stuck waiting on third parties to build landing pages — so I solved it myself: I built from scratch a landing page and lead capture system the company started using. That's where I learned my biggest lesson: understanding the problem is worth more than any tool.",
     "bio_3": "Today I live on three fronts: I'm a salesperson at Loog.ai, a Brazilian AI-powered logistics platform, doing discovery, qualification, and sales meetings; I'm the CEO of Facility, where we understand each client's needs and deliver the system they're looking for; and I create YouTube content about travel and personal growth.",

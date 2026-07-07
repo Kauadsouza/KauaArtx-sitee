@@ -40,6 +40,19 @@ function isRateLimited(ip: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
+    // Só aceita envios vindos do próprio site (bloqueia abuso cross-site)
+    const origin = req.headers.get('origin');
+    const host = req.headers.get('host');
+    if (origin && host && new URL(origin).host !== host) {
+      return NextResponse.json({ error: 'Origem não permitida' }, { status: 403 });
+    }
+
+    // Payload máximo: 25 KB (o formulário legítimo nunca passa disso)
+    const contentLength = Number(req.headers.get('content-length') ?? 0);
+    if (contentLength > 25_000) {
+      return NextResponse.json({ error: 'Payload muito grande' }, { status: 413 });
+    }
+
     const ip =
       req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
     if (isRateLimited(ip)) {
@@ -50,6 +63,13 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+
+    // Honeypot: campo invisível pra humanos — se veio preenchido, é bot.
+    // Responde sucesso pra não dar pista.
+    if (typeof body?.website === 'string' && body.website.length > 0) {
+      return NextResponse.json({ success: true });
+    }
+
     const data = schema.parse(body);
 
     const name = escapeHtml(data.name);

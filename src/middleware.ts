@@ -63,5 +63,7 @@ async function adminMiddleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  // Exclui: api, assets do Next, arquivos com extensão e rotas de metadata
+  // sem extensão (opengraph-image/twitter-image), que não têm versão por idioma
+  matcher: ['/((?!api|_next|_vercel|opengraph-image|twitter-image|.*\\..*).*)'],
 };
