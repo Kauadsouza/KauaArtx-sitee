@@ -152,6 +152,21 @@
     "usa": "Study and attend college in the USA",
     "youtube": "Also make a living from my YouTube channel"
   },
+  "journey": {
+    "title": "My journey",
+    "subtitle": "Everything I've lived — and what I'm still going to unlock. Level by level, like a game.",
+    "start_badge": "BRA · THE START",
+    "you_are_here": "YOU ARE HERE",
+    "done_badge": "Completed",
+    "in_progress_badge": "In progress",
+    "locked_badge": "Next level",
+    "youtube_title": "@KauartX channel",
+    "youtube_desc": "I started documenting the journey on video: travels, lessons, and growth.",
+    "london_title": "Trip to London",
+    "london_desc": "The first international stamp I want in my passport.",
+    "final_title": "GO FAR · THE WORLD",
+    "final_desc": "The trail doesn't end — there's always a next level to unlock."
+  },
   "values": {
     "people_first": {
       "title": "People first",

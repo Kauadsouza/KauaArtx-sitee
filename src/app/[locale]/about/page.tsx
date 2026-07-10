@@ -7,32 +7,24 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight, Youtube, Heart, TrendingUp, PackageCheck, Share2,
   Briefcase, Rocket, Megaphone, Building2, Globe2, Plane, GraduationCap,
-  Sparkles, Wrench, School,
+  Sparkles, Wrench, School, Check, Lock, Flag, Luggage,
 } from 'lucide-react';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
-// Ordem: mais recente primeiro
-const EXPERIENCES = [
-  { key: 'loog', icon: Briefcase, current: true },
-  { key: 'facility', icon: Rocket, current: true },
-  { key: 'diamond', icon: Building2, current: false },
-  { key: 'hlts', icon: Wrench, current: false },
-  { key: 'agencies', icon: Megaphone, current: false },
-] as const;
+// A jornada é uma trilha estilo game (tipo Duolingo): paradas concluídas,
+// paradas em andamento, a parada ATUAL (onde o Kauã está, com a arte dele
+// caminhando) e as fases futuras ainda bloqueadas.
+type TrailState = 'done' | 'progress' | 'current' | 'locked' | 'final';
 
-const PROJECTS = [
-  { key: 'kadenduo', icon: Sparkles, color: 'bg-accent/10 text-accent-deep' },
-  { key: 'finance_card', icon: School, color: 'bg-accent-2/10 text-accent-2-deep' },
-  { key: 'null_forge', icon: Share2, color: 'bg-accent/10 text-accent-deep' },
-] as const;
-
-const GOALS = [
-  { key: 'international', icon: Globe2 },
-  { key: 'abroad', icon: Plane },
-  { key: 'usa', icon: GraduationCap },
-  { key: 'youtube', icon: Youtube },
-] as const;
+interface TrailStop {
+  key: string;
+  icon: typeof Briefcase;
+  state: TrailState;
+  title: string;
+  tag?: string;
+  desc?: string;
+}
 
 const VALUES = [
   { key: 'people_first', icon: Heart, color: 'bg-accent-2/10 text-accent-2-deep' },
@@ -47,6 +39,26 @@ export default function AboutPage() {
   const projects = useTranslations('side_projects');
   const goals = useTranslations('goals');
   const values = useTranslations('values');
+  const j = useTranslations('journey');
+
+  // Do começo (feira da escola) até onde ele quer chegar — em ordem de caminhada
+  const trail: TrailStop[] = [
+    { key: 'finance_card', icon: School, state: 'done', title: projects('finance_card.name'), tag: projects('finance_card.tag'), desc: projects('finance_card.desc') },
+    { key: 'agencies', icon: Megaphone, state: 'done', title: exp('agencies.place'), tag: exp('agencies.role'), desc: exp('agencies.desc') },
+    { key: 'hlts', icon: Wrench, state: 'done', title: exp('hlts.place'), tag: exp('hlts.role'), desc: exp('hlts.desc') },
+    { key: 'diamond', icon: Building2, state: 'done', title: exp('diamond.place'), tag: exp('diamond.role'), desc: exp('diamond.desc') },
+    { key: 'null_forge', icon: Share2, state: 'done', title: projects('null_forge.name'), tag: projects('null_forge.tag'), desc: projects('null_forge.desc') },
+    { key: 'youtube_ch', icon: Youtube, state: 'done', title: j('youtube_title'), desc: j('youtube_desc') },
+    { key: 'facility', icon: Rocket, state: 'progress', title: exp('facility.place'), tag: exp('facility.role'), desc: exp('facility.desc') },
+    { key: 'kadenduo', icon: Sparkles, state: 'progress', title: projects('kadenduo.name'), tag: projects('kadenduo.tag'), desc: projects('kadenduo.desc') },
+    { key: 'loog', icon: Briefcase, state: 'current', title: exp('loog.place'), tag: exp('loog.role'), desc: exp('loog.desc') },
+    { key: 'london', icon: Plane, state: 'locked', title: j('london_title'), desc: j('london_desc') },
+    { key: 'international', icon: Globe2, state: 'locked', title: goals('international') },
+    { key: 'abroad', icon: Luggage, state: 'locked', title: goals('abroad') },
+    { key: 'usa', icon: GraduationCap, state: 'locked', title: goals('usa') },
+    { key: 'youtube_goal', icon: Youtube, state: 'locked', title: goals('youtube') },
+    { key: 'final', icon: Flag, state: 'final', title: j('final_title'), desc: j('final_desc') },
+  ];
 
   return (
     <div className="min-h-screen pt-24 relative overflow-hidden">
@@ -98,140 +110,142 @@ export default function AboutPage() {
           <p>{t('bio_4')}</p>
         </motion.div>
 
-        {/* Experiências */}
-        <section className="mb-16 sm:mb-20">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-8 sm:mb-10"
-          >
-            {t('experience_title')}
-          </motion.h2>
-
-          <div className="space-y-4">
-            {EXPERIENCES.map(({ key, icon: Icon, current }, i) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.06 }}
-                className="group flex flex-col sm:flex-row gap-4 p-5 sm:p-6 rounded-2xl bg-surface border border-border shadow-sm hover:shadow-lg hover:border-border-strong transition-all duration-300"
-              >
-                <div
-                  className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${
-                    current
-                      ? 'bg-accent/10 text-accent-deep'
-                      : 'bg-surface-elevated text-foreground-subtle'
-                  }`}
-                >
-                  <Icon size={20} />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <h3 className="text-lg font-bold text-foreground">
-                      {exp(`${key}.place`)}
-                    </h3>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-surface-elevated border border-border text-foreground-muted font-semibold">
-                      {exp(`${key}.role`)}
-                    </span>
-                    {current && (
-                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-accent/10 border border-accent/25 text-accent-deep font-bold">
-                        {exp('current_badge')}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-foreground-muted leading-relaxed">
-                    {exp(`${key}.desc`)}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Projetos próprios */}
-        <section className="mb-16 sm:mb-20">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-8 sm:mb-10"
-          >
-            {t('projects_title')}
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {PROJECTS.map(({ key, icon: Icon, color }, i) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group flex flex-col p-6 rounded-2xl bg-surface border border-border shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-              >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${color}`}>
-                  <Icon size={20} />
-                </div>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <h3 className="text-lg font-bold text-foreground">
-                    {projects(`${key}.name`)}
-                  </h3>
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-elevated border border-border text-foreground-muted font-semibold">
-                    {projects(`${key}.tag`)}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground-muted leading-relaxed">
-                  {projects(`${key}.desc`)}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Objetivos */}
+        {/* ── Jornada: trilha estilo game (Duolingo de aventureiro) ── */}
         <section className="mb-16 sm:mb-20">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative rounded-3xl overflow-hidden p-7 sm:p-12 bg-surface border border-border shadow-sm"
+            transition={{ duration: 0.5 }}
+            className="mb-8 sm:mb-10"
           >
-            <div className="orb w-[280px] h-[280px] -top-20 -right-16 bg-accent-2/15 animate-float-slow" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px hairline-gradient" />
-
-            <div className="relative">
-              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight mb-2">
-                <span className="text-gradient">{t('goals_title')}</span>
-              </h2>
-              <p className="text-foreground-muted mb-8">{goals('subtitle')}</p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {GOALS.map(({ key, icon: Icon }, i) => (
-                  <motion.div
-                    key={key}
-                    initial={{ opacity: 0, x: -12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: 0.1 + i * 0.08 }}
-                    className="flex items-center gap-3 p-4 rounded-2xl bg-surface-elevated/70 border border-border"
-                  >
-                    <div className="w-9 h-9 shrink-0 rounded-xl bg-accent/10 text-accent-deep flex items-center justify-center">
-                      <Icon size={17} />
-                    </div>
-                    <span className="text-sm font-semibold text-foreground">
-                      {goals(key)}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-2">
+              {j('title')}
+            </h2>
+            <p className="text-foreground-muted mb-4">{j('subtitle')}</p>
+            <span className="boarding-tag font-pixel text-[8px] text-accent-deep uppercase">
+              {j('start_badge')}
+            </span>
           </motion.div>
+
+          <div>
+            {trail.map((stop, i) => {
+              const Icon = stop.icon;
+              const isLast = i === trail.length - 1;
+              // O trecho do caminho depois de onde ele está ainda não foi trilhado
+              const pathAhead =
+                stop.state === 'current' || stop.state === 'locked';
+
+              const node = {
+                done: 'w-12 h-12 bg-accent/15 border-2 border-accent text-accent-deep',
+                progress: 'w-12 h-12 bg-accent/10 border-2 border-dashed border-accent/70 text-accent-deep',
+                current: 'w-16 h-16 bg-accent text-[#04100a] border-4 border-accent-bright shadow-[0_0_30px_rgba(53,224,101,0.55)]',
+                locked: 'w-12 h-12 bg-surface-elevated border-2 border-dashed border-border text-foreground-subtle',
+                final: 'w-14 h-14 bg-accent-2/10 border-2 border-accent-2 text-accent-2-deep',
+              }[stop.state];
+
+              const card = {
+                done: 'bg-surface border-border',
+                progress: 'bg-surface border-border',
+                current: 'bg-surface border-accent/50 shadow-[0_0_24px_rgba(53,224,101,0.15)]',
+                locked: 'bg-surface/60 border-dashed border-border opacity-80',
+                final: 'bg-surface border-accent-2/40',
+              }[stop.state];
+
+              return (
+                <motion.div
+                  key={stop.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.45, delay: 0.04 }}
+                  className="flex gap-4 sm:gap-6 items-stretch"
+                >
+                  {/* Coluna do caminho: parada + pegadas até a próxima */}
+                  <div className="flex flex-col items-center w-20 sm:w-24 shrink-0">
+                    {stop.state === 'current' && (
+                      <Image
+                        src="/images/kaua-journey.png"
+                        alt={t('portrait_alt')}
+                        width={120}
+                        height={150}
+                        className="w-14 sm:w-16 h-auto mb-1.5 rounded-xl border-2 border-accent/60 [image-rendering:pixelated] shadow-[0_6px_20px_rgba(53,224,101,0.35)]"
+                      />
+                    )}
+                    <div
+                      className={`relative shrink-0 rounded-full flex items-center justify-center ${node}`}
+                    >
+                      <Icon size={stop.state === 'current' ? 24 : 19} />
+                      {stop.state === 'done' && (
+                        <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-accent text-[#04100a] border-2 border-background flex items-center justify-center">
+                          <Check size={11} strokeWidth={3.5} />
+                        </span>
+                      )}
+                      {stop.state === 'locked' && (
+                        <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-surface-elevated border border-border text-foreground-subtle flex items-center justify-center">
+                          <Lock size={10} />
+                        </span>
+                      )}
+                    </div>
+                    {!isLast && (
+                      <div
+                        className={`trail-steps flex-1 min-h-8 mt-2 mb-1 ${
+                          pathAhead ? 'opacity-30' : ''
+                        }`}
+                      />
+                    )}
+                  </div>
+
+                  {/* Card da parada */}
+                  <div className={`flex-1 min-w-0 ${isLast ? '' : 'pb-8 sm:pb-10'}`}>
+                    <div className={`rounded-2xl border p-4 sm:p-5 ${card}`}>
+                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                        <h3
+                          className={`font-bold text-foreground ${
+                            stop.state === 'final'
+                              ? 'font-pixel text-xs sm:text-sm text-gradient'
+                              : 'text-base sm:text-lg'
+                          }`}
+                        >
+                          {stop.title}
+                        </h3>
+                        {stop.tag && (
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-elevated border border-border text-foreground-muted font-semibold">
+                            {stop.tag}
+                          </span>
+                        )}
+                        {stop.state === 'current' && (
+                          <span className="font-pixel text-[7px] px-2.5 py-1 rounded-full bg-accent/15 border border-accent/40 text-accent-deep uppercase">
+                            {j('you_are_here')}
+                          </span>
+                        )}
+                        {stop.state === 'done' && (
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent/10 border border-accent/25 text-accent-deep font-bold">
+                            {j('done_badge')}
+                          </span>
+                        )}
+                        {stop.state === 'progress' && (
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent/10 border border-accent/25 text-accent-deep font-bold">
+                            {j('in_progress_badge')}
+                          </span>
+                        )}
+                        {stop.state === 'locked' && (
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-elevated border border-border text-foreground-subtle font-bold">
+                            {j('locked_badge')}
+                          </span>
+                        )}
+                      </div>
+                      {stop.desc && (
+                        <p className="text-sm text-foreground-muted leading-relaxed">
+                          {stop.desc}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         </section>
 
         {/* Values */}

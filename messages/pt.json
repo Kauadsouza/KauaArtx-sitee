@@ -152,6 +152,21 @@
     "usa": "Estudar e fazer faculdade nos EUA",
     "youtube": "Viver também do canal no YouTube"
   },
+  "journey": {
+    "title": "Minha jornada",
+    "subtitle": "Tudo que já vivi — e o que ainda vou desbloquear. Fase por fase, como num jogo.",
+    "start_badge": "BRA · O COMEÇO",
+    "you_are_here": "VOCÊ ESTÁ AQUI",
+    "done_badge": "Concluído",
+    "in_progress_badge": "Em andamento",
+    "locked_badge": "Próxima fase",
+    "youtube_title": "Canal @KauartX",
+    "youtube_desc": "Comecei a documentar a jornada em vídeo: viagens, lições e evolução.",
+    "london_title": "Viagem para Londres",
+    "london_desc": "Primeiro carimbo internacional que quero no passaporte.",
+    "final_title": "GO FAR · O MUNDO",
+    "final_desc": "A trilha não termina — sempre tem uma próxima fase pra desbloquear."
+  },
   "values": {
     "people_first": {
       "title": "Pessoas em primeiro lugar",
