@@ -98,6 +98,18 @@
   50%      { box-shadow: 0 0 22px 6px rgba(75, 238, 198, 0.75); }
 }
 
+/* Floresta respirando atrás do vidro do portão */
+@keyframes forest-drift {
+  0%, 100% { transform: scale(1.02) translateY(0); }
+  50%      { transform: scale(1.1) translateY(-2%); }
+}
+
+/* Cursor ▼ piscando no diálogo RPG */
+@keyframes rpg-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.15; }
+}
+
 /* ── Base ─────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
@@ -293,6 +305,15 @@
     animation: emblem-pulse 3.5s ease-in-out infinite;
   }
 
+  .gate-forest-drift {
+    animation: forest-drift 26s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .rpg-blink {
+    animation: rpg-blink 1s steps(1) infinite;
+  }
+
   /* Etiqueta de embarque — detalhe aventureiro */
   .boarding-tag {
     display: inline-flex;
@@ -420,7 +441,8 @@
   .text-gradient,
   .gate-ring-spin,
   .gate-firefly,
-  .gate-emblem {
+  .gate-emblem,
+  .gate-forest-drift {
     animation: none;
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/navigation';
@@ -10,9 +10,9 @@ import {
   Compass, Eye, EyeOff, Check, Globe, UserPlus, DoorOpen, Swords,
 } from 'lucide-react';
 
-// Tela de login estilo game na frente do site.
-// É teatro: qualquer nome/senha abre o portal. Depois de entrar,
-// a escolha fica salva e o portal não aparece de novo.
+// Tela de login estilo game na frente do site: um portão de madeira
+// guardado por um mago que conversa a cada clique. É teatro — qualquer
+// nome/senha abre o portão. Depois de entrar, a escolha fica salva.
 const ENTERED_KEY = 'kaua-portal-entered';
 const NAME_KEY = 'kaua-adventurer';
 
@@ -30,11 +30,17 @@ const FIREFLIES = [
   { left: '74%', top: '58%', dur: '8.5s', delay: '2.1s' },
   { left: '83%', top: '20%', dur: '10.5s', delay: '1.5s' },
   { left: '90%', top: '70%', dur: '9s', delay: '2.7s' },
-  { left: '38%', top: '52%', dur: '13s', delay: '0.9s' },
-  { left: '52%', top: '40%', dur: '10s', delay: '3.3s' },
 ] as const;
 
-type Stage = 'hidden' | 'open' | 'loading';
+// A janela do portão no sprite (240×320): x 64..176, y 22..158
+// (com 2px de sangria pro aro de ferro cobrir a emenda)
+const HOLE = { left: '26.7%', top: '6.9%', width: '46.6%', height: '42.5%' };
+// Área das portas de madeira onde o formulário se apoia
+const DOOR = { left: '9%', top: '51%', width: '82%', height: '44%' };
+
+const WIZARD_LINES = 4;
+
+type Stage = 'hidden' | 'open' | 'thanks' | 'loading';
 
 export default function LoginGate() {
   const t = useTranslations('gate');
@@ -49,6 +55,17 @@ export default function LoginGate() {
   const [remember, setRemember] = useState(true);
   const [progress, setProgress] = useState(0);
 
+  // Diálogo do mago
+  const [line, setLine] = useState(0);
+  const [typed, setTyped] = useState('');
+  const typedRef = useRef(0);
+
+  const adventurer = name.trim() || t('default_adventurer');
+  const fullMsg =
+    stage === 'thanks'
+      ? t('wizard_thanks', { name: adventurer })
+      : t(`wizard_${line + 1}`);
+
   // Só abre pra quem ainda não entrou (e nunca no servidor → SEO intacto)
   useEffect(() => {
     try {
@@ -60,7 +77,7 @@ export default function LoginGate() {
     }
   }, []);
 
-  // Trava o scroll do site enquanto o portal está aberto
+  // Trava o scroll do site enquanto o portão está fechado
   useEffect(() => {
     if (stage === 'hidden') return;
     const prev = document.body.style.overflow;
@@ -70,6 +87,30 @@ export default function LoginGate() {
     };
   }, [stage]);
 
+  // Máquina de escrever do diálogo
+  useEffect(() => {
+    if (stage === 'hidden' || stage === 'loading') return;
+    typedRef.current = 0;
+    setTyped('');
+    const id = setInterval(() => {
+      typedRef.current = Math.min(fullMsg.length, typedRef.current + 1);
+      setTyped(fullMsg.slice(0, typedRef.current));
+      if (typedRef.current >= fullMsg.length) clearInterval(id);
+    }, 30);
+    return () => clearInterval(id);
+  }, [fullMsg, stage]);
+
+  const talkToWizard = () => {
+    if (stage !== 'open') return;
+    if (typedRef.current < fullMsg.length) {
+      // completa a fala na hora
+      typedRef.current = fullMsg.length;
+      setTyped(fullMsg);
+    } else {
+      setLine((l) => (l + 1) % WIZARD_LINES);
+    }
+  };
+
   const persist = (rememberMe: boolean) => {
     try {
       (rememberMe ? localStorage : sessionStorage).setItem(ENTERED_KEY, '1');
@@ -77,6 +118,16 @@ export default function LoginGate() {
       // navegação privada sem storage — segue o jogo
     }
   };
+
+  // Depois do agradecimento do mago, começa o carregamento
+  useEffect(() => {
+    if (stage !== 'thanks' || typed !== fullMsg) return;
+    const to = setTimeout(() => {
+      setProgress(0);
+      setStage('loading');
+    }, 1100);
+    return () => clearTimeout(to);
+  }, [stage, typed, fullMsg]);
 
   // Barra de progresso do "carregamento do mundo"
   useEffect(() => {
@@ -102,8 +153,7 @@ export default function LoginGate() {
         localStorage.setItem(NAME_KEY, trimmed);
       } catch {}
     }
-    setProgress(0);
-    setStage('loading');
+    setStage('thanks');
   };
 
   const enterGuest = () => {
@@ -120,7 +170,7 @@ export default function LoginGate() {
     router.push('/contact');
   };
 
-  // Esc = pular o portal (acessibilidade)
+  // Esc = pular o portão (acessibilidade)
   useEffect(() => {
     if (stage !== 'open') return;
     const onKey = (e: KeyboardEvent) => {
@@ -194,7 +244,6 @@ export default function LoginGate() {
           <div aria-hidden className="absolute inset-2.5 sm:inset-5 pointer-events-none">
             <div className="absolute inset-0 rounded-xl border border-[#1f4a2e]/70" />
             <div className="absolute inset-1.5 rounded-lg border border-[#35e065]/15" />
-            {/* Losangos nos cantos */}
             {[
               '-top-1 -left-1', '-top-1 -right-1',
               '-bottom-1 -left-1', '-bottom-1 -right-1',
@@ -204,107 +253,147 @@ export default function LoginGate() {
                 className={`absolute ${pos} w-2.5 h-2.5 rotate-45 bg-gradient-to-br from-accent to-accent-2 shadow-[0_0_10px_rgba(53,224,101,0.8)]`}
               />
             ))}
-            {/* Emblema no topo */}
             <div className="absolute -top-2 left-1/2 -translate-x-1/2">
               <div className="gate-emblem w-5 h-5 rotate-45 bg-gradient-to-br from-accent-bright to-accent-2-bright rounded-[3px] flex items-center justify-center">
-                <div className="w-2 h-2 rotate-0 bg-[#04150c] rounded-[1px]" />
+                <div className="w-2 h-2 bg-[#04150c] rounded-[1px]" />
               </div>
             </div>
           </div>
 
-          {/* ── Conteúdo central ── */}
-          <div className="relative flex-1 flex flex-col items-center justify-center px-4 pt-10 pb-2 min-h-0">
+          {/* ── Conteúdo central (com scroll interno se a tela for baixa) ── */}
+          <div className="relative flex-1 min-h-0 overflow-y-auto">
+          <div className="min-h-full flex flex-col items-center justify-center px-4 pt-8 pb-3 gap-3 sm:gap-5">
             {/* Título */}
             <motion.div
               initial={{ opacity: 0, y: -16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25, duration: 0.7 }}
-              className="text-center mb-5 sm:mb-7"
+              className="text-center"
             >
-              <h1 className="font-pixel text-xl sm:text-3xl text-foreground [text-shadow:0_0_24px_rgba(99,247,141,0.65),0_0_60px_rgba(75,238,198,0.35)]">
+              <h1 className="font-pixel text-lg sm:text-2xl text-foreground [text-shadow:0_0_24px_rgba(99,247,141,0.65),0_0_60px_rgba(75,238,198,0.35)]">
                 KAUÃ <span className="text-gradient">ARTX</span>
               </h1>
-              <p className="font-pixel text-[8px] sm:text-[10px] text-foreground-muted tracking-[0.35em] mt-3 uppercase">
+              <p className="font-pixel text-[7px] sm:text-[9px] text-foreground-muted tracking-[0.35em] mt-2 uppercase">
                 {t('subtitle')}
               </p>
             </motion.div>
 
-            {/* Portal circular com a arte da jornada + formulário */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.35, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="relative aspect-square w-[min(92vw,54vh,520px)]"
-            >
-              {/* Brilho difuso atrás do portal */}
-              <div
-                aria-hidden
-                className="absolute -inset-6 rounded-full bg-accent/10 blur-3xl"
-              />
-              {/* Anel de energia girando */}
-              <div aria-hidden className="absolute inset-0 rounded-full gate-ring-spin" />
-              {/* Anel estático */}
-              <div aria-hidden className="absolute inset-[7px] rounded-full border-2 border-[#1f4a2e]" />
-              {/* Interior do portal: a jornada */}
-              <div className="absolute inset-[12px] rounded-full overflow-hidden">
+            {/* Mago + Portão */}
+            <div className="flex flex-col lg:flex-row items-center lg:items-end justify-center gap-3 lg:gap-8 w-full max-w-4xl min-h-0">
+              {/* ── Mago interativo ── */}
+              <motion.button
+                type="button"
+                onClick={talkToWizard}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.55, duration: 0.7 }}
+                className="group flex lg:flex-col items-end lg:items-center gap-2 lg:gap-3 w-full lg:w-64 max-w-[430px] px-1 shrink-0 cursor-pointer text-left lg:pb-4"
+                aria-label={t('wizard_tap')}
+              >
+                {/* Silhueta do mago */}
                 <Image
-                  src="/images/kaua-journey.png"
+                  src="/images/pixel-wizard.png"
                   alt=""
-                  fill
-                  sizes="520px"
+                  width={36}
+                  height={52}
                   priority
-                  className="object-cover object-[center_32%]"
+                  className={`order-1 w-16 sm:w-20 lg:w-28 h-auto shrink-0 [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.5)] ${
+                    stage === 'thanks'
+                      ? 'drop-shadow-[0_0_20px_rgba(99,247,141,0.9)]'
+                      : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.35)]'
+                  }`}
                 />
-                {/* Escurece o centro pra leitura do formulário */}
-                <div
-                  aria-hidden
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      'radial-gradient(circle at 50% 54%, rgba(2,10,6,0.92) 0%, rgba(2,10,6,0.72) 42%, rgba(2,10,6,0.28) 68%, rgba(2,10,6,0.05) 82%, transparent 92%)',
-                  }}
-                />
-              </div>
+                {/* Balão de diálogo RPG */}
+                <span className="order-2 relative flex-1 lg:flex-none lg:w-full lg:order-first block rounded-lg border-2 border-[#1f4a2e] bg-[#04150c]/95 backdrop-blur-sm p-3 sm:p-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.55),inset_0_0_0_1px_rgba(53,224,101,0.12)]">
+                  <span className="block font-pixel text-[8px] sm:text-[9px] leading-[1.9] text-foreground min-h-[4.75em]">
+                    {typed}
+                    {stage === 'open' && typed === fullMsg && (
+                      <span className="rpg-blink text-accent-bright"> ▼</span>
+                    )}
+                  </span>
+                  <span className="block mt-1.5 font-pixel text-[6px] sm:text-[7px] text-foreground-subtle uppercase tracking-widest">
+                    {t('wizard_tap')}
+                  </span>
+                  {/* Rabinho do balão apontando pro mago */}
+                  <span
+                    aria-hidden
+                    className="absolute -left-[7px] bottom-4 lg:left-1/2 lg:-bottom-[7px] lg:-translate-x-1/2 w-3 h-3 rotate-45 bg-[#04150c] border-l-2 border-b-2 border-[#1f4a2e] lg:border-l-0 lg:border-t-0"
+                  />
+                </span>
+              </motion.button>
 
-              {/* Formulário / carregamento dentro do portal */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <AnimatePresence mode="wait">
-                  {stage === 'open' ? (
-                    <motion.form
-                      key="form"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3 }}
-                      onSubmit={enter}
-                      className="w-[74%] max-w-[300px] flex flex-col gap-2.5 sm:gap-3"
-                    >
-                      <div>
-                        <label
-                          htmlFor="gate-user"
-                          className="block font-pixel text-[8px] sm:text-[9px] text-accent-deep uppercase tracking-widest mb-1.5"
-                        >
-                          {t('label_user')}
-                        </label>
+              {/* ── Portão de madeira ── */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="relative shrink-0 w-[min(84vw,44vh,340px)]"
+                style={{ aspectRatio: '3 / 4' }}
+              >
+                {/* Brilho difuso atrás */}
+                <div aria-hidden className="absolute -inset-5 bg-accent/10 blur-3xl rounded-3xl" />
+
+                {/* Floresta vista pelo vidro da janela */}
+                <div
+                  className="absolute overflow-hidden"
+                  style={{
+                    ...HOLE,
+                    borderRadius: '50% 50% 0 0 / 42% 42% 0 0',
+                  }}
+                >
+                  <Image
+                    src="/images/gate-forest.png"
+                    alt=""
+                    fill
+                    sizes="240px"
+                    priority
+                    className="object-cover gate-forest-drift"
+                  />
+                  {/* Vidro: tinta esverdeada + reflexo diagonal */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(115deg, transparent 22%, rgba(234,255,242,0.12) 42%, rgba(234,255,242,0.2) 48%, transparent 60%), linear-gradient(180deg, rgba(31,211,167,0.1), rgba(4,21,12,0.18))',
+                    }}
+                  />
+                </div>
+
+                {/* O portão em pixel art (janela transparente) */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/pixel-gate.png"
+                  alt=""
+                  className="absolute inset-0 w-full h-full [image-rendering:pixelated] select-none pointer-events-none drop-shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+                />
+
+                {/* Formulário sobre as portas de madeira */}
+                <div className="absolute" style={DOOR}>
+                  <AnimatePresence mode="wait">
+                    {stage === 'open' || stage === 'thanks' ? (
+                      <motion.form
+                        key="form"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.3 }}
+                        onSubmit={enter}
+                        className={`w-full h-full flex flex-col justify-center gap-1.5 sm:gap-2 transition-opacity ${
+                          stage === 'thanks' ? 'opacity-60 pointer-events-none' : ''
+                        }`}
+                      >
                         <input
                           id="gate-user"
                           type="text"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder={t('placeholder_user')}
+                          aria-label={t('label_user')}
                           autoComplete="off"
                           maxLength={40}
-                          className="w-full px-3.5 py-2.5 rounded-lg bg-[#04150c]/85 backdrop-blur-sm border border-[#1f4a2e] focus:border-accent-bright outline-none text-sm text-foreground placeholder:text-foreground-subtle/70 transition-colors"
+                          className="w-full px-3 py-2 rounded-md bg-[#04150c]/90 backdrop-blur-sm border border-[#1f4a2e] focus:border-accent-bright outline-none text-[13px] text-foreground placeholder:text-foreground-subtle/70 transition-colors"
                         />
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor="gate-pass"
-                          className="block font-pixel text-[8px] sm:text-[9px] text-accent-deep uppercase tracking-widest mb-1.5"
-                        >
-                          {t('label_pass')}
-                        </label>
                         <div className="relative">
                           <input
                             id="gate-pass"
@@ -312,9 +401,10 @@ export default function LoginGate() {
                             value={pass}
                             onChange={(e) => setPass(e.target.value)}
                             placeholder={t('placeholder_pass')}
+                            aria-label={t('label_pass')}
                             autoComplete="off"
                             maxLength={64}
-                            className="w-full px-3.5 py-2.5 pr-10 rounded-lg bg-[#04150c]/85 backdrop-blur-sm border border-[#1f4a2e] focus:border-accent-bright outline-none text-sm text-foreground placeholder:text-foreground-subtle/70 transition-colors"
+                            className="w-full px-3 py-2 pr-9 rounded-md bg-[#04150c]/90 backdrop-blur-sm border border-[#1f4a2e] focus:border-accent-bright outline-none text-[13px] text-foreground placeholder:text-foreground-subtle/70 transition-colors"
                           />
                           <button
                             type="button"
@@ -322,85 +412,79 @@ export default function LoginGate() {
                             aria-label={showPass ? 'Esconder senha' : 'Mostrar senha'}
                             className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground-subtle hover:text-accent-bright transition-colors"
                           >
-                            {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                            {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
                           </button>
                         </div>
-                        <p className="text-[10px] text-foreground-subtle mt-1.5">{t('hint')}</p>
-                      </div>
 
-                      {/* Lembrar de mim */}
-                      <button
-                        type="button"
-                        role="checkbox"
-                        aria-checked={remember}
-                        onClick={() => setRemember(!remember)}
-                        className="group flex items-center gap-2 self-center"
-                      >
-                        <span
-                          className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                            remember
-                              ? 'bg-accent border-accent-bright text-[#04150c]'
-                              : 'bg-[#04150c]/85 border-[#1f4a2e] group-hover:border-accent'
-                          }`}
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-checked={remember}
+                          onClick={() => setRemember(!remember)}
+                          className="group/r flex items-center gap-2 self-center py-0.5"
                         >
-                          {remember && <Check size={11} strokeWidth={3.5} />}
-                        </span>
-                        <span className="text-xs text-foreground-muted group-hover:text-foreground transition-colors">
-                          {t('remember')}
-                        </span>
-                      </button>
+                          <span
+                            className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
+                              remember
+                                ? 'bg-accent border-accent-bright text-[#04150c]'
+                                : 'bg-[#04150c]/90 border-[#1f4a2e] group-hover/r:border-accent'
+                            }`}
+                          >
+                            {remember && <Check size={10} strokeWidth={3.5} />}
+                          </span>
+                          <span className="text-[11px] text-[#d8f2e2] [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] group-hover/r:text-white transition-colors">
+                            {t('remember')}
+                          </span>
+                        </button>
 
-                      <button
-                        type="submit"
-                        className="btn-pill-primary w-full !py-3 font-pixel text-[10px] sm:text-[11px] uppercase tracking-wider"
-                      >
-                        <Swords size={13} />
-                        {t('enter')}
-                      </button>
+                        <button
+                          type="submit"
+                          className="btn-pill-primary w-full !py-2.5 !rounded-lg font-pixel text-[9px] sm:text-[10px] uppercase tracking-wider"
+                        >
+                          <Swords size={12} />
+                          {t('enter')}
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={enterGuest}
-                        className="self-center text-[11px] text-foreground-subtle hover:text-accent-bright underline underline-offset-4 decoration-dotted transition-colors"
+                        <button
+                          type="button"
+                          onClick={enterGuest}
+                          className="self-center text-[10px] text-[#c4e3d1] [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] hover:text-accent-bright underline underline-offset-4 decoration-dotted transition-colors"
+                        >
+                          {t('guest')} →
+                        </button>
+                      </motion.form>
+                    ) : (
+                      <motion.div
+                        key="loading"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full h-full flex flex-col items-center justify-center gap-3 text-center"
                       >
-                        {t('guest')} →
-                      </button>
-                    </motion.form>
-                  ) : (
-                    <motion.div
-                      key="loading"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="w-[70%] max-w-[280px] flex flex-col items-center gap-4 text-center"
-                    >
-                      <Compass
-                        size={30}
-                        className="text-accent-bright animate-[portal-spin_3s_linear_infinite]"
-                      />
-                      {name.trim() && (
-                        <p className="text-sm text-foreground font-semibold">
-                          {t('welcome')}, <span className="text-gradient">{name.trim()}</span>!
-                        </p>
-                      )}
-                      <p className="font-pixel text-[9px] text-foreground-muted uppercase min-h-[2.5em]">
-                        {t(`loading_${msgIndex}`)}
-                      </p>
-                      <div className="w-full h-2 rounded-full bg-[#04150c]/90 border border-[#1f4a2e] overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-accent-bright to-accent-2-bright transition-[width] duration-100"
-                          style={{ width: `${progress}%` }}
+                        <Compass
+                          size={26}
+                          className="text-accent-bright animate-[portal-spin_3s_linear_infinite]"
                         />
-                      </div>
-                      <span className="font-mono text-[11px] text-accent-deep">
-                        {Math.floor(progress)}%
-                      </span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
+                        <p className="font-pixel text-[8px] text-[#d8f2e2] [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] uppercase min-h-[2.5em]">
+                          {t(`loading_${msgIndex}`)}
+                        </p>
+                        <div className="w-[85%] h-2 rounded-full bg-[#04150c]/90 border border-[#1f4a2e] overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-accent-bright to-accent-2-bright transition-[width] duration-100"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <span className="font-mono text-[11px] text-accent-deep [text-shadow:0_1px_2px_rgba(0,0,0,0.9)]">
+                          {Math.floor(progress)}%
+                        </span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            </div>
+          </div>
           </div>
 
           {/* ── Rodapé: versão + botões de game ── */}
