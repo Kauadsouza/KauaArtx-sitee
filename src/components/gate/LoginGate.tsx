@@ -428,16 +428,22 @@ export default function LoginGate() {
             ))}
           </div>
 
-          {/* ── Logo (canto superior esquerdo, como nos games) ── */}
-          <div className="absolute top-5 left-6 sm:top-7 sm:left-9">
-            <h1 className="font-pixel text-sm sm:text-lg text-foreground [text-shadow:0_0_18px_rgba(99,247,141,0.7),0_2px_4px_rgba(0,0,0,0.9)]">
-              KAUÃ <span className="text-gradient">ARTX</span>
+          {/* ── Logo (canto superior esquerdo, como nos games). No celular ganha
+                 uma placa escura atrás — direto sobre a arte clara ficava lavado.
+                 O "ARTX" é verde vivo sólido: o gradiente com clip-text some na
+                 arte e ignora text-shadow. ── */}
+          <div className="absolute top-3 left-3 sm:top-7 sm:left-9 rounded-xl bg-[#04100a]/70 border border-[#68a14c]/30 shadow-[0_4px_18px_rgba(0,0,0,0.5)] backdrop-blur-[2px] px-3 py-2.5 sm:bg-transparent sm:border-transparent sm:shadow-none sm:backdrop-blur-0 sm:px-0 sm:py-0">
+            <h1 className="font-pixel text-sm sm:text-lg text-white [text-shadow:0_2px_0_rgba(0,0,0,0.9),0_0_18px_rgba(99,247,141,0.75),0_2px_6px_rgba(0,0,0,0.95)]">
+              KAUÃ{' '}
+              <span className="text-[#63f78d] [text-shadow:0_2px_0_rgba(0,0,0,0.9),0_0_16px_rgba(99,247,141,0.85),0_2px_6px_rgba(0,0,0,0.95)]">
+                ARTX
+              </span>
             </h1>
-            <p className="font-pixel text-[6px] sm:text-[8px] text-[#c4e3d1] tracking-[0.3em] mt-1.5 uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+            <p className="font-pixel text-[6px] sm:text-[8px] text-[#eafff2] tracking-[0.3em] mt-1.5 uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">
               {t('subtitle')}
             </p>
             {/* No celular a versão/copyright mora aqui (embaixo não cabe junto dos botões) */}
-            <p className="sm:hidden font-pixel text-[6px] text-[#c4e3d1]/85 mt-2 max-w-[190px] leading-relaxed [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+            <p className="sm:hidden font-pixel text-[6px] text-[#d5efe0] mt-2 max-w-[190px] leading-relaxed [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">
               {t('version')} · {t('copyright')}
             </p>
           </div>
