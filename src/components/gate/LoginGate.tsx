@@ -6,37 +6,43 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Compass, Eye, EyeOff, Check, Globe, UserPlus, DoorOpen, Swords,
-} from 'lucide-react';
+import { Compass, Check, Globe, UserPlus, DoorOpen } from 'lucide-react';
 
-// Tela de login estilo game na frente do site: um portão de madeira
-// guardado por um mago que conversa a cada clique. É teatro — qualquer
-// nome/senha abre o portão. Depois de entrar, a escolha fica salva.
+// Tela de login estilo game na frente do site, usando a arte oficial
+// (moldura ornamentada + círculo com a floresta) como cenário completo.
+// Um mago guardião conversa a cada clique. É teatro — qualquer nome/senha
+// abre o portal. Depois de entrar, a escolha fica salva.
+//
+// IMPORTANTE: o conteúdo é estático (sem animações de entrada por elemento).
+// Animação de entrada em cada bloco deixava a tela vazia quando o navegador
+// pausava o requestAnimationFrame (ex.: troca de idioma com aba desfocada).
 const ENTERED_KEY = 'kaua-portal-entered';
 const NAME_KEY = 'kaua-adventurer';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
+// A arte de fundo tem 1672×941. Os campos reais ficam alinhados por cima
+// dos elementos pintados nela (posições medidas por script, em %).
+const BG_RATIO = 941 / 1672;
+const BOX = {
+  email: { left: '41.2%', top: '41.3%', width: '17.5%', height: '4.1%' },
+  senha: { left: '41.2%', top: '49.9%', width: '17.5%', height: '4.1%' },
+  lembrar: { left: '41.2%', top: '56.5%', width: '10.5%', height: '3%' },
+  entrar: { left: '42.9%', top: '60.7%', width: '14.1%', height: '4.6%' },
+  visitante: { left: '41.2%', top: '66.6%', width: '17.5%' },
+  loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
+} as const;
+
 // Posições fixas (nada de Math.random no render → sem bug de hidratação)
 const FIREFLIES = [
-  { left: '6%', top: '18%', dur: '9s', delay: '0s' },
-  { left: '14%', top: '64%', dur: '11s', delay: '1.2s' },
-  { left: '22%', top: '38%', dur: '8s', delay: '2.4s' },
-  { left: '31%', top: '78%', dur: '12s', delay: '0.6s' },
-  { left: '44%', top: '12%', dur: '10s', delay: '3s' },
-  { left: '58%', top: '84%', dur: '9.5s', delay: '1.8s' },
-  { left: '67%', top: '26%', dur: '11.5s', delay: '0.3s' },
-  { left: '74%', top: '58%', dur: '8.5s', delay: '2.1s' },
-  { left: '83%', top: '20%', dur: '10.5s', delay: '1.5s' },
-  { left: '90%', top: '70%', dur: '9s', delay: '2.7s' },
+  { left: '10%', top: '30%', dur: '9s', delay: '0s' },
+  { left: '20%', top: '66%', dur: '11s', delay: '1.2s' },
+  { left: '33%', top: '24%', dur: '8s', delay: '2.4s' },
+  { left: '62%', top: '30%', dur: '12s', delay: '0.6s' },
+  { left: '75%', top: '62%', dur: '10s', delay: '3s' },
+  { left: '87%', top: '34%', dur: '9.5s', delay: '1.8s' },
+  { left: '48%', top: '76%', dur: '11.5s', delay: '0.3s' },
 ] as const;
-
-// A janela do portão no sprite (240×320): x 64..176, y 22..158
-// (com 2px de sangria pro aro de ferro cobrir a emenda)
-const HOLE = { left: '26.7%', top: '6.9%', width: '46.6%', height: '42.5%' };
-// Área das portas de madeira onde o formulário se apoia
-const DOOR = { left: '9%', top: '51%', width: '82%', height: '44%' };
 
 const WIZARD_LINES = 4;
 
@@ -51,7 +57,6 @@ export default function LoginGate() {
   const [stage, setStage] = useState<Stage>('hidden');
   const [name, setName] = useState('');
   const [pass, setPass] = useState('');
-  const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(true);
   const [progress, setProgress] = useState(0);
 
@@ -62,7 +67,7 @@ export default function LoginGate() {
 
   const adventurer = name.trim() || t('default_adventurer');
   const fullMsg =
-    stage === 'thanks'
+    stage === 'thanks' || stage === 'loading'
       ? t('wizard_thanks', { name: adventurer })
       : t(`wizard_${line + 1}`);
 
@@ -77,7 +82,7 @@ export default function LoginGate() {
     }
   }, []);
 
-  // Trava o scroll do site enquanto o portão está fechado
+  // Trava o scroll do site enquanto o portal está aberto
   useEffect(() => {
     if (stage === 'hidden') return;
     const prev = document.body.style.overflow;
@@ -170,7 +175,7 @@ export default function LoginGate() {
     router.push('/contact');
   };
 
-  // Esc = pular o portão (acessibilidade)
+  // Esc = pular o portal (acessibilidade)
   useEffect(() => {
     if (stage !== 'open') return;
     const onKey = (e: KeyboardEvent) => {
@@ -182,8 +187,12 @@ export default function LoginGate() {
   }, [stage]);
 
   const msgIndex = progress < 30 ? 1 : progress < 60 ? 2 : progress < 88 ? 3 : 4;
+  const formActive = stage === 'open';
 
   if (typeof document === 'undefined') return null;
+
+  const inputClass =
+    'absolute rounded-md bg-[#0a1c0f]/95 border border-[#68a14c]/45 focus:border-[#9fdb6d] outline-none px-3 text-[13px] text-[#e9fbef] placeholder:text-[#7a9a83]/80 shadow-[inset_0_2px_8px_rgba(0,0,0,0.55)] transition-colors';
 
   return createPortal(
     <AnimatePresence>
@@ -197,35 +206,126 @@ export default function LoginGate() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.05, filter: 'brightness(2)' }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] overflow-hidden bg-[#020a06] flex flex-col"
+          className="fixed inset-0 z-[100] overflow-hidden bg-[#0a1408]"
         >
-          {/* ── Céu: estrelas + auroras + horizonte ── */}
+          {/* ── Cenário: a arte ocupa a tela inteira (tipo background cover).
+                 Os campos ficam em % DENTRO desta caixa, então sempre
+                 alinham com os elementos pintados. ── */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{
+              aspectRatio: '1672 / 941',
+              height: `max(100vh, calc(100vw * ${BG_RATIO}))`,
+            }}
+          >
+            <Image
+              src="/images/login-bg.webp"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover select-none"
+            />
+            {/* Pegada mais verde + leitura */}
+            <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
+            <div aria-hidden className="absolute inset-0 aurora-vignette opacity-60" />
+
+            {/* ── Campos reais alinhados sobre os pintados ── */}
+            {stage !== 'loading' ? (
+              <form onSubmit={enter} className={formActive ? '' : 'pointer-events-none opacity-80'}>
+                <input
+                  id="gate-user"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t('placeholder_user')}
+                  aria-label={t('label_user')}
+                  autoComplete="off"
+                  maxLength={40}
+                  style={BOX.email}
+                  className={inputClass}
+                />
+                <input
+                  id="gate-pass"
+                  type="password"
+                  value={pass}
+                  onChange={(e) => setPass(e.target.value)}
+                  placeholder={t('placeholder_pass')}
+                  aria-label={t('label_pass')}
+                  autoComplete="off"
+                  maxLength={64}
+                  style={BOX.senha}
+                  className={inputClass}
+                />
+
+                {/* Lembrar de mim (cobre o pintado, que era ilegível) */}
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={remember}
+                  onClick={() => setRemember(!remember)}
+                  style={BOX.lembrar}
+                  className="absolute flex items-center gap-1.5 px-1.5 rounded bg-[#0a1c0f]/90 border border-[#68a14c]/30"
+                >
+                  <span
+                    className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
+                      remember
+                        ? 'bg-[#4caf50] border-[#9fdb6d] text-[#04150c]'
+                        : 'bg-[#0a1c0f] border-[#68a14c]/60'
+                    }`}
+                  >
+                    {remember && <Check size={10} strokeWidth={3.5} />}
+                  </span>
+                  <span className="text-[11px] text-[#d8f2e2] whitespace-nowrap pr-1">
+                    {t('remember')}
+                  </span>
+                </button>
+
+                {/* Botão Entrar: o desenho pintado é o visual; aqui só o clique */}
+                <button
+                  type="submit"
+                  aria-label={t('enter')}
+                  style={BOX.entrar}
+                  className="absolute rounded-lg cursor-pointer transition-all hover:shadow-[0_0_24px_rgba(120,220,110,0.55),inset_0_0_14px_rgba(160,255,150,0.2)] hover:brightness-110 active:scale-[0.98]"
+                />
+
+                <button
+                  type="button"
+                  onClick={enterGuest}
+                  style={BOX.visitante}
+                  className="absolute text-center text-[11px] text-[#d8f2e2]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.95)] hover:text-white underline underline-offset-4 decoration-dotted transition-colors"
+                >
+                  {t('guest')} →
+                </button>
+              </form>
+            ) : (
+              /* ── Carregando o mundo (no centro do círculo) ── */
+              <div
+                style={BOX.loading}
+                className="absolute flex flex-col items-center justify-center gap-3 text-center rounded-2xl bg-[#07130a]/85 border border-[#68a14c]/35 backdrop-blur-sm p-4"
+              >
+                <Compass
+                  size={26}
+                  className="text-accent-bright animate-[portal-spin_3s_linear_infinite]"
+                />
+                <p className="font-pixel text-[8px] text-[#d8f2e2] uppercase min-h-[2.5em]">
+                  {t(`loading_${msgIndex}`)}
+                </p>
+                <div className="w-full h-2 rounded-full bg-[#04150c] border border-[#1f4a2e] overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-accent-bright to-accent-2-bright transition-[width] duration-100"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <span className="font-mono text-[11px] text-accent-deep">
+                  {Math.floor(progress)}%
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* ── Vagalumes por cima do cenário ── */}
           <div aria-hidden className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 stars-layer opacity-80" />
-            <div className="absolute inset-0 stars-layer-2" />
-            <div
-              className="aurora-curtain w-[70vw] h-[100vh] top-[-32%] left-[-12%]"
-              style={{
-                background:
-                  'radial-gradient(ellipse 42% 52% at 50% 30%, rgba(99,247,141,0.38), rgba(53,224,101,0.1) 58%, transparent 76%)',
-                ['--tilt' as string]: '-18deg',
-                ['--speed' as string]: '24s',
-                ['--glow' as string]: '0.9',
-              }}
-            />
-            <div
-              className="aurora-curtain w-[60vw] h-[95vh] top-[-30%] right-[-10%]"
-              style={{
-                background:
-                  'radial-gradient(ellipse 40% 50% at 50% 28%, rgba(75,238,198,0.34), rgba(31,211,167,0.09) 58%, transparent 76%)',
-                ['--tilt' as string]: '14deg',
-                ['--speed' as string]: '32s',
-                ['--glow' as string]: '0.85',
-                animationDirection: 'reverse',
-              }}
-            />
-            <div className="absolute inset-x-0 bottom-0 h-[46vh] horizon-glow" />
-            <div className="absolute inset-0 aurora-vignette" />
             {FIREFLIES.map((f, i) => (
               <span
                 key={i}
@@ -240,291 +340,83 @@ export default function LoginGate() {
             ))}
           </div>
 
-          {/* ── Moldura ornamentada ── */}
-          <div aria-hidden className="absolute inset-2.5 sm:inset-5 pointer-events-none">
-            <div className="absolute inset-0 rounded-xl border border-[#1f4a2e]/70" />
-            <div className="absolute inset-1.5 rounded-lg border border-[#35e065]/15" />
-            {[
-              '-top-1 -left-1', '-top-1 -right-1',
-              '-bottom-1 -left-1', '-bottom-1 -right-1',
-            ].map((pos) => (
-              <div
-                key={pos}
-                className={`absolute ${pos} w-2.5 h-2.5 rotate-45 bg-gradient-to-br from-accent to-accent-2 shadow-[0_0_10px_rgba(53,224,101,0.8)]`}
-              />
-            ))}
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-              <div className="gate-emblem w-5 h-5 rotate-45 bg-gradient-to-br from-accent-bright to-accent-2-bright rounded-[3px] flex items-center justify-center">
-                <div className="w-2 h-2 bg-[#04150c] rounded-[1px]" />
-              </div>
-            </div>
-          </div>
-
-          {/* ── Conteúdo central (com scroll interno se a tela for baixa) ── */}
-          <div className="relative flex-1 min-h-0 overflow-y-auto">
-          <div className="min-h-full flex flex-col items-center justify-center px-4 pt-8 pb-3 gap-3 sm:gap-5">
-            {/* Título */}
-            <motion.div
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.7 }}
-              className="text-center"
-            >
-              <h1 className="font-pixel text-lg sm:text-2xl text-foreground [text-shadow:0_0_24px_rgba(99,247,141,0.65),0_0_60px_rgba(75,238,198,0.35)]">
-                KAUÃ <span className="text-gradient">ARTX</span>
-              </h1>
-              <p className="font-pixel text-[7px] sm:text-[9px] text-foreground-muted tracking-[0.35em] mt-2 uppercase">
-                {t('subtitle')}
-              </p>
-            </motion.div>
-
-            {/* Mago + Portão */}
-            <div className="flex flex-col lg:flex-row items-center lg:items-end justify-center gap-3 lg:gap-8 w-full max-w-4xl min-h-0">
-              {/* ── Mago interativo ── */}
-              <motion.button
-                type="button"
-                onClick={talkToWizard}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.55, duration: 0.7 }}
-                className="group flex lg:flex-col items-end lg:items-center gap-2 lg:gap-3 w-full lg:w-64 max-w-[430px] px-1 shrink-0 cursor-pointer text-left lg:pb-4"
-                aria-label={t('wizard_tap')}
-              >
-                {/* Silhueta do mago */}
-                <Image
-                  src="/images/pixel-wizard.png"
-                  alt=""
-                  width={36}
-                  height={52}
-                  priority
-                  className={`order-1 w-16 sm:w-20 lg:w-28 h-auto shrink-0 [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.5)] ${
-                    stage === 'thanks'
-                      ? 'drop-shadow-[0_0_20px_rgba(99,247,141,0.9)]'
-                      : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.35)]'
-                  }`}
-                />
-                {/* Balão de diálogo RPG */}
-                <span className="order-2 relative flex-1 lg:flex-none lg:w-full lg:order-first block rounded-lg border-2 border-[#1f4a2e] bg-[#04150c]/95 backdrop-blur-sm p-3 sm:p-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.55),inset_0_0_0_1px_rgba(53,224,101,0.12)]">
-                  <span className="block font-pixel text-[8px] sm:text-[9px] leading-[1.9] text-foreground min-h-[4.75em]">
-                    {typed}
-                    {stage === 'open' && typed === fullMsg && (
-                      <span className="rpg-blink text-accent-bright"> ▼</span>
-                    )}
-                  </span>
-                  <span className="block mt-1.5 font-pixel text-[6px] sm:text-[7px] text-foreground-subtle uppercase tracking-widest">
-                    {t('wizard_tap')}
-                  </span>
-                  {/* Rabinho do balão apontando pro mago */}
-                  <span
-                    aria-hidden
-                    className="absolute -left-[7px] bottom-4 lg:left-1/2 lg:-bottom-[7px] lg:-translate-x-1/2 w-3 h-3 rotate-45 bg-[#04150c] border-l-2 border-b-2 border-[#1f4a2e] lg:border-l-0 lg:border-t-0"
-                  />
-                </span>
-              </motion.button>
-
-              {/* ── Portão de madeira ── */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.94, y: 16 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                className="relative shrink-0 w-[min(84vw,44vh,340px)]"
-                style={{ aspectRatio: '3 / 4' }}
-              >
-                {/* Brilho difuso atrás */}
-                <div aria-hidden className="absolute -inset-5 bg-accent/10 blur-3xl rounded-3xl" />
-
-                {/* Floresta vista pelo vidro da janela */}
-                <div
-                  className="absolute overflow-hidden"
-                  style={{
-                    ...HOLE,
-                    borderRadius: '50% 50% 0 0 / 42% 42% 0 0',
-                  }}
-                >
-                  <Image
-                    src="/images/gate-forest.png"
-                    alt=""
-                    fill
-                    sizes="240px"
-                    priority
-                    className="object-cover gate-forest-drift"
-                  />
-                  {/* Vidro: tinta esverdeada + reflexo diagonal */}
-                  <div
-                    aria-hidden
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        'linear-gradient(115deg, transparent 22%, rgba(234,255,242,0.12) 42%, rgba(234,255,242,0.2) 48%, transparent 60%), linear-gradient(180deg, rgba(31,211,167,0.1), rgba(4,21,12,0.18))',
-                    }}
-                  />
-                </div>
-
-                {/* O portão em pixel art (janela transparente) */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/pixel-gate.png"
-                  alt=""
-                  className="absolute inset-0 w-full h-full [image-rendering:pixelated] select-none pointer-events-none drop-shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
-                />
-
-                {/* Formulário sobre as portas de madeira */}
-                <div className="absolute" style={DOOR}>
-                  <AnimatePresence mode="wait">
-                    {stage === 'open' || stage === 'thanks' ? (
-                      <motion.form
-                        key="form"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        onSubmit={enter}
-                        className={`w-full h-full flex flex-col justify-center gap-1.5 sm:gap-2 transition-opacity ${
-                          stage === 'thanks' ? 'opacity-60 pointer-events-none' : ''
-                        }`}
-                      >
-                        <input
-                          id="gate-user"
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder={t('placeholder_user')}
-                          aria-label={t('label_user')}
-                          autoComplete="off"
-                          maxLength={40}
-                          className="w-full px-3 py-2 rounded-md bg-[#04150c]/90 backdrop-blur-sm border border-[#1f4a2e] focus:border-accent-bright outline-none text-[13px] text-foreground placeholder:text-foreground-subtle/70 transition-colors"
-                        />
-                        <div className="relative">
-                          <input
-                            id="gate-pass"
-                            type={showPass ? 'text' : 'password'}
-                            value={pass}
-                            onChange={(e) => setPass(e.target.value)}
-                            placeholder={t('placeholder_pass')}
-                            aria-label={t('label_pass')}
-                            autoComplete="off"
-                            maxLength={64}
-                            className="w-full px-3 py-2 pr-9 rounded-md bg-[#04150c]/90 backdrop-blur-sm border border-[#1f4a2e] focus:border-accent-bright outline-none text-[13px] text-foreground placeholder:text-foreground-subtle/70 transition-colors"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPass(!showPass)}
-                            aria-label={showPass ? 'Esconder senha' : 'Mostrar senha'}
-                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground-subtle hover:text-accent-bright transition-colors"
-                          >
-                            {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
-                          </button>
-                        </div>
-
-                        <button
-                          type="button"
-                          role="checkbox"
-                          aria-checked={remember}
-                          onClick={() => setRemember(!remember)}
-                          className="group/r flex items-center gap-2 self-center py-0.5"
-                        >
-                          <span
-                            className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
-                              remember
-                                ? 'bg-accent border-accent-bright text-[#04150c]'
-                                : 'bg-[#04150c]/90 border-[#1f4a2e] group-hover/r:border-accent'
-                            }`}
-                          >
-                            {remember && <Check size={10} strokeWidth={3.5} />}
-                          </span>
-                          <span className="text-[11px] text-[#d8f2e2] [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] group-hover/r:text-white transition-colors">
-                            {t('remember')}
-                          </span>
-                        </button>
-
-                        <button
-                          type="submit"
-                          className="btn-pill-primary w-full !py-2.5 !rounded-lg font-pixel text-[9px] sm:text-[10px] uppercase tracking-wider"
-                        >
-                          <Swords size={12} />
-                          {t('enter')}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={enterGuest}
-                          className="self-center text-[10px] text-[#c4e3d1] [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] hover:text-accent-bright underline underline-offset-4 decoration-dotted transition-colors"
-                        >
-                          {t('guest')} →
-                        </button>
-                      </motion.form>
-                    ) : (
-                      <motion.div
-                        key="loading"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="w-full h-full flex flex-col items-center justify-center gap-3 text-center"
-                      >
-                        <Compass
-                          size={26}
-                          className="text-accent-bright animate-[portal-spin_3s_linear_infinite]"
-                        />
-                        <p className="font-pixel text-[8px] text-[#d8f2e2] [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] uppercase min-h-[2.5em]">
-                          {t(`loading_${msgIndex}`)}
-                        </p>
-                        <div className="w-[85%] h-2 rounded-full bg-[#04150c]/90 border border-[#1f4a2e] overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-accent-bright to-accent-2-bright transition-[width] duration-100"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                        <span className="font-mono text-[11px] text-accent-deep [text-shadow:0_1px_2px_rgba(0,0,0,0.9)]">
-                          {Math.floor(progress)}%
-                        </span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-          </div>
-
-          {/* ── Rodapé: versão + botões de game ── */}
-          <div className="relative flex flex-col-reverse sm:flex-row items-center sm:items-end justify-between gap-3 px-6 sm:px-10 pb-5 sm:pb-8">
-            <div className="text-center sm:text-left">
-              <p className="font-pixel text-[8px] text-foreground-subtle">{t('version')}</p>
-              <p className="text-[10px] text-foreground-subtle/70 mt-1">{t('copyright')}</p>
-            </div>
-
-            <p className="hidden md:block font-pixel text-[8px] text-foreground-subtle/80 uppercase tracking-[0.25em]">
-              {t('tagline')}
+          {/* ── Logo (canto superior esquerdo, como nos games) ── */}
+          <div className="absolute top-5 left-6 sm:top-7 sm:left-9">
+            <h1 className="font-pixel text-sm sm:text-lg text-foreground [text-shadow:0_0_18px_rgba(99,247,141,0.7),0_2px_4px_rgba(0,0,0,0.9)]">
+              KAUÃ <span className="text-gradient">ARTX</span>
+            </h1>
+            <p className="font-pixel text-[6px] sm:text-[8px] text-[#c4e3d1] tracking-[0.3em] mt-1.5 uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+              {t('subtitle')}
             </p>
+          </div>
 
-            <div className="flex sm:flex-col gap-2">
+          {/* ── Mago guardião + balão de diálogo ── */}
+          <button
+            type="button"
+            onClick={talkToWizard}
+            aria-label={t('wizard_tap')}
+            className="group absolute left-2 sm:left-6 lg:left-[4%] bottom-16 sm:bottom-14 flex flex-col items-start gap-2 cursor-pointer text-left max-w-[78vw] sm:max-w-[300px]"
+          >
+            <span className="relative block w-full rounded-lg border-2 border-[#68a14c]/50 bg-[#07130a]/95 backdrop-blur-sm p-3 shadow-[0_8px_30px_rgba(0,0,0,0.65),inset_0_0_0_1px_rgba(120,220,110,0.15)]">
+              <span className="block font-pixel text-[8px] sm:text-[9px] leading-[1.9] text-[#e9fbef] min-h-[4.75em]">
+                {typed}
+                {stage === 'open' && typed === fullMsg && (
+                  <span className="rpg-blink text-accent-bright"> ▼</span>
+                )}
+              </span>
+              <span className="block mt-1.5 font-pixel text-[6px] sm:text-[7px] text-[#7a9a83] uppercase tracking-widest">
+                {t('wizard_tap')}
+              </span>
+              <span
+                aria-hidden
+                className="absolute left-8 -bottom-[8px] w-3.5 h-3.5 rotate-45 bg-[#07130a] border-r-2 border-b-2 border-[#68a14c]/50"
+              />
+            </span>
+            <Image
+              src="/images/pixel-wizard.png"
+              alt=""
+              width={36}
+              height={52}
+              priority
+              className={`w-16 sm:w-24 lg:w-28 h-auto ml-3 [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.55)] ${
+                stage === 'thanks' || stage === 'loading'
+                  ? 'drop-shadow-[0_0_22px_rgba(99,247,141,0.95)]'
+                  : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.4)]'
+              }`}
+            />
+          </button>
+
+          {/* ── Rodapé: versão + copyright centralizados (o mago mora à esquerda) ── */}
+          <div className="absolute bottom-2.5 sm:bottom-4 inset-x-0 text-center pointer-events-none">
+            <p className="font-pixel text-[7px] text-[#c4e3d1]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+              {t('version')} · {t('copyright')}
+            </p>
+          </div>
+
+          <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-9 flex flex-col gap-2">
+            {[
+              { icon: Globe, label: `${t('language')}: ${locale === 'pt' ? 'EN' : 'PT'}`, onClick: switchLocale },
+              { icon: UserPlus, label: t('create'), onClick: goCreateAccount },
+            ].map(({ icon: Icon, label, onClick }) => (
               <button
+                key={label}
                 type="button"
-                onClick={switchLocale}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-[#04150c]/80 border border-[#1f4a2e] hover:border-accent text-xs text-foreground-muted hover:text-foreground transition-all"
+                onClick={onClick}
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-[#9fdb6d] hover:bg-[#12301a]/90 text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
               >
-                <Globe size={12} />
-                {t('language')}: {locale === 'pt' ? 'EN' : 'PT'}
+                <Icon size={12} />
+                {label}
               </button>
-              <button
-                type="button"
-                onClick={goCreateAccount}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-[#04150c]/80 border border-[#1f4a2e] hover:border-accent text-xs text-foreground-muted hover:text-foreground transition-all"
-              >
-                <UserPlus size={12} />
-                {t('create')}
-              </button>
-              <a
-                href={YOUTUBE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-[#04150c]/80 border border-[#1f4a2e] hover:border-red-500/50 text-xs text-foreground-muted hover:text-red-400 transition-all"
-              >
-                <DoorOpen size={12} />
-                {t('exit')}
-              </a>
-            </div>
+            ))}
+            <a
+              href={YOUTUBE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-red-400/60 hover:text-red-300 text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+            >
+              <DoorOpen size={12} />
+              {t('exit')}
+            </a>
           </div>
         </motion.div>
       )}
