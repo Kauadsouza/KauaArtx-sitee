@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, Youtube } from 'lucide-react';
+import { Menu, X, Globe, Youtube, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ENTERED_KEY, NAME_KEY, AUTH_EVENT } from '@/components/gate/LoginGate';
 
 const LOCALES = [
   { code: 'pt', label: 'PT', flag: '🇧🇷' },
@@ -26,12 +27,45 @@ export default function Header({ locale }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [hasAccount, setHasAccount] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // "Conta vinculada" (por enquanto): entrou pelo portal COM nome de
+  // aventureiro salvo. Quando a Supabase for ligada, este check vira a
+  // sessão real. O portal avisa via evento quando o login muda.
+  useEffect(() => {
+    const check = () => {
+      try {
+        const entered =
+          localStorage.getItem(ENTERED_KEY) ?? sessionStorage.getItem(ENTERED_KEY);
+        setHasAccount(!!entered && !!localStorage.getItem(NAME_KEY));
+      } catch {
+        setHasAccount(false);
+      }
+    };
+    check();
+    window.addEventListener(AUTH_EVENT, check);
+    window.addEventListener('storage', check);
+    return () => {
+      window.removeEventListener(AUTH_EVENT, check);
+      window.removeEventListener('storage', check);
+    };
+  }, []);
+
+  // Sai da conta e volta pra tela de login (o portal reabre na home)
+  const logout = () => {
+    try {
+      localStorage.removeItem(ENTERED_KEY);
+      sessionStorage.removeItem(ENTERED_KEY);
+      localStorage.removeItem(NAME_KEY);
+    } catch {}
+    window.location.href = locale === 'pt' ? '/' : `/${locale}`;
+  };
 
   const navLinks = [
     { href: '/about', label: t('about') },
@@ -102,6 +136,16 @@ export default function Header({ locale }: HeaderProps) {
               <Youtube size={15} />
               {t('youtube')}
             </a>
+            {hasAccount && (
+              <button
+                type="button"
+                onClick={logout}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full text-foreground-muted hover:text-red-400 transition-colors"
+              >
+                <LogOut size={15} />
+                {t('logout')}
+              </button>
+            )}
           </nav>
 
           {/* Right side */}
@@ -204,6 +248,16 @@ export default function Header({ locale }: HeaderProps) {
                   <Youtube size={15} />
                   {t('youtube')}
                 </a>
+                {hasAccount && (
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground-muted hover:text-red-400 transition-colors text-left"
+                  >
+                    <LogOut size={15} />
+                    {t('logout')}
+                  </button>
+                )}
               </nav>
             </motion.div>
           )}

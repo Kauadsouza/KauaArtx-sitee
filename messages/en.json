@@ -3,7 +3,8 @@
     "about": "About",
     "blog": "Blog",
     "contact": "Contact",
-    "youtube": "YouTube"
+    "youtube": "YouTube",
+    "logout": "Log out"
   },
   "gate": {
     "aria_label": "Site entrance portal",

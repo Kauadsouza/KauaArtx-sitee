@@ -16,8 +16,11 @@ import { Compass, Check, Globe, UserPlus, DoorOpen } from 'lucide-react';
 // IMPORTANTE: o conteúdo é estático (sem animações de entrada por elemento).
 // Animação de entrada em cada bloco deixava a tela vazia quando o navegador
 // pausava o requestAnimationFrame (ex.: troca de idioma com aba desfocada).
-const ENTERED_KEY = 'kaua-portal-entered';
-const NAME_KEY = 'kaua-adventurer';
+// Chaves compartilhadas com o Header (botão Sair) — e, no futuro, com a
+// conta real via Supabase (quando o Kauã mandar as credenciais da API).
+export const ENTERED_KEY = 'kaua-portal-entered';
+export const NAME_KEY = 'kaua-adventurer';
+export const AUTH_EVENT = 'kaua-auth-changed';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
@@ -169,6 +172,8 @@ export default function LoginGate() {
     } catch {
       // navegação privada sem storage — segue o jogo
     }
+    // Avisa o Header (botão Sair) que o estado de login mudou
+    window.dispatchEvent(new Event(AUTH_EVENT));
   };
 
   // Depois do agradecimento do mago, começa o carregamento
@@ -437,14 +442,28 @@ export default function LoginGate() {
             </p>
           </div>
 
-          {/* ── Mago guardião + balão de diálogo ── */}
+          {/* ── Mago guardião + diálogo. No celular vira caixa RPG na BASE da
+                 tela (mago à esquerda, fala à direita) — o balão que crescia
+                 pra cima cobria o botão Entrar quando a fala era longa. ── */}
           <button
             type="button"
             onClick={talkToWizard}
             aria-label={t('wizard_tap')}
-            className="group absolute left-2 sm:left-6 lg:left-[4%] bottom-16 sm:bottom-14 flex flex-col items-start gap-2 cursor-pointer text-left max-w-[78vw] sm:max-w-[300px]"
+            className="group absolute left-2 right-2 bottom-2 sm:right-auto sm:left-6 lg:left-[4%] sm:bottom-14 flex flex-row items-end gap-2 sm:flex-col sm:items-start sm:gap-2 cursor-pointer text-left sm:max-w-[300px]"
           >
-            <span className="relative block w-full rounded-lg border-2 border-[#68a14c]/50 bg-[#07130a]/95 backdrop-blur-sm p-3 shadow-[0_8px_30px_rgba(0,0,0,0.65),inset_0_0_0_1px_rgba(120,220,110,0.15)]">
+            <Image
+              src="/images/pixel-wizard.png"
+              alt=""
+              width={36}
+              height={52}
+              priority
+              className={`order-1 sm:order-2 w-14 sm:w-24 lg:w-28 h-auto shrink-0 sm:ml-3 [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.55)] ${
+                stage === 'thanks' || stage === 'loading'
+                  ? 'drop-shadow-[0_0_22px_rgba(99,247,141,0.95)]'
+                  : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.4)]'
+              }`}
+            />
+            <span className="order-2 sm:order-1 relative block flex-1 sm:flex-none sm:w-full rounded-lg border-2 border-[#68a14c]/50 bg-[#07130a]/95 backdrop-blur-sm p-3 shadow-[0_8px_30px_rgba(0,0,0,0.65),inset_0_0_0_1px_rgba(120,220,110,0.15)]">
               <span className="block font-pixel text-[8px] sm:text-[9px] leading-[1.9] text-[#e9fbef] min-h-[4.75em]">
                 {typed}
                 {stage === 'open' && typed === fullMsg && (
@@ -454,23 +473,12 @@ export default function LoginGate() {
               <span className="block mt-1.5 font-pixel text-[6px] sm:text-[7px] text-[#7a9a83] uppercase tracking-widest">
                 {t('wizard_tap')}
               </span>
+              {/* setinha do balão: aponta pro mago (esquerda no celular, baixo no PC) */}
               <span
                 aria-hidden
-                className="absolute left-8 -bottom-[8px] w-3.5 h-3.5 rotate-45 bg-[#07130a] border-r-2 border-b-2 border-[#68a14c]/50"
+                className="absolute top-1/2 -left-[8px] -translate-y-1/2 w-3.5 h-3.5 rotate-45 bg-[#07130a] border-l-2 border-b-2 border-[#68a14c]/50 sm:top-auto sm:translate-y-0 sm:left-8 sm:-bottom-[8px] sm:border-l-0 sm:border-r-2"
               />
             </span>
-            <Image
-              src="/images/pixel-wizard.png"
-              alt=""
-              width={36}
-              height={52}
-              priority
-              className={`w-16 sm:w-24 lg:w-28 h-auto ml-3 [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.55)] ${
-                stage === 'thanks' || stage === 'loading'
-                  ? 'drop-shadow-[0_0_22px_rgba(99,247,141,0.95)]'
-                  : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.4)]'
-              }`}
-            />
           </button>
 
           {/* ── Rodapé: versão + copyright centralizados (o mago mora à esquerda) ── */}
@@ -480,7 +488,8 @@ export default function LoginGate() {
             </p>
           </div>
 
-          <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-9 flex flex-col gap-2">
+          {/* No celular ficam no topo direito (a base é da caixa de diálogo do mago) */}
+          <div className="absolute top-4 right-3 bottom-auto sm:top-auto sm:right-9 sm:bottom-6 flex flex-col items-end sm:items-stretch gap-2">
             {[
               { icon: Globe, label: `${t('language')}: ${locale === 'pt' ? 'EN' : 'PT'}`, onClick: switchLocale },
               { icon: UserPlus, label: t('create'), onClick: goCreateAccount },
@@ -489,7 +498,7 @@ export default function LoginGate() {
                 key={label}
                 type="button"
                 onClick={onClick}
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-[#9fdb6d] hover:bg-[#12301a]/90 text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-[#9fdb6d] hover:bg-[#12301a]/90 text-[11px] sm:text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
               >
                 <Icon size={12} />
                 {label}
@@ -499,7 +508,7 @@ export default function LoginGate() {
               href={YOUTUBE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-red-400/60 hover:text-red-300 text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-red-400/60 hover:text-red-300 text-[11px] sm:text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
             >
               <DoorOpen size={12} />
               {t('exit')}
