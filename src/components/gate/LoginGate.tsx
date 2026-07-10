@@ -21,17 +21,54 @@ const NAME_KEY = 'kaua-adventurer';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
-// A arte de fundo tem 1672×941. Os campos reais ficam alinhados por cima
-// dos elementos pintados nela (posições medidas por script, em %).
-const BG_RATIO = 941 / 1672;
-const BOX = {
-  email: { left: '41.2%', top: '41.3%', width: '17.5%', height: '4.1%' },
-  senha: { left: '41.2%', top: '49.9%', width: '17.5%', height: '4.1%' },
-  lembrar: { left: '41.2%', top: '56.5%', width: '10.5%', height: '3%' },
-  entrar: { left: '42.9%', top: '60.7%', width: '14.1%', height: '4.6%' },
-  visitante: { left: '41.2%', top: '66.6%', width: '17.5%' },
-  loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
-} as const;
+// Duas versões da arte oficial: horizontal (PC) e vertical (celular).
+// Na horizontal o formulário está PINTADO na arte e os campos reais só se
+// alinham por cima (posições medidas por script). A vertical é limpa — o
+// site desenha rótulos, campos e botão no estilo da arte.
+type Pos = { left: string; top: string; width: string; height?: string };
+type ArtSpec = {
+  src: string;
+  ratio: string;
+  hOverW: number;
+  painted: boolean;
+  labels?: { user: Pos; pass: Pos };
+  box: Record<'email' | 'senha' | 'lembrar' | 'entrar' | 'visitante' | 'loading', Pos>;
+};
+
+const ART: Record<'landscape' | 'portrait', ArtSpec> = {
+  landscape: {
+    src: '/images/login-bg.webp',
+    ratio: '1672 / 941',
+    hOverW: 941 / 1672,
+    painted: true,
+    box: {
+      email: { left: '41.2%', top: '41.3%', width: '17.5%', height: '4.1%' },
+      senha: { left: '41.2%', top: '49.9%', width: '17.5%', height: '4.1%' },
+      lembrar: { left: '41.2%', top: '56.5%', width: '10.5%', height: '3%' },
+      entrar: { left: '42.9%', top: '60.7%', width: '14.1%', height: '4.6%' },
+      visitante: { left: '41.2%', top: '66.6%', width: '17.5%' },
+      loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
+    },
+  },
+  portrait: {
+    src: '/images/login-bg-mobile.webp',
+    ratio: '853 / 1844',
+    hOverW: 1844 / 853,
+    painted: false,
+    labels: {
+      user: { left: '27.4%', top: '47.4%', width: '45.2%' },
+      pass: { left: '27.4%', top: '53.8%', width: '45.2%' },
+    },
+    box: {
+      email: { left: '27.4%', top: '49.6%', width: '45.2%', height: '3%' },
+      senha: { left: '27.4%', top: '55.9%', width: '45.2%', height: '3%' },
+      lembrar: { left: '27.4%', top: '59.9%', width: '45.2%', height: '2.2%' },
+      entrar: { left: '29.5%', top: '63.2%', width: '41%', height: '4%' },
+      visitante: { left: '27.4%', top: '68.6%', width: '45.2%' },
+      loading: { left: '22%', top: '43%', width: '56%', height: '15%' },
+    },
+  },
+};
 
 // Posições fixas (nada de Math.random no render → sem bug de hidratação)
 const FIREFLIES = [
@@ -55,6 +92,7 @@ export default function LoginGate() {
   const pathname = usePathname();
 
   const [stage, setStage] = useState<Stage>('hidden');
+  const [portrait, setPortrait] = useState(false);
   const [name, setName] = useState('');
   const [pass, setPass] = useState('');
   const [remember, setRemember] = useState(true);
@@ -70,6 +108,15 @@ export default function LoginGate() {
     stage === 'thanks' || stage === 'loading'
       ? t('wizard_thanks', { name: adventurer })
       : t(`wizard_${line + 1}`);
+
+  // Celular/tela em pé usa a arte vertical; PC usa a horizontal
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)');
+    setPortrait(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setPortrait(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   // Só abre pra quem ainda não entrou (e nunca no servidor → SEO intacto)
   useEffect(() => {
@@ -188,6 +235,8 @@ export default function LoginGate() {
 
   const msgIndex = progress < 30 ? 1 : progress < 60 ? 2 : progress < 88 ? 3 : 4;
   const formActive = stage === 'open';
+  const art = portrait ? ART.portrait : ART.landscape;
+  const BOX = art.box;
 
   if (typeof document === 'undefined') return null;
 
@@ -214,12 +263,13 @@ export default function LoginGate() {
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{
-              aspectRatio: '1672 / 941',
-              height: `max(100vh, calc(100vw * ${BG_RATIO}))`,
+              aspectRatio: art.ratio,
+              height: `max(100vh, calc(100vw * ${art.hOverW}))`,
             }}
           >
             <Image
-              src="/images/login-bg.webp"
+              key={art.src}
+              src={art.src}
               alt=""
               fill
               priority
@@ -233,6 +283,25 @@ export default function LoginGate() {
             {/* ── Campos reais alinhados sobre os pintados ── */}
             {stage !== 'loading' ? (
               <form onSubmit={enter} className={formActive ? '' : 'pointer-events-none opacity-80'}>
+                {/* Arte limpa (celular): os rótulos são desenhados pelo site — e traduzem */}
+                {art.labels && (
+                  <>
+                    <label
+                      htmlFor="gate-user"
+                      style={art.labels.user}
+                      className="absolute text-center text-[13px] font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.95),0_0_14px_rgba(0,0,0,0.6)] pointer-events-none"
+                    >
+                      {t('label_user')}
+                    </label>
+                    <label
+                      htmlFor="gate-pass"
+                      style={art.labels.pass}
+                      className="absolute text-center text-[13px] font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.95),0_0_14px_rgba(0,0,0,0.6)] pointer-events-none"
+                    >
+                      {t('label_pass')}
+                    </label>
+                  </>
+                )}
                 <input
                   id="gate-user"
                   type="text"
@@ -258,14 +327,17 @@ export default function LoginGate() {
                   className={inputClass}
                 />
 
-                {/* Lembrar de mim (cobre o pintado, que era ilegível) */}
+                {/* Lembrar de mim: no PC cobre o pintado (chip opaco); na arte
+                    limpa é checkbox + texto direto sobre a grama, como na referência */}
                 <button
                   type="button"
                   role="checkbox"
                   aria-checked={remember}
                   onClick={() => setRemember(!remember)}
                   style={BOX.lembrar}
-                  className="absolute flex items-center gap-1.5 px-1.5 rounded bg-[#0a1c0f]/90 border border-[#68a14c]/30"
+                  className={`absolute flex items-center justify-center gap-1.5 ${
+                    art.painted ? 'px-1.5 rounded bg-[#0a1c0f] border border-[#68a14c]/30' : ''
+                  }`}
                 >
                   <span
                     className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
@@ -276,18 +348,29 @@ export default function LoginGate() {
                   >
                     {remember && <Check size={10} strokeWidth={3.5} />}
                   </span>
-                  <span className="text-[11px] text-[#d8f2e2] whitespace-nowrap pr-1">
+                  <span
+                    className={`text-[#f2fdf5] whitespace-nowrap pr-1 [text-shadow:0_1px_3px_rgba(0,0,0,0.95)] ${
+                      art.painted ? 'text-[11px]' : 'text-[12px] font-medium'
+                    }`}
+                  >
                     {t('remember')}
                   </span>
                 </button>
 
-                {/* Botão Entrar: o desenho pintado é o visual; aqui só o clique */}
+                {/* Botão Entrar: no PC o desenho pintado é o visual (aqui só o
+                    clique); na arte limpa o botão é desenhado no mesmo estilo */}
                 <button
                   type="submit"
                   aria-label={t('enter')}
                   style={BOX.entrar}
-                  className="absolute rounded-lg cursor-pointer transition-all hover:shadow-[0_0_24px_rgba(120,220,110,0.55),inset_0_0_14px_rgba(160,255,150,0.2)] hover:brightness-110 active:scale-[0.98]"
-                />
+                  className={`absolute rounded-lg cursor-pointer transition-all hover:brightness-110 active:scale-[0.98] ${
+                    art.painted
+                      ? 'hover:shadow-[0_0_24px_rgba(120,220,110,0.55),inset_0_0_14px_rgba(160,255,150,0.2)]'
+                      : 'bg-gradient-to-b from-[#25491f] via-[#132e14] to-[#0a1f0d] border-2 border-[#7ba659]/75 text-[15px] font-semibold text-[#eefbea] [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] shadow-[inset_0_1px_0_rgba(190,255,170,0.3),inset_0_-8px_14px_rgba(0,0,0,0.45),0_6px_18px_rgba(0,0,0,0.6)] hover:shadow-[0_0_22px_rgba(120,220,110,0.5),inset_0_1px_0_rgba(190,255,170,0.3)]'
+                  }`}
+                >
+                  {!art.painted && t('enter')}
+                </button>
 
                 <button
                   type="button"
@@ -348,6 +431,10 @@ export default function LoginGate() {
             <p className="font-pixel text-[6px] sm:text-[8px] text-[#c4e3d1] tracking-[0.3em] mt-1.5 uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
               {t('subtitle')}
             </p>
+            {/* No celular a versão/copyright mora aqui (embaixo não cabe junto dos botões) */}
+            <p className="sm:hidden font-pixel text-[6px] text-[#c4e3d1]/85 mt-2 max-w-[190px] leading-relaxed [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+              {t('version')} · {t('copyright')}
+            </p>
           </div>
 
           {/* ── Mago guardião + balão de diálogo ── */}
@@ -387,7 +474,7 @@ export default function LoginGate() {
           </button>
 
           {/* ── Rodapé: versão + copyright centralizados (o mago mora à esquerda) ── */}
-          <div className="absolute bottom-2.5 sm:bottom-4 inset-x-0 text-center pointer-events-none">
+          <div className="hidden sm:block absolute bottom-4 inset-x-0 text-center pointer-events-none">
             <p className="font-pixel text-[7px] text-[#c4e3d1]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
               {t('version')} · {t('copyright')}
             </p>
