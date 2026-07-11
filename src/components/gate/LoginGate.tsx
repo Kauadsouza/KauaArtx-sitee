@@ -290,8 +290,9 @@ export default function LoginGate() {
         alt=""
         fill
         priority
+        unoptimized
         sizes="100vw"
-        className="object-cover select-none"
+        className="object-cover select-none [image-rendering:pixelated]"
       />
       <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
       <div aria-hidden className="absolute inset-0 aurora-vignette opacity-60" />
@@ -390,8 +391,9 @@ export default function LoginGate() {
               alt=""
               fill
               priority
+              unoptimized
               sizes="100vw"
-              className="object-cover select-none"
+              className="object-cover select-none [image-rendering:pixelated]"
             />
             {/* Pegada mais verde + leitura */}
             <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
