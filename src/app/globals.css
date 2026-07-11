@@ -276,6 +276,17 @@
     animation: rpg-blink 1s steps(1) infinite;
   }
 
+  /* Trilha da jornada (página Sobre): pegadas em pares descendo o caminho */
+  .trail-steps {
+    width: 18px;
+    background-image:
+      radial-gradient(circle, color-mix(in srgb, var(--accent-bright) 60%, transparent) 2.5px, transparent 3px),
+      radial-gradient(circle, color-mix(in srgb, var(--accent-bright) 60%, transparent) 2.5px, transparent 3px);
+    background-position: 2px 0, 10px 12px;
+    background-size: 16px 24px;
+    background-repeat: repeat-y;
+  }
+
   /* Etiqueta de embarque — detalhe aventureiro */
   .boarding-tag {
     display: inline-flex;
