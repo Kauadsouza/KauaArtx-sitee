@@ -92,7 +92,10 @@ const FIREFLIES = [
 
 const WIZARD_LINES = 4;
 
-type Stage = 'hidden' | 'open' | 'thanks' | 'loading';
+// 'opening' = os portões se partindo em duas portas 3D que giram
+// abrindo pra fora, com luz explodindo do vão — a recompensa de quem
+// entregou as credenciais ao mago (visitante entra sem cerimônia)
+type Stage = 'hidden' | 'open' | 'thanks' | 'loading' | 'opening';
 
 export default function LoginGate() {
   const t = useTranslations('gate');
@@ -101,6 +104,7 @@ export default function LoginGate() {
   const pathname = usePathname();
 
   const [stage, setStage] = useState<Stage>('hidden');
+  const [uiFading, setUiFading] = useState(false);
   const [portrait, setPortrait] = useState(false);
   const [name, setName] = useState('');
   const [pass, setPass] = useState('');
@@ -201,12 +205,27 @@ export default function LoginGate() {
     return () => clearInterval(id);
   }, [stage]);
 
+  // Carregou 100% → a interface some e os portões se abrem
   useEffect(() => {
     if (stage !== 'loading' || progress < 100) return;
     persist(remember);
-    const to = setTimeout(() => setStage('hidden'), 500);
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setUiFading(true);
+    const to = setTimeout(
+      () => setStage(reduce ? 'hidden' : 'opening'),
+      reduce ? 450 : 380
+    );
     return () => clearTimeout(to);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progress, stage, remember]);
+
+  // Rede de segurança: se a animação dos portões travar (aba desfocada
+  // pausa o requestAnimationFrame), fecha mesmo assim
+  useEffect(() => {
+    if (stage !== 'opening') return;
+    const to = setTimeout(() => setStage('hidden'), 2300);
+    return () => clearTimeout(to);
+  }, [stage]);
 
   const enter = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -254,6 +273,31 @@ export default function LoginGate() {
   const inputClass =
     'absolute rounded-md bg-[#0a1c0f]/95 border border-[#68a14c]/45 focus:border-[#9fdb6d] outline-none px-3 text-[13px] text-[#e9fbef] placeholder:text-[#7a9a83]/80 shadow-[inset_0_2px_8px_rgba(0,0,0,0.55)] transition-colors';
 
+  // Some suave da interface pouco antes dos portões abrirem
+  const uiFadeClass = `transition-opacity duration-300 ${uiFading ? 'opacity-0' : ''}`;
+
+  // Cópia só da arte (sem interface) — cada porta carrega metade dela
+  const artOnly = (
+    <div
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      style={{
+        aspectRatio: art.ratio,
+        height: `max(100vh, calc(100vw * ${art.hOverW}))`,
+      }}
+    >
+      <Image
+        src={art.src}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover select-none"
+      />
+      <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
+      <div aria-hidden className="absolute inset-0 aurora-vignette opacity-60" />
+    </div>
+  );
+
   return createPortal(
     <AnimatePresence>
       {stage !== 'hidden' && (
@@ -266,8 +310,70 @@ export default function LoginGate() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.05, filter: 'brightness(2)' }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] overflow-hidden bg-[#0a1408]"
+          className={`fixed inset-0 z-[100] overflow-hidden ${
+            stage === 'opening' ? 'bg-transparent' : 'bg-[#0a1408]'
+          }`}
         >
+          {stage === 'opening' ? (
+            /* ── PORTÕES SE ABRINDO: a cena parte ao meio e as duas
+                   portas giram pra fora em 3D, luz jorrando do vão ── */
+            <div className="absolute inset-0" style={{ perspective: '1400px' }}>
+              {/* Porta esquerda */}
+              <motion.div
+                className="absolute inset-y-0 left-0 w-1/2 overflow-hidden"
+                style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
+                initial={{ rotateY: 0 }}
+                animate={{ rotateY: -105 }}
+                transition={{ duration: 1.6, ease: [0.6, 0.05, 0.9, 0.5] }}
+                onAnimationComplete={() => setStage('hidden')}
+              >
+                <div className="absolute inset-y-0 left-0 w-screen h-full">{artOnly}</div>
+                <div aria-hidden className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black/60 to-transparent" />
+                <div aria-hidden className="absolute inset-y-0 right-0 w-1 bg-[#eafff2]/90 shadow-[0_0_38px_14px_rgba(160,255,180,0.9)]" />
+              </motion.div>
+
+              {/* Porta direita */}
+              <motion.div
+                className="absolute inset-y-0 right-0 w-1/2 overflow-hidden"
+                style={{ transformOrigin: 'right center', backfaceVisibility: 'hidden' }}
+                initial={{ rotateY: 0 }}
+                animate={{ rotateY: 105 }}
+                transition={{ duration: 1.6, ease: [0.6, 0.05, 0.9, 0.5] }}
+              >
+                <div className="absolute inset-y-0 right-0 w-screen h-full">{artOnly}</div>
+                <div aria-hidden className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/60 to-transparent" />
+                <div aria-hidden className="absolute inset-y-0 left-0 w-1 bg-[#eafff2]/90 shadow-[0_0_38px_14px_rgba(160,255,180,0.9)]" />
+              </motion.div>
+
+              {/* Feixe de luz vertical rasgando o vão */}
+              <motion.div
+                aria-hidden
+                className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-2"
+                style={{
+                  background:
+                    'linear-gradient(180deg, transparent, #d5ffe2 18%, #ffffff 50%, #d5ffe2 82%, transparent)',
+                  boxShadow: '0 0 80px 30px rgba(170,255,190,0.75)',
+                }}
+                initial={{ opacity: 0, scaleX: 0.4 }}
+                animate={{ opacity: [0, 1, 1, 0], scaleX: [0.4, 3, 14, 40] }}
+                transition={{ duration: 1.6, times: [0, 0.25, 0.65, 1], ease: 'easeIn' }}
+              />
+
+              {/* Clarão que toma a tela quando as portas passam do meio */}
+              <motion.div
+                aria-hidden
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background:
+                    'radial-gradient(ellipse at center, rgba(240,255,245,0.95) 0%, rgba(140,245,165,0.45) 35%, transparent 70%)',
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.15, 0.9, 0] }}
+                transition={{ duration: 1.6, times: [0, 0.45, 0.8, 1] }}
+              />
+            </div>
+          ) : (
+          <>
           {/* ── Cenário: a arte ocupa a tela inteira (tipo background cover).
                  Os campos ficam em % DENTRO desta caixa, então sempre
                  alinham com os elementos pintados. ── */}
@@ -396,7 +502,7 @@ export default function LoginGate() {
               /* ── Carregando o mundo (no centro do círculo) ── */
               <div
                 style={BOX.loading}
-                className="absolute flex flex-col items-center justify-center gap-3 text-center rounded-2xl bg-[#07130a]/85 border border-[#68a14c]/35 backdrop-blur-sm p-4"
+                className={`absolute flex flex-col items-center justify-center gap-3 text-center rounded-2xl bg-[#07130a]/85 border border-[#68a14c]/35 backdrop-blur-sm p-4 ${uiFadeClass}`}
               >
                 <Compass
                   size={26}
@@ -419,7 +525,7 @@ export default function LoginGate() {
           </div>
 
           {/* ── Vagalumes por cima do cenário ── */}
-          <div aria-hidden className="absolute inset-0 pointer-events-none">
+          <div aria-hidden className={`absolute inset-0 pointer-events-none ${uiFadeClass}`}>
             {FIREFLIES.map((f, i) => (
               <span
                 key={i}
@@ -438,7 +544,7 @@ export default function LoginGate() {
                  uma placa escura atrás — direto sobre a arte clara ficava lavado.
                  O "ARTX" é verde vivo sólido: o gradiente com clip-text some na
                  arte e ignora text-shadow. ── */}
-          <div className="absolute top-3 left-3 sm:top-7 sm:left-9 rounded-xl bg-[#04100a]/70 border border-[#68a14c]/30 shadow-[0_4px_18px_rgba(0,0,0,0.5)] backdrop-blur-[2px] px-3 py-2.5 sm:bg-transparent sm:border-transparent sm:shadow-none sm:backdrop-blur-0 sm:px-0 sm:py-0">
+          <div className={`absolute top-3 left-3 sm:top-7 sm:left-9 rounded-xl bg-[#04100a]/70 border border-[#68a14c]/30 shadow-[0_4px_18px_rgba(0,0,0,0.5)] backdrop-blur-[2px] px-3 py-2.5 sm:bg-transparent sm:border-transparent sm:shadow-none sm:backdrop-blur-0 sm:px-0 sm:py-0 ${uiFadeClass}`}>
             <h1 className="font-pixel text-sm sm:text-lg text-white [text-shadow:0_2px_0_rgba(0,0,0,0.9),0_0_18px_rgba(99,247,141,0.75),0_2px_6px_rgba(0,0,0,0.95)]">
               KAUÃ{' '}
               <span className="text-[#63f78d] [text-shadow:0_2px_0_rgba(0,0,0,0.9),0_0_16px_rgba(99,247,141,0.85),0_2px_6px_rgba(0,0,0,0.95)]">
@@ -461,7 +567,7 @@ export default function LoginGate() {
             type="button"
             onClick={talkToWizard}
             aria-label={t('wizard_tap')}
-            className="group absolute left-2 right-2 bottom-2 sm:right-auto sm:left-6 lg:left-[4%] sm:bottom-14 flex flex-row items-end gap-2 sm:flex-col sm:items-start sm:gap-2 cursor-pointer text-left sm:max-w-[300px]"
+            className={`group absolute left-2 right-2 bottom-2 sm:right-auto sm:left-6 lg:left-[4%] sm:bottom-14 flex flex-row items-end gap-2 sm:flex-col sm:items-start sm:gap-2 cursor-pointer text-left sm:max-w-[300px] ${uiFadeClass}`}
           >
             <Image
               src="/images/pixel-wizard.png"
@@ -494,14 +600,14 @@ export default function LoginGate() {
           </button>
 
           {/* ── Rodapé: versão + copyright centralizados (o mago mora à esquerda) ── */}
-          <div className="hidden sm:block absolute bottom-4 inset-x-0 text-center pointer-events-none">
+          <div className={`hidden sm:block absolute bottom-4 inset-x-0 text-center pointer-events-none ${uiFadeClass}`}>
             <p className="font-pixel text-[7px] text-[#c4e3d1]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
               {t('version')} · {t('copyright')}
             </p>
           </div>
 
           {/* No celular ficam no topo direito (a base é da caixa de diálogo do mago) */}
-          <div className="absolute top-4 right-3 bottom-auto sm:top-auto sm:right-9 sm:bottom-6 flex flex-col items-end sm:items-stretch gap-2">
+          <div className={`absolute top-4 right-3 bottom-auto sm:top-auto sm:right-9 sm:bottom-6 flex flex-col items-end sm:items-stretch gap-2 ${uiFadeClass}`}>
             {[
               { icon: Globe, label: `${t('language')}: ${locale === 'pt' ? 'EN' : 'PT'}`, onClick: switchLocale },
               { icon: UserPlus, label: t('create'), onClick: goCreateAccount },
@@ -526,6 +632,8 @@ export default function LoginGate() {
               {t('exit')}
             </a>
           </div>
+          </>
+          )}
         </motion.div>
       )}
     </AnimatePresence>,
