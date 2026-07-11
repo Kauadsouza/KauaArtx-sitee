@@ -21,17 +21,11 @@ const NAME_KEY = 'kaua-adventurer';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
-// A arte de fundo tem 1672×941. Os campos reais ficam alinhados por cima
-// dos elementos pintados nela (posições medidas por script, em %).
+// A arte de fundo tem 1672×941 (círculo limpo no centro).
+// O formulário mora numa coluna centralizada dentro do círculo.
 const BG_RATIO = 941 / 1672;
-const BOX = {
-  email: { left: '41.2%', top: '41.3%', width: '17.5%', height: '4.1%' },
-  senha: { left: '41.2%', top: '49.9%', width: '17.5%', height: '4.1%' },
-  lembrar: { left: '41.2%', top: '56.5%', width: '10.5%', height: '3%' },
-  entrar: { left: '42.9%', top: '60.7%', width: '14.1%', height: '4.6%' },
-  visitante: { left: '41.2%', top: '66.6%', width: '17.5%' },
-  loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
-} as const;
+const FORM_AREA = { left: '50%', top: '32%', width: '19%' } as const;
+const LOADING_AREA = { left: '50%', top: '42%', width: '24%', height: '26%' } as const;
 
 // Posições fixas (nada de Math.random no render → sem bug de hidratação)
 const FIREFLIES = [
@@ -192,7 +186,7 @@ export default function LoginGate() {
   if (typeof document === 'undefined') return null;
 
   const inputClass =
-    'absolute rounded-md bg-[#0a1c0f]/95 border border-[#68a14c]/45 focus:border-[#9fdb6d] outline-none px-3 text-[13px] text-[#e9fbef] placeholder:text-[#7a9a83]/80 shadow-[inset_0_2px_8px_rgba(0,0,0,0.55)] transition-colors';
+    'w-full rounded-md bg-[#0a1c0f]/95 border border-[#68a14c]/45 focus:border-[#9fdb6d] outline-none px-3 py-2.5 text-[13px] text-[#e9fbef] placeholder:text-[#7a9a83]/80 shadow-[inset_0_2px_8px_rgba(0,0,0,0.55)] transition-colors';
 
   return createPortal(
     <AnimatePresence>
@@ -230,42 +224,56 @@ export default function LoginGate() {
             <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
             <div aria-hidden className="absolute inset-0 aurora-vignette opacity-60" />
 
-            {/* ── Campos reais alinhados sobre os pintados ── */}
+            {/* ── Formulário no centro do círculo ── */}
             {stage !== 'loading' ? (
-              <form onSubmit={enter} className={formActive ? '' : 'pointer-events-none opacity-80'}>
+              <form
+                onSubmit={enter}
+                style={FORM_AREA}
+                className={`absolute -translate-x-1/2 flex flex-col gap-2 min-w-[250px] max-w-[340px] ${
+                  formActive ? '' : 'pointer-events-none opacity-80'
+                }`}
+              >
+                <label
+                  htmlFor="gate-user"
+                  className="self-center text-[13px] font-bold text-[#f2fbe8] [text-shadow:0_1px_4px_rgba(0,0,0,0.95),0_0_12px_rgba(0,0,0,0.6)]"
+                >
+                  {t('label_user')}
+                </label>
                 <input
                   id="gate-user"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t('placeholder_user')}
-                  aria-label={t('label_user')}
                   autoComplete="off"
                   maxLength={40}
-                  style={BOX.email}
                   className={inputClass}
                 />
+
+                <label
+                  htmlFor="gate-pass"
+                  className="self-center mt-1 text-[13px] font-bold text-[#f2fbe8] [text-shadow:0_1px_4px_rgba(0,0,0,0.95),0_0_12px_rgba(0,0,0,0.6)]"
+                >
+                  {t('label_pass')}
+                </label>
                 <input
                   id="gate-pass"
                   type="password"
                   value={pass}
                   onChange={(e) => setPass(e.target.value)}
                   placeholder={t('placeholder_pass')}
-                  aria-label={t('label_pass')}
                   autoComplete="off"
                   maxLength={64}
-                  style={BOX.senha}
                   className={inputClass}
                 />
 
-                {/* Lembrar de mim (cobre o pintado, que era ilegível) */}
+                {/* Lembrar de mim */}
                 <button
                   type="button"
                   role="checkbox"
                   aria-checked={remember}
                   onClick={() => setRemember(!remember)}
-                  style={BOX.lembrar}
-                  className="absolute flex items-center gap-1.5 px-1.5 rounded bg-[#0a1c0f]/90 border border-[#68a14c]/30"
+                  className="self-center mt-1 flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#0a1c0f]/80 border border-[#68a14c]/30"
                 >
                   <span
                     className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
@@ -276,24 +284,23 @@ export default function LoginGate() {
                   >
                     {remember && <Check size={10} strokeWidth={3.5} />}
                   </span>
-                  <span className="text-[11px] text-[#d8f2e2] whitespace-nowrap pr-1">
+                  <span className="text-[11px] text-[#d8f2e2] whitespace-nowrap">
                     {t('remember')}
                   </span>
                 </button>
 
-                {/* Botão Entrar: o desenho pintado é o visual; aqui só o clique */}
+                {/* Botão Entrar — estilo pedra/madeira do jogo */}
                 <button
                   type="submit"
-                  aria-label={t('enter')}
-                  style={BOX.entrar}
-                  className="absolute rounded-lg cursor-pointer transition-all hover:shadow-[0_0_24px_rgba(120,220,110,0.55),inset_0_0_14px_rgba(160,255,150,0.2)] hover:brightness-110 active:scale-[0.98]"
-                />
+                  className="mt-2 w-full py-2.5 rounded-lg bg-gradient-to-b from-[#1d4a20] to-[#0d2b12] border-2 border-[#7aa54b]/70 text-[#eafff2] text-[15px] font-bold tracking-wide shadow-[0_4px_16px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(180,255,160,0.25)] transition-all hover:brightness-115 hover:shadow-[0_0_24px_rgba(120,220,110,0.5),inset_0_1px_0_rgba(180,255,160,0.3)] active:scale-[0.98]"
+                >
+                  {t('enter')}
+                </button>
 
                 <button
                   type="button"
                   onClick={enterGuest}
-                  style={BOX.visitante}
-                  className="absolute text-center text-[11px] text-[#d8f2e2]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.95)] hover:text-white underline underline-offset-4 decoration-dotted transition-colors"
+                  className="self-center text-[11px] text-[#e4f5ea] [text-shadow:0_1px_3px_rgba(0,0,0,0.95)] hover:text-white underline underline-offset-4 decoration-dotted transition-colors"
                 >
                   {t('guest')} →
                 </button>
@@ -301,8 +308,8 @@ export default function LoginGate() {
             ) : (
               /* ── Carregando o mundo (no centro do círculo) ── */
               <div
-                style={BOX.loading}
-                className="absolute flex flex-col items-center justify-center gap-3 text-center rounded-2xl bg-[#07130a]/85 border border-[#68a14c]/35 backdrop-blur-sm p-4"
+                style={LOADING_AREA}
+                className="absolute -translate-x-1/2 min-w-[250px] flex flex-col items-center justify-center gap-3 text-center rounded-2xl bg-[#07130a]/85 border border-[#68a14c]/35 backdrop-blur-sm p-4"
               >
                 <Compass
                   size={26}
