@@ -7,6 +7,7 @@ import { useRouter, usePathname } from '@/i18n/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Compass, Check, Globe, UserPlus, DoorOpen } from 'lucide-react';
+import PixelLife from './PixelLife';
 
 // Tela de login estilo game na frente do site, usando a arte oficial
 // (moldura ornamentada + círculo com a floresta) como cenário completo.
@@ -78,17 +79,6 @@ const ART: Record<'landscape' | 'portrait', ArtSpec> = {
     },
   },
 };
-
-// Posições fixas (nada de Math.random no render → sem bug de hidratação)
-const FIREFLIES = [
-  { left: '10%', top: '30%', dur: '9s', delay: '0s' },
-  { left: '20%', top: '66%', dur: '11s', delay: '1.2s' },
-  { left: '33%', top: '24%', dur: '8s', delay: '2.4s' },
-  { left: '62%', top: '30%', dur: '12s', delay: '0.6s' },
-  { left: '75%', top: '62%', dur: '10s', delay: '3s' },
-  { left: '87%', top: '34%', dur: '9.5s', delay: '1.8s' },
-  { left: '48%', top: '76%', dur: '11.5s', delay: '0.3s' },
-] as const;
 
 const WIZARD_LINES = 4;
 
@@ -399,6 +389,11 @@ export default function LoginGate() {
             <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
             <div aria-hidden className="absolute inset-0 aurora-vignette opacity-60" />
 
+            {/* ── Vida pixel: borboletas, vagalumes, folhas e libélula ── */}
+            <div aria-hidden className={`absolute inset-0 pointer-events-none ${uiFadeClass}`}>
+              <PixelLife />
+            </div>
+
             {/* ── Campos reais alinhados sobre os pintados ── */}
             {stage !== 'loading' ? (
               <form onSubmit={enter} className={formActive ? '' : 'pointer-events-none opacity-80'}>
@@ -524,22 +519,6 @@ export default function LoginGate() {
                 </span>
               </div>
             )}
-          </div>
-
-          {/* ── Vagalumes por cima do cenário ── */}
-          <div aria-hidden className={`absolute inset-0 pointer-events-none ${uiFadeClass}`}>
-            {FIREFLIES.map((f, i) => (
-              <span
-                key={i}
-                className="gate-firefly"
-                style={{
-                  left: f.left,
-                  top: f.top,
-                  ['--dur' as string]: f.dur,
-                  ['--delay' as string]: f.delay,
-                }}
-              />
-            ))}
           </div>
 
           {/* ── Logo (canto superior esquerdo, como nos games). No celular ganha
