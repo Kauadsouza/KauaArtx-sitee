@@ -182,6 +182,11 @@
     letter-spacing: 0.1em;
   }
 
+  /* Cursiva manuscrita (card de login) */
+  .font-script {
+    font-family: var(--font-script), cursive;
+  }
+
   /* Texto gradiente verde → ciano (luz de aurora) */
   .text-gradient {
     background: linear-gradient(

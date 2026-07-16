@@ -34,49 +34,27 @@ type ArtSpec = {
   src: string;
   ratio: string;
   hOverW: number;
-  painted: boolean;
-  labels?: { user: Pos; pass: Pos };
-  box: Record<'email' | 'senha' | 'lembrar' | 'entrar' | 'visitante' | 'loading', Pos>;
+  // Onde o card de vidro (formulário) e o painel de loading se apoiam
+  card: Pos;
+  loading: Pos;
 };
 
 const ART: Record<'landscape' | 'portrait', ArtSpec> = {
-  // Arte dourada limpa (sem formulário pintado): o site desenha
-  // rótulos, campos e botão centralizados no círculo
+  // O formulário mora num CARD DE VIDRO fosco centralizado no círculo,
+  // com o "Entrar" manuscrito ao lado — como na referência de Sign Up
   landscape: {
     src: '/images/login-bg.webp',
     ratio: '1672 / 941',
     hOverW: 941 / 1672,
-    painted: false,
-    labels: {
-      user: { left: '40.5%', top: '35.8%', width: '19%' },
-      pass: { left: '40.5%', top: '44.6%', width: '19%' },
-    },
-    box: {
-      email: { left: '40.5%', top: '38.8%', width: '19%', height: '4.3%' },
-      senha: { left: '40.5%', top: '47.6%', width: '19%', height: '4.3%' },
-      lembrar: { left: '40.5%', top: '53.4%', width: '19%', height: '2.8%' },
-      entrar: { left: '42.5%', top: '57.6%', width: '15%', height: '5%' },
-      visitante: { left: '40.5%', top: '64.2%', width: '19%' },
-      loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
-    },
+    card: { left: '50%', top: '34%', width: '26%' },
+    loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
   },
   portrait: {
     src: '/images/login-bg-mobile.webp',
     ratio: '853 / 1844',
     hOverW: 1844 / 853,
-    painted: false,
-    labels: {
-      user: { left: '27.4%', top: '47.4%', width: '45.2%' },
-      pass: { left: '27.4%', top: '53.8%', width: '45.2%' },
-    },
-    box: {
-      email: { left: '27.4%', top: '49.6%', width: '45.2%', height: '3%' },
-      senha: { left: '27.4%', top: '55.9%', width: '45.2%', height: '3%' },
-      lembrar: { left: '27.4%', top: '59.9%', width: '45.2%', height: '2.2%' },
-      entrar: { left: '29.5%', top: '63.2%', width: '41%', height: '4%' },
-      visitante: { left: '27.4%', top: '68.6%', width: '45.2%' },
-      loading: { left: '22%', top: '43%', width: '56%', height: '15%' },
-    },
+    card: { left: '50%', top: '42%', width: '58%' },
+    loading: { left: '22%', top: '43%', width: '56%', height: '15%' },
   },
 };
 
@@ -290,12 +268,11 @@ export default function LoginGate() {
   const msgIndex = progress < 30 ? 1 : progress < 60 ? 2 : progress < 88 ? 3 : 4;
   const formActive = stage === 'open';
   const art = portrait ? ART.portrait : ART.landscape;
-  const BOX = art.box;
 
   if (typeof document === 'undefined') return null;
 
   const inputClass =
-    'absolute rounded-md bg-[#0a1c0f]/95 border border-[#68a14c]/45 focus:border-[#9fdb6d] outline-none px-3 text-[13px] text-[#e9fbef] placeholder:text-[#7a9a83]/80 shadow-[inset_0_2px_8px_rgba(0,0,0,0.55)] transition-colors';
+    'w-full rounded-lg bg-[#0a1c0f]/85 border border-[#68a14c]/40 focus:border-[#9fdb6d] outline-none px-3 py-2.5 text-[13px] text-[#e9fbef] placeholder:text-[#7a9a83]/80 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] transition-colors';
 
   // Some suave da interface pouco antes dos portões abrirem
   const uiFadeClass = `transition-opacity duration-300 ${uiFading ? 'opacity-0' : ''}`;
@@ -444,111 +421,90 @@ export default function LoginGate() {
               <PixelLife />
             </div>
 
-            {/* ── Campos reais alinhados sobre os pintados ── */}
+            {/* ── Card de vidro fosco com o formulário (estilo Sign Up) ── */}
             {stage !== 'loading' ? (
-              <form onSubmit={enter} className={formActive ? '' : 'pointer-events-none opacity-80'}>
-                {/* Arte limpa (celular): os rótulos são desenhados pelo site — e traduzem */}
-                {art.labels && (
-                  <>
-                    <label
-                      htmlFor="gate-user"
-                      style={art.labels.user}
-                      className="absolute text-center text-[13px] font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.95),0_0_14px_rgba(0,0,0,0.6)] pointer-events-none"
+              <form
+                onSubmit={enter}
+                style={art.card}
+                className={`absolute -translate-x-1/2 min-w-[min(310px,90vw)] max-w-[min(460px,92vw)] rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] p-4 sm:p-5 ${
+                  formActive ? '' : 'pointer-events-none opacity-80'
+                }`}
+              >
+                <div className="flex items-center gap-3 sm:gap-4">
+                  {/* "Entrar" manuscrito ao lado dos campos, como na referência */}
+                  <div className="shrink-0 w-14 sm:w-20 flex items-center justify-center">
+                    <span className="font-script text-2xl sm:text-4xl text-[#eafff2] -rotate-6 [text-shadow:0_2px_10px_rgba(0,0,0,0.7)]">
+                      {t('enter')}
+                    </span>
+                  </div>
+
+                  <div className="flex-1 flex flex-col gap-2">
+                    <input
+                      id="gate-user"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder={t('placeholder_user')}
+                      aria-label={t('label_user')}
+                      autoComplete="off"
+                      maxLength={40}
+                      className={inputClass}
+                    />
+                    <input
+                      id="gate-pass"
+                      type="password"
+                      value={pass}
+                      onChange={(e) => setPass(e.target.value)}
+                      placeholder={t('placeholder_pass')}
+                      aria-label={t('label_pass')}
+                      autoComplete="off"
+                      maxLength={64}
+                      className={inputClass}
+                    />
+
+                    {/* Lembrar de mim — pill de vidro, como os botões da referência */}
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={remember}
+                      onClick={() => setRemember(!remember)}
+                      className="self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/15 hover:bg-white/15 transition-colors"
                     >
-                      {t('label_user')}
-                    </label>
-                    <label
-                      htmlFor="gate-pass"
-                      style={art.labels.pass}
-                      className="absolute text-center text-[13px] font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.95),0_0_14px_rgba(0,0,0,0.6)] pointer-events-none"
+                      <span
+                        className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
+                          remember
+                            ? 'bg-[#4caf50] border-[#9fdb6d] text-[#04150c]'
+                            : 'bg-[#0a1c0f] border-[#68a14c]/60'
+                        }`}
+                      >
+                        {remember && <Check size={10} strokeWidth={3.5} />}
+                      </span>
+                      <span className="text-[11px] font-medium text-[#f2fdf5] whitespace-nowrap">
+                        {t('remember')}
+                      </span>
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="w-full py-2.5 rounded-lg bg-gradient-to-b from-[#25491f] via-[#132e14] to-[#0a1f0d] border border-[#7ba659]/60 text-[14px] font-semibold text-[#eefbea] [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] shadow-[inset_0_1px_0_rgba(190,255,170,0.3),0_6px_18px_rgba(0,0,0,0.5)] transition-all hover:brightness-115 hover:shadow-[0_0_22px_rgba(120,220,110,0.5)] active:scale-[0.98]"
                     >
-                      {t('label_pass')}
-                    </label>
-                  </>
-                )}
-                <input
-                  id="gate-user"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={t('placeholder_user')}
-                  aria-label={t('label_user')}
-                  autoComplete="off"
-                  maxLength={40}
-                  style={BOX.email}
-                  className={inputClass}
-                />
-                <input
-                  id="gate-pass"
-                  type="password"
-                  value={pass}
-                  onChange={(e) => setPass(e.target.value)}
-                  placeholder={t('placeholder_pass')}
-                  aria-label={t('label_pass')}
-                  autoComplete="off"
-                  maxLength={64}
-                  style={BOX.senha}
-                  className={inputClass}
-                />
+                      {t('enter')}
+                    </button>
 
-                {/* Lembrar de mim: no PC cobre o pintado (chip opaco); na arte
-                    limpa é checkbox + texto direto sobre a grama, como na referência */}
-                <button
-                  type="button"
-                  role="checkbox"
-                  aria-checked={remember}
-                  onClick={() => setRemember(!remember)}
-                  style={BOX.lembrar}
-                  className={`absolute flex items-center justify-center gap-1.5 ${
-                    art.painted ? 'px-1.5 rounded bg-[#0a1c0f] border border-[#68a14c]/30' : ''
-                  }`}
-                >
-                  <span
-                    className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
-                      remember
-                        ? 'bg-[#4caf50] border-[#9fdb6d] text-[#04150c]'
-                        : 'bg-[#0a1c0f] border-[#68a14c]/60'
-                    }`}
-                  >
-                    {remember && <Check size={10} strokeWidth={3.5} />}
-                  </span>
-                  <span
-                    className={`text-[#f2fdf5] whitespace-nowrap pr-1 [text-shadow:0_1px_3px_rgba(0,0,0,0.95)] ${
-                      art.painted ? 'text-[11px]' : 'text-[12px] font-medium'
-                    }`}
-                  >
-                    {t('remember')}
-                  </span>
-                </button>
-
-                {/* Botão Entrar: no PC o desenho pintado é o visual (aqui só o
-                    clique); na arte limpa o botão é desenhado no mesmo estilo */}
-                <button
-                  type="submit"
-                  aria-label={t('enter')}
-                  style={BOX.entrar}
-                  className={`absolute rounded-lg cursor-pointer transition-all hover:brightness-110 active:scale-[0.98] ${
-                    art.painted
-                      ? 'hover:shadow-[0_0_24px_rgba(120,220,110,0.55),inset_0_0_14px_rgba(160,255,150,0.2)]'
-                      : 'bg-gradient-to-b from-[#25491f] via-[#132e14] to-[#0a1f0d] border-2 border-[#7ba659]/75 text-[15px] font-semibold text-[#eefbea] [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] shadow-[inset_0_1px_0_rgba(190,255,170,0.3),inset_0_-8px_14px_rgba(0,0,0,0.45),0_6px_18px_rgba(0,0,0,0.6)] hover:shadow-[0_0_22px_rgba(120,220,110,0.5),inset_0_1px_0_rgba(190,255,170,0.3)]'
-                  }`}
-                >
-                  {!art.painted && t('enter')}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={enterGuest}
-                  style={BOX.visitante}
-                  className="absolute text-center text-[11px] text-[#d8f2e2]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.95)] hover:text-white underline underline-offset-4 decoration-dotted transition-colors"
-                >
-                  {t('guest')} →
-                </button>
+                    <button
+                      type="button"
+                      onClick={enterGuest}
+                      className="self-center text-[11px] text-[#e4f5ea]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] hover:text-white underline underline-offset-4 decoration-dotted transition-colors"
+                    >
+                      {t('guest')} →
+                    </button>
+                  </div>
+                </div>
               </form>
             ) : (
               /* ── Carregando o mundo (no centro do círculo) ── */
               <div
-                style={BOX.loading}
+                style={art.loading}
                 className={`absolute flex flex-col items-center justify-center gap-3 text-center rounded-2xl bg-[#07130a]/85 border border-[#68a14c]/35 backdrop-blur-sm p-4 ${uiFadeClass}`}
               >
                 <Compass

@@ -1,170 +1,138 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Youtube, Briefcase, Rocket, Compass, Plane } from 'lucide-react';
+import { Youtube, Instagram, Linkedin, Twitter } from 'lucide-react';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.15 },
-  },
-};
+const SOCIALS = [
+  { href: YOUTUBE_URL, icon: Youtube, label: 'YouTube' },
+  { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram' },
+  { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn' },
+  { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X' },
+];
 
-const item = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
-};
-
+// Hero estilo pôster de viagem: o nome GIGANTE atrás da paisagem
+// (a arte da jornada com o céu recortado cobre parte das letras).
 export default function Hero() {
   const t = useTranslations('hero');
 
-  const chips = [
-    { icon: Briefcase, label: t('chip_sales'), color: 'text-accent-deep bg-accent/10 border-accent/25' },
-    { icon: Rocket, label: t('chip_ceo'), color: 'text-accent-2-deep bg-accent-2/10 border-accent-2/25' },
-    { icon: Youtube, label: t('chip_youtube'), color: 'text-red-400 bg-red-500/10 border-red-500/25' },
-  ];
-
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Luz de aurora atrás do conteúdo */}
-      <div className="orb w-[520px] h-[520px] top-[-10%] left-[-10%] bg-accent-bright/20 animate-float-slow" />
-      <div className="orb w-[460px] h-[460px] bottom-[-8%] right-[-8%] bg-accent-2/20 animate-float-slower" />
+    <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
+      {/* Luz de aurora atrás de tudo */}
       <div className="absolute inset-0 gradient-radial-top pointer-events-none" />
+      <div className="orb w-[520px] h-[520px] top-[-10%] left-[-10%] bg-accent-bright/15 animate-float-slow" />
+      <div className="orb w-[460px] h-[460px] top-[-5%] right-[-8%] bg-accent-2/15 animate-float-slower" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-6 items-center">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="max-w-4xl"
+      {/* ── O nome gigante (ATRÁS da paisagem) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-x-0 top-[11%] sm:top-[10%] z-0 flex flex-col items-center px-2"
+      >
+        <span className="font-pixel text-[8px] sm:text-[11px] text-accent-bright tracking-[0.4em] uppercase mb-2 sm:mb-4 [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]">
+          {t('name')}
+        </span>
+        <h1
+          aria-label={`${t('name')} — ${t('role')}`}
+          className="font-black text-white leading-[0.85] tracking-tight text-[30vw] sm:text-[24vw] lg:text-[20vw] select-none [text-shadow:0_0_90px_rgba(99,247,141,0.3)]"
         >
-          {/* Badge de movimento */}
-          <motion.div variants={item} className="inline-flex items-center gap-2 mb-8">
-            <div className="flex items-center gap-2.5 px-4 py-2 rounded-full glass text-[10px] sm:text-xs text-foreground-muted font-pixel uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-bright animate-pulse-dot" />
-              <Compass size={11} className="text-accent-2-bright" />
-              <span>{t('open_to')}</span>
-            </div>
-          </motion.div>
+          <span aria-hidden>ARTX</span>
+        </h1>
+      </motion.div>
 
-          {/* Name */}
-          <motion.h1
-            variants={item}
-            className="text-5xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tighter text-foreground leading-[0.95] mb-5 break-words [text-shadow:0_0_60px_rgba(99,247,141,0.25)]"
-          >
-            {t('name')}
-          </motion.h1>
+      {/* ── A paisagem por cima do texto (céu transparente) ── */}
+      {/* Desktop/paisagem: faixa larga ancorada embaixo */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-x-0 bottom-0 h-[78%] z-[1] hidden sm:block"
+      >
+        <Image
+          src="/images/kaua-journey-cutout.png"
+          alt={t('portrait_alt')}
+          fill
+          priority
+          unoptimized
+          sizes="100vw"
+          className="object-cover [object-position:center_12%] [image-rendering:pixelated] select-none"
+        />
+      </motion.div>
+      {/* Celular: a arte inteira centralizada */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-x-0 bottom-0 h-[76%] z-[1] sm:hidden"
+      >
+        <Image
+          src="/images/kaua-journey-cutout.png"
+          alt={t('portrait_alt')}
+          fill
+          priority
+          unoptimized
+          sizes="100vw"
+          className="object-cover [object-position:center_8%] [image-rendering:pixelated] select-none"
+        />
+      </motion.div>
 
-          {/* Role — gradiente de aurora */}
-          <motion.p
-            variants={item}
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-6"
-          >
-            <span className="text-gradient">{t('role')}</span>
-          </motion.p>
+      {/* Sombra de leitura na base */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-40 z-[1] bg-gradient-to-t from-[#04100a]/80 to-transparent pointer-events-none"
+      />
 
-          {/* Tagline */}
-          <motion.p
-            variants={item}
-            className="text-base sm:text-lg text-foreground-muted max-w-xl mb-8 leading-relaxed"
-          >
-            {t('tagline')}
-          </motion.p>
-
-          {/* Chips: as três frentes */}
-          <motion.div variants={item} className="flex flex-wrap gap-2.5 mb-6">
-            {chips.map(({ icon: Icon, label, color }) => (
-              <span
-                key={label}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-semibold ${color}`}
-              >
-                <Icon size={12} />
-                {label}
-              </span>
-            ))}
-          </motion.div>
-
-          {/* Etiqueta de embarque — BRA → MUNDO */}
-          <motion.div variants={item} className="mb-10">
-            <span className="boarding-tag font-pixel text-[10px] sm:text-xs uppercase">
-              <Plane size={13} className="text-accent-bright" />
-              <span>{t('route')}</span>
-              <span className="text-foreground-subtle">·</span>
-              <span className="text-accent-deep">GO FAR</span>
-            </span>
-          </motion.div>
-
-          {/* CTAs — negócio na frente, canal como bônus */}
-          <motion.div variants={item} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-            <Link href="/contact" className="group btn-pill-primary text-sm">
-              {t('cta_contact')}
-              <ArrowRight
-                size={14}
-                className="transition-transform group-hover:translate-x-1"
-              />
-            </Link>
-            <a
-              href={YOUTUBE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group btn-pill-secondary text-sm"
-            >
-              <Youtube size={15} />
-              {t('cta_youtube')}
-            </a>
-          </motion.div>
-        </motion.div>
-
-        {/* Retrato em pixel art — o Kauã em pessoa */}
-        <motion.div
-          initial={{ opacity: 0, y: 28, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.9, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="relative flex justify-center lg:justify-end"
+      {/* ── Botão central estilo "WATCH TOUR" ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="absolute inset-x-0 top-[47%] sm:top-[50%] z-[2] flex flex-col items-center gap-3 px-4"
+      >
+        <a
+          href={YOUTUBE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border-2 border-white/85 text-white text-xs sm:text-sm font-bold tracking-[0.22em] uppercase backdrop-blur-[2px] bg-[#04100a]/20 transition-all hover:bg-white hover:text-[#04100a] hover:shadow-[0_0_40px_rgba(255,255,255,0.35)]"
         >
-          <div className="relative w-56 sm:w-72 lg:w-full lg:max-w-md">
-            {/* Luz de aurora atrás do retrato */}
-            <div
-              aria-hidden
-              className="absolute inset-x-4 top-8 bottom-0 rounded-full bg-accent/15 blur-3xl"
-            />
-            <div
-              aria-hidden
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-12 rounded-full bg-accent-2/20 blur-2xl"
-            />
-            <Image
-              src="/images/kaua-pixel.png"
-              alt={t('portrait_alt')}
-              width={720}
-              height={735}
-              priority
-              sizes="(min-width: 1024px) 28rem, (min-width: 640px) 18rem, 14rem"
-              className="relative w-full h-auto drop-shadow-[0_18px_50px_rgba(53,224,101,0.22)]"
-            />
-          </div>
-        </motion.div>
-        </div>
+          <Youtube size={16} />
+          {t('watch_tour')}
+        </a>
+        <span className="font-pixel text-[7px] sm:text-[9px] text-white/85 tracking-[0.3em] uppercase [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]">
+          {t('role')}
+        </span>
+      </motion.div>
 
-        {/* Scroll indicator */}
+      {/* ── "Saiba mais" vertical à esquerda ── */}
+      <div className="hidden sm:flex absolute left-6 bottom-8 z-[2] flex-col items-center gap-3">
+        <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] tracking-[0.3em] text-white/70 uppercase">
+          {t('learn_more')}
+        </span>
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-px h-12 bg-gradient-to-b from-accent-bright via-accent-2-bright/60 to-transparent"
-          />
-        </motion.div>
+          animate={{ scaleY: [1, 0.6, 1] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-px h-16 bg-white/50 origin-top"
+        />
+      </div>
+
+      {/* ── Sociais no canto inferior direito ── */}
+      <div className="absolute right-5 sm:right-7 bottom-6 z-[2] flex items-center gap-1.5">
+        {SOCIALS.map(({ href, icon: Icon, label }) => (
+          <a
+            key={href}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className="p-2 rounded-full text-white/80 hover:text-accent-bright hover:bg-white/10 transition-all"
+          >
+            <Icon size={16} />
+          </a>
+        ))}
       </div>
     </section>
   );
