@@ -99,6 +99,22 @@
   50%      { opacity: 0.15; }
 }
 
+/* ── Atmosfera do cenário (vira cena viva, não foto) ── */
+@keyframes sun-breathe {
+  0%, 100% { opacity: 0.22; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 0.45; transform: translate(-50%, -50%) scale(1.12); }
+}
+
+@keyframes rays-sway {
+  0%, 100% { opacity: 0.1; }
+  50%      { opacity: 0.28; }
+}
+
+@keyframes fog-drift {
+  0%   { transform: translateX(-22%); }
+  100% { transform: translateX(22%); }
+}
+
 /* ── Base ─────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
@@ -276,6 +292,56 @@
     animation: rpg-blink 1s steps(1) infinite;
   }
 
+  /* Sol da cena respirando devagar */
+  .gate-sun-breathe {
+    background: radial-gradient(
+      circle,
+      rgba(255, 214, 120, 0.5),
+      rgba(255, 170, 60, 0.16) 45%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+    animation: sun-breathe 7s ease-in-out infinite;
+  }
+
+  /* Raios de luz descendo por entre as árvores */
+  .gate-rays {
+    background: repeating-conic-gradient(
+      from -12deg at 50% 0%,
+      rgba(255, 230, 160, 0.14) 0deg 5deg,
+      transparent 5deg 14deg
+    );
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 75%);
+    mask-image: linear-gradient(180deg, #000, transparent 75%);
+    mix-blend-mode: screen;
+    animation: rays-sway 9s ease-in-out infinite;
+  }
+
+  /* Névoa rasteira cruzando a cena */
+  .gate-fog {
+    position: absolute;
+    left: -30%;
+    width: 160%;
+    height: 34%;
+    filter: blur(2px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .gate-fog-a {
+    top: 46%;
+    background:
+      radial-gradient(50% 60% at 30% 50%, rgba(180, 240, 200, 0.1), transparent 70%),
+      radial-gradient(40% 55% at 70% 50%, rgba(200, 255, 220, 0.08), transparent 70%);
+    animation: fog-drift 46s ease-in-out infinite alternate;
+  }
+  .gate-fog-b {
+    top: 62%;
+    background:
+      radial-gradient(45% 60% at 60% 50%, rgba(180, 240, 200, 0.09), transparent 70%),
+      radial-gradient(35% 50% at 25% 50%, rgba(200, 255, 220, 0.07), transparent 70%);
+    animation: fog-drift 62s ease-in-out infinite alternate-reverse;
+  }
+
   /* Trilha da jornada (página Sobre): pegadas em pares descendo o caminho */
   .trail-steps {
     width: 18px;
@@ -412,7 +478,10 @@
   .animate-float-slow,
   .animate-float-slower,
   .text-gradient,
-  .gate-firefly {
+  .gate-firefly,
+  .gate-sun-breathe,
+  .gate-rays,
+  .gate-fog {
     animation: none;
   }
 }

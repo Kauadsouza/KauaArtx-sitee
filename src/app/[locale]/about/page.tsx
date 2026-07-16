@@ -7,14 +7,15 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight, Youtube, Heart, TrendingUp, PackageCheck, Share2,
   Briefcase, Rocket, Megaphone, Building2, Globe2, Plane, GraduationCap,
-  Sparkles, Wrench, School, Check, Lock, Flag, Luggage,
+  Sparkles, Wrench, School, Check, Lock, Flag, Luggage, Footprints,
 } from 'lucide-react';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
 // A jornada é uma trilha estilo game (tipo Duolingo): paradas concluídas,
 // paradas em andamento, a parada ATUAL (onde o Kauã está, com a arte dele
-// caminhando) e as fases futuras ainda bloqueadas.
+// caminhando) e as fases futuras ainda bloqueadas. No desktop a trilha
+// serpenteia em zigue-zague (cards alternando os lados da linha central).
 type TrailState = 'done' | 'progress' | 'current' | 'locked' | 'final';
 
 interface TrailStop {
@@ -65,59 +66,72 @@ export default function AboutPage() {
       <div className="orb w-[420px] h-[420px] top-[-6%] right-[-8%] bg-accent-2/20 animate-float-slow" />
 
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-8">
-        {/* Hero */}
+        {/* ── Hero: a arte da jornada com o título por cima ── */}
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="py-12 sm:py-20 flex flex-col-reverse sm:flex-row sm:items-center gap-8 sm:gap-12"
+          className="relative rounded-3xl overflow-hidden border border-border shadow-lg mt-4"
         >
-          <div className="flex-1">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground mb-5">
+          <Image
+            src="/images/kaua-journey.png"
+            alt={t('portrait_alt')}
+            width={960}
+            height={1440}
+            priority
+            sizes="(min-width: 896px) 832px, 100vw"
+            className="w-full h-[340px] sm:h-[430px] object-cover object-[center_20%] [image-rendering:pixelated]"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-r from-[#04100a]/85 via-[#04100a]/45 to-transparent"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#04100a]/70 to-transparent"
+          />
+          <div className="absolute inset-0 flex flex-col justify-center p-6 sm:p-10">
+            <span className="font-pixel text-[8px] sm:text-[10px] uppercase tracking-[0.3em] text-accent-bright mb-4 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
               {t('title')}
+            </span>
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white max-w-xl leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
+              {t('subtitle')}
             </h1>
-            <p className="text-lg sm:text-2xl font-semibold mb-2">
-              <span className="text-gradient">{t('subtitle')}</span>
+            <p className="mt-4 inline-flex items-center gap-2 text-sm sm:text-base text-[#d8f2e2] [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+              <Footprints size={15} className="text-accent-bright" />
+              {t('hero_follow')}
             </p>
           </div>
-          <div className="relative shrink-0 self-center">
-            <div
-              aria-hidden
-              className="absolute inset-2 rounded-full bg-accent/15 blur-2xl"
-            />
-            <Image
-              src="/images/kaua-pixel.png"
-              alt={t('portrait_alt')}
-              width={720}
-              height={735}
-              priority
-              sizes="(min-width: 640px) 13rem, 10rem"
-              className="relative w-40 sm:w-52 h-auto drop-shadow-[0_12px_32px_rgba(53,224,101,0.2)]"
-            />
+        </motion.div>
+
+        {/* ── Pill de contato (meio sobreposta no hero, como nos sites de viagem) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="relative z-10 -mt-7 flex justify-center mb-16 sm:mb-20 px-2"
+        >
+          <div className="glass-strong rounded-full pl-5 pr-2 py-2 flex items-center gap-3 sm:gap-5 shadow-lg">
+            <span className="text-xs sm:text-sm text-foreground-muted whitespace-nowrap">
+              {t('pill_text')}
+            </span>
+            <Link
+              href="/contact"
+              className="btn-pill-primary !py-2 !px-5 text-xs whitespace-nowrap"
+            >
+              {t('pill_button')}
+            </Link>
           </div>
         </motion.div>
 
-        {/* Bio */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="space-y-6 text-base sm:text-lg text-foreground-muted leading-relaxed mb-16 sm:mb-20"
-        >
-          <p>{t('bio_1')}</p>
-          <p>{t('bio_2')}</p>
-          <p>{t('bio_3')}</p>
-          <p>{t('bio_4')}</p>
-        </motion.div>
-
-        {/* ── Jornada: trilha estilo game (Duolingo de aventureiro) ── */}
+        {/* ── Jornada: trilha estilo game em zigue-zague ── */}
         <section className="mb-16 sm:mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mb-8 sm:mb-10"
+            className="mb-8 sm:mb-10 text-center"
           >
             <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-2">
               {j('title')}
@@ -132,6 +146,8 @@ export default function AboutPage() {
             {trail.map((stop, i) => {
               const Icon = stop.icon;
               const isLast = i === trail.length - 1;
+              // Zigue-zague: no desktop os cards alternam o lado da linha
+              const leftSide = i % 2 === 0;
               // O trecho do caminho depois de onde ele está ainda não foi trilhado
               const pathAhead =
                 stop.state === 'current' || stop.state === 'locked';
@@ -159,10 +175,10 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-40px' }}
                   transition={{ duration: 0.45, delay: 0.04 }}
-                  className="flex gap-4 sm:gap-6 items-stretch"
+                  className="grid grid-cols-[4.5rem_1fr] sm:grid-cols-[1fr_6rem_1fr] gap-x-3 sm:gap-x-2 items-stretch"
                 >
                   {/* Coluna do caminho: parada + pegadas até a próxima */}
-                  <div className="flex flex-col items-center w-20 sm:w-24 shrink-0">
+                  <div className="flex flex-col items-center col-start-1 sm:col-start-2 row-start-1">
                     {stop.state === 'current' && (
                       <Image
                         src="/images/kaua-journey.png"
@@ -196,10 +212,22 @@ export default function AboutPage() {
                     )}
                   </div>
 
-                  {/* Card da parada */}
-                  <div className={`flex-1 min-w-0 ${isLast ? '' : 'pb-8 sm:pb-10'}`}>
-                    <div className={`rounded-2xl border p-4 sm:p-5 ${card}`}>
-                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  {/* Card da parada — alterna o lado no desktop */}
+                  <div
+                    className={`col-start-2 row-start-1 min-w-0 ${
+                      leftSide ? 'sm:col-start-1' : 'sm:col-start-3'
+                    } ${isLast ? '' : 'pb-8 sm:pb-10'}`}
+                  >
+                    <div
+                      className={`rounded-2xl border p-4 sm:p-5 ${card} ${
+                        leftSide ? 'sm:text-right' : ''
+                      }`}
+                    >
+                      <div
+                        className={`flex flex-wrap items-center gap-2 mb-1.5 ${
+                          leftSide ? 'sm:justify-end' : ''
+                        }`}
+                      >
                         <h3
                           className={`font-bold text-foreground ${
                             stop.state === 'final'
@@ -248,8 +276,85 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* ── Faixa de cenário (respiro visual, como na referência) ── */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="rounded-3xl overflow-hidden border border-border shadow-lg mb-16 sm:mb-20"
+        >
+          <Image
+            src="/images/kaua-journey.png"
+            alt=""
+            width={960}
+            height={1440}
+            sizes="(min-width: 896px) 832px, 100vw"
+            className="w-full h-36 sm:h-52 object-cover object-[center_72%] [image-rendering:pixelated]"
+          />
+        </motion.div>
+
+        {/* ── "Nascido pra aventura": retrato + bio (foto à esquerda, texto à direita) ── */}
+        <section className="mb-16 sm:mb-20 grid grid-cols-1 md:grid-cols-[minmax(0,300px)_1fr] gap-8 md:gap-12 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative mx-auto md:mx-0 max-w-[280px]"
+          >
+            <div
+              aria-hidden
+              className="absolute inset-4 rounded-full bg-accent/15 blur-2xl"
+            />
+            <div className="relative rounded-3xl bg-surface border border-border p-6 shadow-lg">
+              <Image
+                src="/images/kaua-pixel.png"
+                alt={t('portrait_alt')}
+                width={720}
+                height={735}
+                sizes="280px"
+                className="w-full h-auto drop-shadow-[0_12px_32px_rgba(53,224,101,0.2)]"
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-5">
+              {t('born_title')}
+            </h2>
+            <div className="space-y-4 text-sm sm:text-base text-foreground-muted leading-relaxed mb-7">
+              <p>{t('bio_1')}</p>
+              <p>{t('bio_2')}</p>
+              <p>{t('bio_3')}</p>
+              <p>{t('bio_4')}</p>
+            </div>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+              <a
+                href={YOUTUBE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group btn-pill-primary text-sm"
+              >
+                <Youtube size={15} />
+                {t('cta_youtube')}
+                <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
+              </a>
+              <Link href="/contact" className="group btn-pill-secondary text-sm">
+                {t('cta_contact')}
+                <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </motion.div>
+        </section>
+
         {/* Values */}
-        <section className="mb-16 sm:mb-20">
+        <section className="pb-24">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -282,24 +387,6 @@ export default function AboutPage() {
               </motion.div>
             ))}
           </div>
-        </section>
-
-        {/* CTAs */}
-        <section className="pb-24 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-          <a
-            href={YOUTUBE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group btn-pill-primary text-sm"
-          >
-            <Youtube size={15} />
-            {t('cta_youtube')}
-            <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
-          </a>
-          <Link href="/contact" className="group btn-pill-secondary text-sm">
-            {t('cta_contact')}
-            <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
-          </Link>
         </section>
       </div>
     </div>

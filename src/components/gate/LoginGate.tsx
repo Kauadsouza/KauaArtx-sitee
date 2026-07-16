@@ -106,11 +106,45 @@ export default function LoginGate() {
   const [typed, setTyped] = useState('');
   const typedRef = useRef(0);
 
+  // Parallax do cenário: a arte acompanha o mouse de leve (só desktop)
+  const artLayerRef = useRef<HTMLDivElement>(null);
+
   const adventurer = name.trim() || t('default_adventurer');
   const fullMsg =
     stage === 'thanks' || stage === 'loading'
       ? t('wizard_thanks', { name: adventurer })
       : t(`wizard_${line + 1}`);
+
+  // Cena viva: a arte se move sutilmente com o mouse (profundidade).
+  // Celular (pointer coarse) e quem pediu menos animação ficam de fora.
+  useEffect(() => {
+    if (stage === 'hidden' || stage === 'opening') return;
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      window.matchMedia('(pointer: coarse)').matches
+    )
+      return;
+    let tx = 0, ty = 0, cx = 0, cy = 0;
+    let raf = 0;
+    const onMove = (e: PointerEvent) => {
+      tx = (e.clientX / window.innerWidth - 0.5) * -16;
+      ty = (e.clientY / window.innerHeight - 0.5) * -10;
+    };
+    const loop = () => {
+      cx += (tx - cx) * 0.05;
+      cy += (ty - cy) * 0.05;
+      if (artLayerRef.current) {
+        artLayerRef.current.style.transform = `scale(1.05) translate(${cx.toFixed(2)}px, ${cy.toFixed(2)}px)`;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    window.addEventListener('pointermove', onMove);
+    raf = requestAnimationFrame(loop);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      cancelAnimationFrame(raf);
+    };
+  }, [stage]);
 
   // Celular/tela em pé usa a arte vertical; PC usa a horizontal
   useEffect(() => {
@@ -375,19 +409,35 @@ export default function LoginGate() {
               height: `max(100vh, calc(100vw * ${art.hOverW}))`,
             }}
           >
-            <Image
-              key={art.src}
-              src={art.src}
-              alt=""
-              fill
-              priority
-              unoptimized
-              sizes="100vw"
-              className="object-cover select-none [image-rendering:pixelated]"
-            />
+            {/* A arte fica numa camada própria com leve zoom — o parallax
+                   move ela sem nunca mostrar as bordas */}
+            <div
+              ref={artLayerRef}
+              className="absolute inset-0 will-change-transform"
+              style={{ transform: 'scale(1.05)' }}
+            >
+              <Image
+                key={art.src}
+                src={art.src}
+                alt=""
+                fill
+                priority
+                unoptimized
+                sizes="100vw"
+                className="object-cover select-none [image-rendering:pixelated]"
+              />
+            </div>
             {/* Pegada mais verde + leitura */}
             <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
             <div aria-hidden className="absolute inset-0 aurora-vignette opacity-60" />
+
+            {/* ── Atmosfera: sol respirando, raios e névoa ── */}
+            <div aria-hidden className={`absolute inset-0 pointer-events-none overflow-hidden ${uiFadeClass}`}>
+              <div className="gate-sun-breathe absolute left-1/2 top-[28%] -translate-x-1/2 -translate-y-1/2 w-[46%] aspect-square rounded-full" />
+              <div className="gate-rays absolute left-1/2 top-0 -translate-x-1/2 w-[76%] h-[68%]" />
+              <div className="gate-fog gate-fog-a" />
+              <div className="gate-fog gate-fog-b" />
+            </div>
 
             {/* ── Vida pixel: borboletas, vagalumes, folhas e libélula ── */}
             <div aria-hidden className={`absolute inset-0 pointer-events-none ${uiFadeClass}`}>
