@@ -218,8 +218,9 @@ export default function LoginGate() {
       return () => clearTimeout(to);
     }
     const fade = setTimeout(() => setUiFading(true), 150);
-    // no auge do clarão o portal se desfaz; o fade de saída dissolve a luz
-    const done = setTimeout(() => setStage('hidden'), 1300);
+    // ~1,5s de energia concentrando no orbe + ~1s de clarão crescendo;
+    // no auge o portal se desfaz e o fade de saída dissolve a luz
+    const done = setTimeout(() => setStage('hidden'), 2700);
     return () => {
       clearTimeout(fade);
       clearTimeout(done);
@@ -508,8 +509,12 @@ export default function LoginGate() {
             {/* O mago não some no fade: ele é quem lança o feitiço */}
             <motion.span
               className="order-1 sm:order-2 relative shrink-0 sm:ml-3 w-14 sm:w-24 lg:w-28"
-              animate={casting ? { scale: [1, 1.04, 1.01, 1.08], y: [0, -2, 0, -5] } : {}}
-              transition={{ duration: 1.1, ease: 'easeInOut' }}
+              animate={
+                casting
+                  ? { scale: [1, 1.05, 1.02, 1.06, 1.03, 1.09], y: [0, -3, -1, -5, -2, -7] }
+                  : {}
+              }
+              transition={{ duration: 2.4, ease: 'easeInOut' }}
             >
               <Image
                 src="/images/pixel-wizard.png"
@@ -544,8 +549,11 @@ export default function LoginGate() {
                       boxShadow: '0 0 34px 14px rgba(150,255,180,0.85)',
                     }}
                     initial={{ scale: 0.15, opacity: 0 }}
-                    animate={{ scale: [0.15, 0.9, 0.7, 1.5], opacity: [0, 1, 1, 1] }}
-                    transition={{ duration: 0.55, ease: 'easeOut' }}
+                    animate={{
+                      scale: [0.15, 0.8, 0.55, 1.0, 0.7, 1.25, 0.9, 1.7],
+                      opacity: [0, 1, 0.85, 1, 0.9, 1, 1, 1],
+                    }}
+                    transition={{ duration: 1.5, ease: 'easeInOut' }}
                   />
                   {/* anel de choque disparando na frente do clarão */}
                   <motion.span
@@ -553,7 +561,7 @@ export default function LoginGate() {
                     style={{ x: '-50%', y: '-50%' }}
                     initial={{ scale: 0.2, opacity: 0 }}
                     animate={{ scale: 16, opacity: [0, 0.9, 0] }}
-                    transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
+                    transition={{ duration: 0.9, delay: 1.5, ease: 'easeOut' }}
                   />
                   {/* o clarão em si, crescendo do orbe até tomar tudo */}
                   <motion.span
@@ -566,7 +574,7 @@ export default function LoginGate() {
                     }}
                     initial={{ scale: 0, opacity: 0.9 }}
                     animate={{ scale: 60, opacity: 1 }}
-                    transition={{ duration: 0.75, delay: 0.45, ease: [0.4, 0, 0.8, 0.4] }}
+                    transition={{ duration: 0.95, delay: 1.6, ease: [0.4, 0, 0.8, 0.4] }}
                   />
                 </span>
               )}
@@ -604,7 +612,7 @@ export default function LoginGate() {
               }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.75, ease: 'easeIn' }}
+              transition={{ duration: 0.55, delay: 2.0, ease: 'easeIn' }}
             />
           )}
 
