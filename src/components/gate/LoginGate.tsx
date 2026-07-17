@@ -484,15 +484,13 @@ export default function LoginGate() {
               </form>
           </div>
 
-          {/* ── Logo (canto superior esquerdo, como nos games). No celular ganha
-                 uma placa escura atrás — direto sobre a arte clara ficava lavado.
-                 O "ARTX" é verde vivo sólido: o gradiente com clip-text some na
-                 arte e ignora text-shadow. ── */}
-          <div className={`absolute top-3 left-3 sm:top-7 sm:left-9 rounded-xl bg-[#04100a]/70 border border-[#68a14c]/30 shadow-[0_4px_18px_rgba(0,0,0,0.5)] backdrop-blur-[2px] px-3 py-2.5 sm:bg-transparent sm:border-transparent sm:shadow-none sm:backdrop-blur-0 sm:px-0 sm:py-0 ${uiFadeClass}`}>
-            <h1 className="font-pixel text-sm sm:text-lg text-white [text-shadow:0_2px_0_rgba(0,0,0,0.9),0_0_18px_rgba(99,247,141,0.75),0_2px_6px_rgba(0,0,0,0.95)]">
-              KAUÃ{' '}
-              <span className="text-[#63f78d] [text-shadow:0_2px_0_rgba(0,0,0,0.9),0_0_16px_rgba(99,247,141,0.85),0_2px_6px_rgba(0,0,0,0.95)]">
-                ARTX
+          {/* ── Logo (canto superior esquerdo) — mesma marca profissional
+                 do header do site: Geist bold, "Artx" em verde ── */}
+          <div className={`absolute top-4 left-4 sm:top-6 sm:left-8 ${uiFadeClass}`}>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_0_22px_rgba(0,0,0,0.6)]">
+              Kauã{' '}
+              <span className="text-[#63f78d] [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_0_18px_rgba(99,247,141,0.5)]">
+                Artx
               </span>
             </h1>
           </div>

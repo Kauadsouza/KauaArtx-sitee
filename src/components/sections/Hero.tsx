@@ -14,14 +14,14 @@ const SOCIALS = [
   { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X' },
 ];
 
-// Hero estilo pôster de viagem: o nome GIGANTE atrás da paisagem
-// (a arte da jornada com o céu recortado cobre parte das letras).
+// Hero pôster: a foto oficial do Fuji com o "ARTX" já embutido ATRÁS
+// da montanha (em 4K) — o site só coloca os controles por cima.
 export default function Hero() {
   const t = useTranslations('hero');
 
   return (
     <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
-      {/* ── A floresta real de fundo (tela inteira) ── */}
+      {/* ── A foto oficial em tela cheia ── */}
       <motion.div
         initial={{ opacity: 0, scale: 1.04 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -30,35 +30,29 @@ export default function Hero() {
       >
         <Image
           src="/images/hero-photo.webp"
-          alt=""
+          alt="ARTX gigante atrás do Monte Fuji, com uma loja de conveniência iluminada à noite"
           fill
           priority
           quality={95}
           sizes="100vw"
           className="object-cover select-none"
         />
-        {/* Escurece pra leitura do texto */}
-        <div aria-hidden className="absolute inset-0 bg-[#04100a]/35" />
-        <div aria-hidden className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#04100a]/70 to-transparent" />
+        {/* Véus leves só pra legibilidade do menu e da base */}
+        <div aria-hidden className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#04100a]/70 to-transparent" />
       </motion.div>
 
-      {/* ── O nome gigante sobre a floresta ── */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
+      {/* Nome pra SEO/leitores de tela (o visual está na foto) */}
+      <h1 className="sr-only">{`${t('name')} — ${t('role')}`}</h1>
+
+      {/* ── Kicker discreto no topo ── */}
+      <motion.span
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-x-0 top-[13%] sm:top-[12%] z-[1] flex flex-col items-center px-2"
+        className="absolute inset-x-0 top-[7%] z-[1] text-center font-pixel text-[8px] sm:text-[10px] text-white/90 tracking-[0.4em] uppercase [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]"
       >
-        <span className="font-pixel text-[8px] sm:text-[11px] text-accent-bright tracking-[0.4em] uppercase mb-2 sm:mb-4 [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]">
-          {t('name')}
-        </span>
-        <h1
-          aria-label={`${t('name')} — ${t('role')}`}
-          className="font-black text-white leading-[0.85] tracking-tight text-[30vw] sm:text-[24vw] lg:text-[20vw] select-none [text-shadow:0_0_90px_rgba(99,247,141,0.3)]"
-        >
-          <span aria-hidden>ARTX</span>
-        </h1>
-      </motion.div>
+        {t('name')}
+      </motion.span>
 
       {/* Sombra de leitura na base */}
       <div
@@ -71,7 +65,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="absolute inset-x-0 top-[47%] sm:top-[50%] z-[2] flex flex-col items-center gap-3 px-4"
+        className="absolute inset-x-0 top-[52%] sm:top-[55%] z-[2] flex flex-col items-center gap-3 px-4"
       >
         <a
           href={YOUTUBE_URL}
