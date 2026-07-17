@@ -6,7 +6,10 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Check, Globe, UserPlus, DoorOpen } from 'lucide-react';
+import {
+  Compass, Check, Globe, Eye, EyeOff,
+  Youtube, Instagram, Linkedin,
+} from 'lucide-react';
 import PixelLife from './PixelLife';
 
 // Tela de login estilo game na frente do site, usando a arte oficial
@@ -46,14 +49,14 @@ const ART: Record<'landscape' | 'portrait', ArtSpec> = {
     src: '/images/login-bg.webp',
     ratio: '1672 / 941',
     hOverW: 941 / 1672,
-    card: { left: '50%', top: '34%', width: '26%' },
+    card: { left: '50%', top: '26%', width: '26%' },
     loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
   },
   portrait: {
     src: '/images/login-bg-mobile.webp',
     ratio: '853 / 1844',
     hOverW: 1844 / 853,
-    card: { left: '50%', top: '42%', width: '58%' },
+    card: { left: '50%', top: '30%', width: '58%' },
     loading: { left: '22%', top: '43%', width: '56%', height: '15%' },
   },
 };
@@ -76,6 +79,7 @@ export default function LoginGate() {
   const [portrait, setPortrait] = useState(false);
   const [name, setName] = useState('');
   const [pass, setPass] = useState('');
+  const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(true);
   const [progress, setProgress] = useState(0);
 
@@ -271,9 +275,6 @@ export default function LoginGate() {
 
   if (typeof document === 'undefined') return null;
 
-  const inputClass =
-    'w-full rounded-lg bg-[#0a1c0f]/85 border border-[#68a14c]/40 focus:border-[#9fdb6d] outline-none px-3 py-2.5 text-[13px] text-[#e9fbef] placeholder:text-[#7a9a83]/80 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] transition-colors';
-
   // Some suave da interface pouco antes dos portões abrirem
   const uiFadeClass = `transition-opacity duration-300 ${uiFading ? 'opacity-0' : ''}`;
 
@@ -401,7 +402,7 @@ export default function LoginGate() {
                 priority
                 unoptimized
                 sizes="100vw"
-                className="object-cover select-none [image-rendering:pixelated]"
+                className="object-cover select-none"
               />
             </div>
             {/* Pegada mais verde + leitura */}
@@ -421,85 +422,150 @@ export default function LoginGate() {
               <PixelLife />
             </div>
 
-            {/* ── Card de vidro fosco com o formulário (estilo Sign Up) ── */}
+            {/* ── Card de vidro com login animado (labels flutuantes) ── */}
             {stage !== 'loading' ? (
               <form
                 onSubmit={enter}
                 style={art.card}
-                className={`absolute -translate-x-1/2 min-w-[min(310px,90vw)] max-w-[min(460px,92vw)] rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] p-4 sm:p-5 ${
+                className={`absolute -translate-x-1/2 w-[min(400px,92vw)] rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] p-5 sm:p-7 ${
                   formActive ? '' : 'pointer-events-none opacity-80'
                 }`}
               >
-                <div className="flex items-center gap-3 sm:gap-4">
-                  {/* "Entrar" manuscrito ao lado dos campos, como na referência */}
-                  <div className="shrink-0 w-14 sm:w-20 flex items-center justify-center">
-                    <span className="font-script text-2xl sm:text-4xl text-[#eafff2] -rotate-6 [text-shadow:0_2px_10px_rgba(0,0,0,0.7)]">
-                      {t('enter')}
-                    </span>
-                  </div>
-
-                  <div className="flex-1 flex flex-col gap-2">
-                    <input
-                      id="gate-user"
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder={t('placeholder_user')}
-                      aria-label={t('label_user')}
-                      autoComplete="off"
-                      maxLength={40}
-                      className={inputClass}
-                    />
-                    <input
-                      id="gate-pass"
-                      type="password"
-                      value={pass}
-                      onChange={(e) => setPass(e.target.value)}
-                      placeholder={t('placeholder_pass')}
-                      aria-label={t('label_pass')}
-                      autoComplete="off"
-                      maxLength={64}
-                      className={inputClass}
-                    />
-
-                    {/* Lembrar de mim — pill de vidro, como os botões da referência */}
-                    <button
-                      type="button"
-                      role="checkbox"
-                      aria-checked={remember}
-                      onClick={() => setRemember(!remember)}
-                      className="self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/15 hover:bg-white/15 transition-colors"
-                    >
-                      <span
-                        className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-all ${
-                          remember
-                            ? 'bg-[#4caf50] border-[#9fdb6d] text-[#04150c]'
-                            : 'bg-[#0a1c0f] border-[#68a14c]/60'
-                        }`}
-                      >
-                        {remember && <Check size={10} strokeWidth={3.5} />}
-                      </span>
-                      <span className="text-[11px] font-medium text-[#f2fdf5] whitespace-nowrap">
-                        {t('remember')}
-                      </span>
-                    </button>
-
-                    <button
-                      type="submit"
-                      className="w-full py-2.5 rounded-lg bg-gradient-to-b from-[#25491f] via-[#132e14] to-[#0a1f0d] border border-[#7ba659]/60 text-[14px] font-semibold text-[#eefbea] [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] shadow-[inset_0_1px_0_rgba(190,255,170,0.3),0_6px_18px_rgba(0,0,0,0.5)] transition-all hover:brightness-115 hover:shadow-[0_0_22px_rgba(120,220,110,0.5)] active:scale-[0.98]"
-                    >
-                      {t('enter')}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={enterGuest}
-                      className="self-center text-[11px] text-[#e4f5ea]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] hover:text-white underline underline-offset-4 decoration-dotted transition-colors"
-                    >
-                      {t('guest')} →
-                    </button>
-                  </div>
+                {/* Cabeçalho de boas-vindas */}
+                <div className="text-center mb-4 sm:mb-5">
+                  <h2 className="font-script text-4xl sm:text-5xl text-[#eafff2] [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+                    {t('welcome_title')}
+                  </h2>
+                  <p className="mt-1.5 text-[12px] text-[#c9e4d2] [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
+                    {t('welcome_sub')}
+                  </p>
                 </div>
+
+                {/* Aventureiro — label flutuante */}
+                <div className="relative mb-3">
+                  <input
+                    id="gate-user"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder=" "
+                    autoComplete="off"
+                    maxLength={40}
+                    className="peer w-full rounded-xl bg-[#0a1c0f]/80 border border-white/15 focus:border-[#9fdb6d] outline-none px-3.5 pt-5 pb-2 text-[14px] text-[#e9fbef] shadow-[inset_0_2px_8px_rgba(0,0,0,0.45)] transition-colors"
+                  />
+                  <label
+                    htmlFor="gate-user"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-[#8fae9a] pointer-events-none transition-all duration-200 peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-[#9fdb6d] peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px]"
+                  >
+                    {t('label_user')}
+                  </label>
+                </div>
+
+                {/* Senha — label flutuante + mostrar/esconder */}
+                <div className="relative mb-3.5">
+                  <input
+                    id="gate-pass"
+                    type={showPass ? 'text' : 'password'}
+                    value={pass}
+                    onChange={(e) => setPass(e.target.value)}
+                    placeholder=" "
+                    autoComplete="off"
+                    maxLength={64}
+                    className="peer w-full rounded-xl bg-[#0a1c0f]/80 border border-white/15 focus:border-[#9fdb6d] outline-none px-3.5 pr-10 pt-5 pb-2 text-[14px] text-[#e9fbef] shadow-[inset_0_2px_8px_rgba(0,0,0,0.45)] transition-colors"
+                  />
+                  <label
+                    htmlFor="gate-pass"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-[#8fae9a] pointer-events-none transition-all duration-200 peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-[#9fdb6d] peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px]"
+                  >
+                    {t('label_pass')}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
+                    aria-label={showPass ? 'Esconder senha' : 'Mostrar senha'}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8fae9a] hover:text-[#9fdb6d] transition-colors"
+                  >
+                    {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+
+                {/* Lembrar de mim + visitante */}
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={remember}
+                    onClick={() => setRemember(!remember)}
+                    className="inline-flex items-center gap-2 group/r"
+                  >
+                    <span
+                      className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                        remember
+                          ? 'bg-[#4caf50] border-[#9fdb6d] text-[#04150c]'
+                          : 'bg-[#0a1c0f]/80 border-white/25 group-hover/r:border-[#9fdb6d]'
+                      }`}
+                    >
+                      {remember && <Check size={11} strokeWidth={3.5} />}
+                    </span>
+                    <span className="text-[11px] text-[#e4f5ea] [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
+                      {t('remember')}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={enterGuest}
+                    className="text-[11px] text-[#9fdb6d] hover:text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] transition-colors"
+                  >
+                    {t('guest')} →
+                  </button>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-b from-[#25491f] via-[#132e14] to-[#0a1f0d] border border-[#7ba659]/60 text-[14px] font-semibold text-[#eefbea] [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] shadow-[inset_0_1px_0_rgba(190,255,170,0.3),0_6px_18px_rgba(0,0,0,0.5)] transition-all hover:brightness-115 hover:shadow-[0_0_22px_rgba(120,220,110,0.5)] active:scale-[0.98]"
+                >
+                  {t('enter')}
+                </button>
+
+                {/* Separador */}
+                <div className="flex items-center gap-3 my-4">
+                  <span aria-hidden className="h-px flex-1 bg-white/15" />
+                  <span className="text-[10px] text-[#c9e4d2]/85 uppercase tracking-widest [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
+                    {t('or_continue')}
+                  </span>
+                  <span aria-hidden className="h-px flex-1 bg-white/15" />
+                </div>
+
+                {/* Sociais */}
+                <div className="flex justify-center gap-3 mb-4">
+                  {[
+                    { href: YOUTUBE_URL, icon: Youtube, label: 'YouTube' },
+                    { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram' },
+                    { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn' },
+                  ].map(({ href, icon: Icon, label }) => (
+                    <a
+                      key={href}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 hover:bg-white/20 hover:border-white/30 flex items-center justify-center text-[#e9fbef] transition-all"
+                    >
+                      <Icon size={17} />
+                    </a>
+                  ))}
+                </div>
+
+                <p className="text-center text-[11px] text-[#c9e4d2] [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
+                  {t('no_account')}{' '}
+                  <button
+                    type="button"
+                    onClick={goCreateAccount}
+                    className="font-semibold text-[#9fdb6d] hover:underline"
+                  >
+                    {t('create')}
+                  </button>
+                </p>
               </form>
             ) : (
               /* ── Carregando o mundo (no centro do círculo) ── */
@@ -538,13 +604,6 @@ export default function LoginGate() {
                 ARTX
               </span>
             </h1>
-            <p className="font-pixel text-[6px] sm:text-[8px] text-[#eafff2] tracking-[0.3em] mt-1.5 uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">
-              {t('subtitle')}
-            </p>
-            {/* No celular a versão/copyright mora aqui (embaixo não cabe junto dos botões) */}
-            <p className="sm:hidden font-pixel text-[6px] text-[#d5efe0] mt-2 max-w-[190px] leading-relaxed [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">
-              {t('version')} · {t('copyright')}
-            </p>
           </div>
 
           {/* ── Mago guardião + diálogo. No celular vira caixa RPG na BASE da
@@ -586,39 +645,15 @@ export default function LoginGate() {
             </span>
           </button>
 
-          {/* ── Rodapé: versão + copyright centralizados (o mago mora à esquerda) ── */}
-          <div className={`hidden sm:block absolute bottom-4 inset-x-0 text-center pointer-events-none ${uiFadeClass}`}>
-            <p className="font-pixel text-[7px] text-[#c4e3d1]/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
-              {t('version')} · {t('copyright')}
-            </p>
-          </div>
-
-          {/* No celular ficam no topo direito (a base é da caixa de diálogo do mago) */}
-          <div className={`absolute top-4 right-3 bottom-auto sm:top-auto sm:right-9 sm:bottom-6 flex flex-col items-end sm:items-stretch gap-2 ${uiFadeClass}`}>
-            {[
-              { icon: Globe, label: `${t('language')}: ${locale === 'pt' ? 'EN' : 'PT'}`, onClick: switchLocale },
-              { icon: UserPlus, label: t('create'), onClick: goCreateAccount },
-            ].map(({ icon: Icon, label, onClick }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={onClick}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-[#9fdb6d] hover:bg-[#12301a]/90 text-[11px] sm:text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
-              >
-                <Icon size={12} />
-                {label}
-              </button>
-            ))}
-            <a
-              href={YOUTUBE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2 rounded-md bg-[#0a1c0f]/90 border border-[#68a14c]/50 hover:border-red-400/60 hover:text-red-300 text-[11px] sm:text-xs text-[#d8f2e2] transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
-            >
-              <DoorOpen size={12} />
-              {t('exit')}
-            </a>
-          </div>
+          {/* ── Troca de idioma discreta (canto superior direito) ── */}
+          <button
+            type="button"
+            onClick={switchLocale}
+            className={`absolute top-4 right-4 sm:top-6 sm:right-7 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#04100a]/50 border border-white/15 backdrop-blur-[2px] text-[11px] text-[#d8f2e2] hover:bg-[#04100a]/70 hover:border-white/30 transition-all ${uiFadeClass}`}
+          >
+            <Globe size={12} />
+            {locale === 'pt' ? 'EN' : 'PT'}
+          </button>
           </>
           )}
         </motion.div>

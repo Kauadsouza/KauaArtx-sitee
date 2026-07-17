@@ -21,17 +21,32 @@ export default function Hero() {
 
   return (
     <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
-      {/* Luz de aurora atrás de tudo */}
-      <div className="absolute inset-0 gradient-radial-top pointer-events-none" />
-      <div className="orb w-[520px] h-[520px] top-[-10%] left-[-10%] bg-accent-bright/15 animate-float-slow" />
-      <div className="orb w-[460px] h-[460px] top-[-5%] right-[-8%] bg-accent-2/15 animate-float-slower" />
+      {/* ── A floresta real de fundo (tela inteira) ── */}
+      <motion.div
+        initial={{ opacity: 0, scale: 1.04 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-0"
+      >
+        <Image
+          src="/images/hero-photo.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover select-none"
+        />
+        {/* Escurece pra leitura do texto */}
+        <div aria-hidden className="absolute inset-0 bg-[#04100a]/35" />
+        <div aria-hidden className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#04100a]/70 to-transparent" />
+      </motion.div>
 
-      {/* ── O nome gigante (ATRÁS da paisagem) ── */}
+      {/* ── O nome gigante sobre a floresta ── */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-x-0 top-[11%] sm:top-[10%] z-0 flex flex-col items-center px-2"
+        className="absolute inset-x-0 top-[13%] sm:top-[12%] z-[1] flex flex-col items-center px-2"
       >
         <span className="font-pixel text-[8px] sm:text-[11px] text-accent-bright tracking-[0.4em] uppercase mb-2 sm:mb-4 [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]">
           {t('name')}
@@ -42,42 +57,6 @@ export default function Hero() {
         >
           <span aria-hidden>ARTX</span>
         </h1>
-      </motion.div>
-
-      {/* ── A paisagem por cima do texto (céu transparente) ── */}
-      {/* Desktop/paisagem: faixa larga ancorada embaixo */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-x-0 bottom-0 h-[78%] z-[1] hidden sm:block"
-      >
-        <Image
-          src="/images/kaua-journey-cutout.png"
-          alt={t('portrait_alt')}
-          fill
-          priority
-          unoptimized
-          sizes="100vw"
-          className="object-cover [object-position:center_12%] [image-rendering:pixelated] select-none"
-        />
-      </motion.div>
-      {/* Celular: a arte inteira centralizada */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-x-0 bottom-0 h-[76%] z-[1] sm:hidden"
-      >
-        <Image
-          src="/images/kaua-journey-cutout.png"
-          alt={t('portrait_alt')}
-          fill
-          priority
-          unoptimized
-          sizes="100vw"
-          className="object-cover [object-position:center_8%] [image-rendering:pixelated] select-none"
-        />
       </motion.div>
 
       {/* Sombra de leitura na base */}
