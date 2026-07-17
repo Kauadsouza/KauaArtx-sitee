@@ -32,10 +32,6 @@
     "wizard_thanks": "Muito obrigado, {name}. Atravesse... Nos veremos novamente.",
     "wizard_tap": "toque no mago pra conversar",
     "default_adventurer": "aventureiro",
-    "loading_1": "Conectando ao servidor...",
-    "loading_2": "Carregando o mundo...",
-    "loading_3": "Ajustando a mochila...",
-    "loading_4": "Abrindo o portal...",
     "welcome": "Bem-vindo de volta",
     "version": "Versão 2.0.0",
     "copyright": "© 2026 Kauã Artx — Forjado na jornada."

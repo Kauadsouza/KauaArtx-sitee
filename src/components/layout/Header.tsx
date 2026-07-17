@@ -136,16 +136,15 @@ export default function Header({ locale }: HeaderProps) {
               <Youtube size={15} />
               {t('youtube')}
             </a>
-            {hasAccount && (
-              <button
-                type="button"
-                onClick={logout}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full text-foreground-muted hover:text-red-400 transition-colors"
-              >
-                <LogOut size={15} />
-                {t('logout')}
-              </button>
-            )}
+            {/* Sair fica SEMPRE visível — leva de volta pra tela de login */}
+            <button
+              type="button"
+              onClick={logout}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full text-foreground-muted hover:text-red-400 transition-colors"
+            >
+              <LogOut size={15} />
+              {t('logout')}
+            </button>
           </nav>
 
           {/* Right side */}
@@ -248,16 +247,14 @@ export default function Header({ locale }: HeaderProps) {
                   <Youtube size={15} />
                   {t('youtube')}
                 </a>
-                {hasAccount && (
-                  <button
-                    type="button"
-                    onClick={logout}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground-muted hover:text-red-400 transition-colors text-left"
-                  >
-                    <LogOut size={15} />
-                    {t('logout')}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground-muted hover:text-red-400 transition-colors text-left"
+                >
+                  <LogOut size={15} />
+                  {t('logout')}
+                </button>
               </nav>
             </motion.div>
           )}

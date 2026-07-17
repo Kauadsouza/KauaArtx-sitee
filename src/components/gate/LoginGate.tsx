@@ -7,7 +7,7 @@ import { useRouter, usePathname } from '@/i18n/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Compass, Check, Globe, Eye, EyeOff,
+  Check, Globe, Eye, EyeOff,
   Youtube, Instagram, Linkedin,
 } from 'lucide-react';
 import PixelLife from './PixelLife';
@@ -37,9 +37,8 @@ type ArtSpec = {
   src: string;
   ratio: string;
   hOverW: number;
-  // Onde o card de vidro (formulário) e o painel de loading se apoiam
+  // Onde o card de vidro (formulário) se apoia
   card: Pos;
-  loading: Pos;
 };
 
 const ART: Record<'landscape' | 'portrait', ArtSpec> = {
@@ -50,23 +49,21 @@ const ART: Record<'landscape' | 'portrait', ArtSpec> = {
     ratio: '1672 / 941',
     hOverW: 941 / 1672,
     card: { left: '50%', top: '26%', width: '26%' },
-    loading: { left: '38%', top: '44%', width: '24%', height: '24%' },
   },
   portrait: {
     src: '/images/login-bg-mobile.webp',
     ratio: '853 / 1844',
     hOverW: 1844 / 853,
     card: { left: '50%', top: '30%', width: '58%' },
-    loading: { left: '22%', top: '43%', width: '56%', height: '15%' },
   },
 };
 
 const WIZARD_LINES = 4;
 
-// 'opening' = os portões se partindo em duas portas 3D que giram
-// abrindo pra fora, com luz explodindo do vão — a recompensa de quem
-// entregou as credenciais ao mago (visitante entra sem cerimônia)
-type Stage = 'hidden' | 'open' | 'thanks' | 'loading' | 'opening';
+// 'casting' = o mago ergue o cajado, o orbe concentra energia e um
+// clarão de magia engole a tela — quando a luz dissipa, o site já está
+// revelado. Visitante ganha o feitiço direto, sem o agradecimento antes.
+type Stage = 'hidden' | 'open' | 'thanks' | 'casting';
 
 export default function LoginGate() {
   const t = useTranslations('gate');
@@ -81,26 +78,33 @@ export default function LoginGate() {
   const [pass, setPass] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [progress, setProgress] = useState(0);
 
   // Diálogo do mago
   const [line, setLine] = useState(0);
   const [typed, setTyped] = useState('');
   const typedRef = useRef(0);
+  const lastMsgRef = useRef('');
+  // Visitante não marca "lembrar" — mas ganha a mesma entrada animada
+  const guestRef = useRef(false);
+  // Quem pediu menos animação entra num fade simples, sem clarão
+  const reduceRef = useRef(false);
+  useEffect(() => {
+    reduceRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
 
   // Parallax do cenário: a arte acompanha o mouse de leve (só desktop)
   const artLayerRef = useRef<HTMLDivElement>(null);
 
   const adventurer = name.trim() || t('default_adventurer');
   const fullMsg =
-    stage === 'thanks' || stage === 'loading'
+    stage === 'thanks' || stage === 'casting'
       ? t('wizard_thanks', { name: adventurer })
       : t(`wizard_${line + 1}`);
 
   // Cena viva: a arte se move sutilmente com o mouse (profundidade).
   // Celular (pointer coarse) e quem pediu menos animação ficam de fora.
   useEffect(() => {
-    if (stage === 'hidden' || stage === 'opening') return;
+    if (stage === 'hidden') return;
     if (
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
       window.matchMedia('(pointer: coarse)').matches
@@ -158,9 +162,12 @@ export default function LoginGate() {
     };
   }, [stage]);
 
-  // Máquina de escrever do diálogo
+  // Máquina de escrever do diálogo. Se a fala já terminou e só o estágio
+  // mudou (thanks → casting), não recomeça — evitaria redigitar o obrigado.
   useEffect(() => {
-    if (stage === 'hidden' || stage === 'loading') return;
+    if (stage === 'hidden') return;
+    if (lastMsgRef.current === fullMsg && typedRef.current >= fullMsg.length) return;
+    lastMsgRef.current = fullMsg;
     typedRef.current = 0;
     setTyped('');
     const id = setInterval(() => {
@@ -192,46 +199,33 @@ export default function LoginGate() {
     window.dispatchEvent(new Event(AUTH_EVENT));
   };
 
-  // Depois do agradecimento do mago, começa o carregamento
+  // Mago terminou de agradecer → ergue o cajado e lança o feitiço
   useEffect(() => {
     if (stage !== 'thanks' || typed !== fullMsg) return;
-    const to = setTimeout(() => {
-      setProgress(0);
-      setStage('loading');
-    }, 1100);
+    const to = setTimeout(() => setStage('casting'), 500);
     return () => clearTimeout(to);
   }, [stage, typed, fullMsg]);
 
-  // Barra de progresso do "carregamento do mundo"
+  // O feitiço: o card some, o orbe do cajado concentra energia e o clarão
+  // engole a tela. Timeouts (e não onAnimationComplete) guiam o estágio —
+  // aba desfocada pausa animações, mas o portal fecha mesmo assim.
   useEffect(() => {
-    if (stage !== 'loading') return;
-    const id = setInterval(() => {
-      setProgress((p) => Math.min(100, p + 2 + Math.random() * 4));
-    }, 45);
-    return () => clearInterval(id);
-  }, [stage]);
-
-  // Carregou 100% → a interface some e os portões se abrem
-  useEffect(() => {
-    if (stage !== 'loading' || progress < 100) return;
-    persist(remember);
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setUiFading(true);
-    const to = setTimeout(
-      () => setStage(reduce ? 'hidden' : 'opening'),
-      reduce ? 450 : 380
-    );
-    return () => clearTimeout(to);
+    if (stage !== 'casting') return;
+    persist(guestRef.current ? false : remember);
+    if (reduceRef.current) {
+      setUiFading(true);
+      const to = setTimeout(() => setStage('hidden'), 450);
+      return () => clearTimeout(to);
+    }
+    const fade = setTimeout(() => setUiFading(true), 150);
+    // no auge do clarão o portal se desfaz; o fade de saída dissolve a luz
+    const done = setTimeout(() => setStage('hidden'), 1300);
+    return () => {
+      clearTimeout(fade);
+      clearTimeout(done);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [progress, stage, remember]);
-
-  // Rede de segurança: se a animação dos portões travar (aba desfocada
-  // pausa o requestAnimationFrame), fecha mesmo assim
-  useEffect(() => {
-    if (stage !== 'opening') return;
-    const to = setTimeout(() => setStage('hidden'), 2300);
-    return () => clearTimeout(to);
-  }, [stage]);
+  }, [stage, remember]);
 
   const enter = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -244,9 +238,10 @@ export default function LoginGate() {
     setStage('thanks');
   };
 
+  // Visitante entra com a mesma cerimônia: o feitiço do mago
   const enterGuest = () => {
-    persist(false);
-    setStage('hidden');
+    guestRef.current = true;
+    setStage('casting');
   };
 
   const switchLocale = () => {
@@ -269,37 +264,14 @@ export default function LoginGate() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 
-  const msgIndex = progress < 30 ? 1 : progress < 60 ? 2 : progress < 88 ? 3 : 4;
   const formActive = stage === 'open';
+  const casting = stage === 'casting';
   const art = portrait ? ART.portrait : ART.landscape;
 
   if (typeof document === 'undefined') return null;
 
-  // Some suave da interface pouco antes dos portões abrirem
+  // Some suave da interface enquanto o mago concentra o feitiço
   const uiFadeClass = `transition-opacity duration-300 ${uiFading ? 'opacity-0' : ''}`;
-
-  // Cópia só da arte (sem interface) — cada porta carrega metade dela
-  const artOnly = (
-    <div
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-      style={{
-        aspectRatio: art.ratio,
-        height: `max(100vh, calc(100vw * ${art.hOverW}))`,
-      }}
-    >
-      <Image
-        src={art.src}
-        alt=""
-        fill
-        priority
-        unoptimized
-        sizes="100vw"
-        className="object-cover select-none [image-rendering:pixelated]"
-      />
-      <div aria-hidden className="absolute inset-0 bg-[#0d3a1c]/15 mix-blend-overlay" />
-      <div aria-hidden className="absolute inset-0 aurora-vignette opacity-60" />
-    </div>
-  );
 
   return createPortal(
     <AnimatePresence>
@@ -313,69 +285,8 @@ export default function LoginGate() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.05, filter: 'brightness(2)' }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className={`fixed inset-0 z-[100] overflow-hidden ${
-            stage === 'opening' ? 'bg-transparent' : 'bg-[#0a1408]'
-          }`}
+          className="fixed inset-0 z-[100] overflow-hidden bg-[#0a1408]"
         >
-          {stage === 'opening' ? (
-            /* ── PORTÕES SE ABRINDO: a cena parte ao meio e as duas
-                   portas giram pra fora em 3D, luz jorrando do vão ── */
-            <div className="absolute inset-0" style={{ perspective: '1400px' }}>
-              {/* Porta esquerda */}
-              <motion.div
-                className="absolute inset-y-0 left-0 w-1/2 overflow-hidden"
-                style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
-                initial={{ rotateY: 0 }}
-                animate={{ rotateY: -105 }}
-                transition={{ duration: 1.6, ease: [0.6, 0.05, 0.9, 0.5] }}
-                onAnimationComplete={() => setStage('hidden')}
-              >
-                <div className="absolute inset-y-0 left-0 w-screen h-full">{artOnly}</div>
-                <div aria-hidden className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black/60 to-transparent" />
-                <div aria-hidden className="absolute inset-y-0 right-0 w-1 bg-[#eafff2]/90 shadow-[0_0_38px_14px_rgba(160,255,180,0.9)]" />
-              </motion.div>
-
-              {/* Porta direita */}
-              <motion.div
-                className="absolute inset-y-0 right-0 w-1/2 overflow-hidden"
-                style={{ transformOrigin: 'right center', backfaceVisibility: 'hidden' }}
-                initial={{ rotateY: 0 }}
-                animate={{ rotateY: 105 }}
-                transition={{ duration: 1.6, ease: [0.6, 0.05, 0.9, 0.5] }}
-              >
-                <div className="absolute inset-y-0 right-0 w-screen h-full">{artOnly}</div>
-                <div aria-hidden className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/60 to-transparent" />
-                <div aria-hidden className="absolute inset-y-0 left-0 w-1 bg-[#eafff2]/90 shadow-[0_0_38px_14px_rgba(160,255,180,0.9)]" />
-              </motion.div>
-
-              {/* Feixe de luz vertical rasgando o vão */}
-              <motion.div
-                aria-hidden
-                className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-2"
-                style={{
-                  background:
-                    'linear-gradient(180deg, transparent, #d5ffe2 18%, #ffffff 50%, #d5ffe2 82%, transparent)',
-                  boxShadow: '0 0 80px 30px rgba(170,255,190,0.75)',
-                }}
-                initial={{ opacity: 0, scaleX: 0.4 }}
-                animate={{ opacity: [0, 1, 1, 0], scaleX: [0.4, 3, 14, 40] }}
-                transition={{ duration: 1.6, times: [0, 0.25, 0.65, 1], ease: 'easeIn' }}
-              />
-
-              {/* Clarão que toma a tela quando as portas passam do meio */}
-              <motion.div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    'radial-gradient(ellipse at center, rgba(240,255,245,0.95) 0%, rgba(140,245,165,0.45) 35%, transparent 70%)',
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.15, 0.9, 0] }}
-                transition={{ duration: 1.6, times: [0, 0.45, 0.8, 1] }}
-              />
-            </div>
-          ) : (
           <>
           {/* ── Cenário: a arte ocupa a tela inteira (tipo background cover).
                  Os campos ficam em % DENTRO desta caixa, então sempre
@@ -400,7 +311,7 @@ export default function LoginGate() {
                 alt=""
                 fill
                 priority
-                unoptimized
+                quality={95}
                 sizes="100vw"
                 className="object-cover select-none"
               />
@@ -423,12 +334,15 @@ export default function LoginGate() {
             </div>
 
             {/* ── Card de vidro com login animado (labels flutuantes) ── */}
-            {stage !== 'loading' ? (
-              <form
+            <form
                 onSubmit={enter}
                 style={art.card}
-                className={`absolute -translate-x-1/2 w-[min(400px,92vw)] rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] p-5 sm:p-7 ${
-                  formActive ? '' : 'pointer-events-none opacity-80'
+                className={`absolute -translate-x-1/2 w-[min(400px,92vw)] rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] p-5 sm:p-7 transition-opacity duration-300 ${
+                  uiFading
+                    ? 'pointer-events-none opacity-0'
+                    : formActive
+                      ? ''
+                      : 'pointer-events-none opacity-80'
                 }`}
               >
                 {/* Cabeçalho de boas-vindas */}
@@ -567,30 +481,6 @@ export default function LoginGate() {
                   </button>
                 </p>
               </form>
-            ) : (
-              /* ── Carregando o mundo (no centro do círculo) ── */
-              <div
-                style={art.loading}
-                className={`absolute flex flex-col items-center justify-center gap-3 text-center rounded-2xl bg-[#07130a]/85 border border-[#68a14c]/35 backdrop-blur-sm p-4 ${uiFadeClass}`}
-              >
-                <Compass
-                  size={26}
-                  className="text-accent-bright animate-[portal-spin_3s_linear_infinite]"
-                />
-                <p className="font-pixel text-[8px] text-[#d8f2e2] uppercase min-h-[2.5em]">
-                  {t(`loading_${msgIndex}`)}
-                </p>
-                <div className="w-full h-2 rounded-full bg-[#04150c] border border-[#1f4a2e] overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-accent-bright to-accent-2-bright transition-[width] duration-100"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <span className="font-mono text-[11px] text-accent-deep">
-                  {Math.floor(progress)}%
-                </span>
-              </div>
-            )}
           </div>
 
           {/* ── Logo (canto superior esquerdo, como nos games). No celular ganha
@@ -613,20 +503,74 @@ export default function LoginGate() {
             type="button"
             onClick={talkToWizard}
             aria-label={t('wizard_tap')}
-            className={`group absolute left-2 right-2 bottom-2 sm:right-auto sm:left-6 lg:left-[4%] sm:bottom-14 flex flex-row items-end gap-2 sm:flex-col sm:items-start sm:gap-2 cursor-pointer text-left sm:max-w-[300px] ${uiFadeClass}`}
+            className="group absolute left-2 right-2 bottom-2 sm:right-auto sm:left-6 lg:left-[4%] sm:bottom-14 flex flex-row items-end gap-2 sm:flex-col sm:items-start sm:gap-2 cursor-pointer text-left sm:max-w-[300px]"
           >
-            <Image
-              src="/images/pixel-wizard.png"
-              alt=""
-              width={36}
-              height={52}
-              priority
-              className={`order-1 sm:order-2 w-14 sm:w-24 lg:w-28 h-auto shrink-0 sm:ml-3 [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.55)] ${
-                stage === 'thanks' || stage === 'loading'
-                  ? 'drop-shadow-[0_0_22px_rgba(99,247,141,0.95)]'
-                  : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.4)]'
-              }`}
-            />
+            {/* O mago não some no fade: ele é quem lança o feitiço */}
+            <motion.span
+              className="order-1 sm:order-2 relative shrink-0 sm:ml-3 w-14 sm:w-24 lg:w-28"
+              animate={casting ? { scale: [1, 1.04, 1.01, 1.08], y: [0, -2, 0, -5] } : {}}
+              transition={{ duration: 1.1, ease: 'easeInOut' }}
+            >
+              <Image
+                src="/images/pixel-wizard.png"
+                alt=""
+                width={36}
+                height={52}
+                priority
+                className={`w-full h-auto [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.55)] ${
+                  casting
+                    ? 'drop-shadow-[0_0_30px_rgba(140,255,170,1)]'
+                    : stage === 'thanks'
+                      ? 'drop-shadow-[0_0_22px_rgba(99,247,141,0.95)]'
+                      : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.4)]'
+                }`}
+              />
+              {/* ── O FEITIÇO: energia concentra no orbe do cajado (79% / 8%
+                     do sprite) e explode num clarão que engole a tela ── */}
+              {casting && !reduceRef.current && (
+                <span
+                  aria-hidden
+                  className="absolute pointer-events-none"
+                  style={{ left: '79%', top: '8%' }}
+                >
+                  {/* orbe concentrando energia */}
+                  <motion.span
+                    className="absolute block w-10 h-10 rounded-full"
+                    style={{
+                      x: '-50%',
+                      y: '-50%',
+                      background:
+                        'radial-gradient(circle, #ffffff 0%, #c8ffdb 40%, rgba(140,255,170,0) 72%)',
+                      boxShadow: '0 0 34px 14px rgba(150,255,180,0.85)',
+                    }}
+                    initial={{ scale: 0.15, opacity: 0 }}
+                    animate={{ scale: [0.15, 0.9, 0.7, 1.5], opacity: [0, 1, 1, 1] }}
+                    transition={{ duration: 0.55, ease: 'easeOut' }}
+                  />
+                  {/* anel de choque disparando na frente do clarão */}
+                  <motion.span
+                    className="absolute block w-16 h-16 rounded-full border-2 border-[#d9ffe6]"
+                    style={{ x: '-50%', y: '-50%' }}
+                    initial={{ scale: 0.2, opacity: 0 }}
+                    animate={{ scale: 16, opacity: [0, 0.9, 0] }}
+                    transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
+                  />
+                  {/* o clarão em si, crescendo do orbe até tomar tudo */}
+                  <motion.span
+                    className="absolute block w-24 h-24 rounded-full"
+                    style={{
+                      x: '-50%',
+                      y: '-50%',
+                      background:
+                        'radial-gradient(circle, #ffffff 0%, #eafff2 34%, #a5f7bd 60%, rgba(150,247,180,0.7) 80%, rgba(150,247,180,0) 100%)',
+                    }}
+                    initial={{ scale: 0, opacity: 0.9 }}
+                    animate={{ scale: 60, opacity: 1 }}
+                    transition={{ duration: 0.75, delay: 0.45, ease: [0.4, 0, 0.8, 0.4] }}
+                  />
+                </span>
+              )}
+            </motion.span>
             <span className="order-2 sm:order-1 relative block flex-1 sm:flex-none sm:w-full rounded-lg border-2 border-[#68a14c]/50 bg-[#07130a]/95 backdrop-blur-sm p-3 shadow-[0_8px_30px_rgba(0,0,0,0.65),inset_0_0_0_1px_rgba(120,220,110,0.15)]">
               <span className="block font-pixel text-[8px] sm:text-[9px] leading-[1.9] text-[#e9fbef] min-h-[4.75em]">
                 {typed}
@@ -634,9 +578,11 @@ export default function LoginGate() {
                   <span className="rpg-blink text-accent-bright"> ▼</span>
                 )}
               </span>
-              <span className="block mt-1.5 font-pixel text-[6px] sm:text-[7px] text-[#7a9a83] uppercase tracking-widest">
-                {t('wizard_tap')}
-              </span>
+              {stage === 'open' && (
+                <span className="block mt-1.5 font-pixel text-[6px] sm:text-[7px] text-[#7a9a83] uppercase tracking-widest">
+                  {t('wizard_tap')}
+                </span>
+              )}
               {/* setinha do balão: aponta pro mago (esquerda no celular, baixo no PC) */}
               <span
                 aria-hidden
@@ -644,6 +590,23 @@ export default function LoginGate() {
               />
             </span>
           </button>
+
+          {/* ── Garantia de cobertura do feitiço: em telas muito grandes o
+                 clarão que cresce do cajado pode não alcançar o canto oposto —
+                 esta camada acende a tela inteira junto com o auge ── */}
+          {casting && !reduceRef.current && (
+            <motion.div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  'radial-gradient(circle at 10% 88%, #ffffff 0%, #eafff2 45%, #b9f7cc 100%)',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.75, ease: 'easeIn' }}
+            />
+          )}
 
           {/* ── Troca de idioma discreta (canto superior direito) ── */}
           <button
@@ -655,7 +618,6 @@ export default function LoginGate() {
             {locale === 'pt' ? 'EN' : 'PT'}
           </button>
           </>
-          )}
         </motion.div>
       )}
     </AnimatePresence>,

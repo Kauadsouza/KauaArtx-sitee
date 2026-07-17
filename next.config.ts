@@ -25,6 +25,8 @@ const csp = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
+    // 95 = fundos do login e foto do herói em qualidade quase máxima
+    qualities: [75, 95],
     remotePatterns: [
       { protocol: 'https', hostname: '**.supabase.co' },
     ],

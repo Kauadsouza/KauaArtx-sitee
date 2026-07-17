@@ -32,10 +32,6 @@
     "wizard_thanks": "Thank you, {name}. Step through... We shall meet again.",
     "wizard_tap": "tap the wizard to talk",
     "default_adventurer": "adventurer",
-    "loading_1": "Connecting to server...",
-    "loading_2": "Loading the world...",
-    "loading_3": "Packing the backpack...",
-    "loading_4": "Opening the portal...",
     "welcome": "Welcome back",
     "version": "Version 2.0.0",
     "copyright": "© 2026 Kauã Artx — Forged on the journey."

@@ -33,6 +33,7 @@ export default function Hero() {
           alt=""
           fill
           priority
+          quality={95}
           sizes="100vw"
           className="object-cover select-none"
         />
