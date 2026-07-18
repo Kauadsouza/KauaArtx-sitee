@@ -86,11 +86,9 @@ export default function LoginGate() {
   const lastMsgRef = useRef('');
   // Visitante não marca "lembrar" — mas ganha a mesma entrada animada
   const guestRef = useRef(false);
-  // Quem pediu menos animação entra num fade simples, sem clarão
-  const reduceRef = useRef(false);
-  useEffect(() => {
-    reduceRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }, []);
+  // O feitiço roda SEMPRE (celulares com economia de bateria ligam
+  // prefers-reduced-motion sem o dono saber e o mago ficava mudo);
+  // ele é curto e os timeouts garantem que ninguém fica preso.
 
   // Parallax do cenário: a arte acompanha o mouse de leve (só desktop)
   const artLayerRef = useRef<HTMLDivElement>(null);
@@ -212,11 +210,6 @@ export default function LoginGate() {
   useEffect(() => {
     if (stage !== 'casting') return;
     persist(guestRef.current ? false : remember);
-    if (reduceRef.current) {
-      setUiFading(true);
-      const to = setTimeout(() => setStage('hidden'), 450);
-      return () => clearTimeout(to);
-    }
     const fade = setTimeout(() => setUiFading(true), 150);
     // ~1,5s de energia concentrando no orbe + ~1s de clarão crescendo;
     // no auge o portal se desfaz e o fade de saída dissolve a luz
@@ -228,8 +221,16 @@ export default function LoginGate() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, remember]);
 
+  // Fecha o teclado do celular — senão ele esconde o mago na hora do show
+  const closeKeyboard = () => {
+    try {
+      (document.activeElement as HTMLElement | null)?.blur?.();
+    } catch {}
+  };
+
   const enter = (e?: React.FormEvent) => {
     e?.preventDefault();
+    closeKeyboard();
     const trimmed = name.trim();
     if (trimmed) {
       try {
@@ -241,6 +242,7 @@ export default function LoginGate() {
 
   // Visitante entra com a mesma cerimônia: o feitiço do mago
   const enterGuest = () => {
+    closeKeyboard();
     guestRef.current = true;
     setStage('casting');
   };
@@ -530,7 +532,7 @@ export default function LoginGate() {
               />
               {/* ── O FEITIÇO: energia concentra no orbe do cajado (79% / 8%
                      do sprite) e explode num clarão que engole a tela ── */}
-              {casting && !reduceRef.current && (
+              {casting && (
                 <span
                   aria-hidden
                   className="absolute pointer-events-none"
@@ -600,7 +602,7 @@ export default function LoginGate() {
           {/* ── Garantia de cobertura do feitiço: em telas muito grandes o
                  clarão que cresce do cajado pode não alcançar o canto oposto —
                  esta camada acende a tela inteira junto com o auge ── */}
-          {casting && !reduceRef.current && (
+          {casting && (
             <motion.div
               aria-hidden
               className="absolute inset-0 pointer-events-none"
