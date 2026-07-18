@@ -253,11 +253,6 @@ export default function LoginGate() {
     router.replace(pathname, { locale: locale === 'pt' ? 'en' : 'pt' });
   };
 
-  const goCreateAccount = () => {
-    persist(false);
-    router.push('/contact');
-  };
-
   // Esc = pular o portal (acessibilidade)
   useEffect(() => {
     if (stage !== 'open') return;
@@ -459,7 +454,7 @@ export default function LoginGate() {
                 </div>
 
                 {/* Sociais */}
-                <div className="flex justify-center gap-3 mb-4">
+                <div className="flex justify-center gap-3">
                   {[
                     { href: YOUTUBE_URL, icon: Youtube, label: 'YouTube' },
                     { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram' },
@@ -477,17 +472,6 @@ export default function LoginGate() {
                     </a>
                   ))}
                 </div>
-
-                <p className="text-center text-[11px] text-[#c9e4d2] [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
-                  {t('no_account')}{' '}
-                  <button
-                    type="button"
-                    onClick={goCreateAccount}
-                    className="font-semibold text-[#9fdb6d] hover:underline"
-                  >
-                    {t('create')}
-                  </button>
-                </p>
               </form>
           </div>
 
