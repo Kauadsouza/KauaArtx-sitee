@@ -1,10 +1,10 @@
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 import Hero from '@/components/sections/Hero';
-import WhatIDo from '@/components/sections/WhatIDo';
-import YouTubeSection from '@/components/sections/YouTubeSection';
-import LatestPosts from '@/components/sections/LatestPosts';
-import CTASection from '@/components/sections/CTASection';
+import AdventureFeatures from '@/components/sections/AdventureFeatures';
+import AdventureSplit from '@/components/sections/AdventureSplit';
+import AdventureGrid from '@/components/sections/AdventureGrid';
+import AdventureSpotlight from '@/components/sections/AdventureSpotlight';
 import LoginGate from '@/components/gate/LoginGate';
 import { getPublishedPosts } from '@/lib/supabase/server';
 
@@ -25,17 +25,20 @@ export async function generateMetadata({
 }
 
 export default async function HomePage() {
-  const posts = await getPublishedPosts(3);
+  const posts = await getPublishedPosts(4);
 
   return (
     <>
       {/* Portal de entrada estilo game — some depois do primeiro "login" */}
       <LoginGate />
+      {/* Hero do Fuji (intocado) + estrutura de aventura espelhada do
+          escopo enviado pelo Kauã: features + 2 destaques, split texto/foto,
+          grade do blog e bloco de 2 cards + CTA grande. */}
       <Hero />
-      <WhatIDo />
-      <YouTubeSection />
-      <LatestPosts posts={posts} />
-      <CTASection />
+      <AdventureFeatures />
+      <AdventureSplit />
+      <AdventureGrid posts={posts} />
+      <AdventureSpotlight />
     </>
   );
 }
