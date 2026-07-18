@@ -67,7 +67,7 @@ export default function Hero() {
       <div aria-hidden className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#0a1526]/85 via-[#0a1526]/25 to-transparent" />
 
       {/* ── Camada 2: o nome monumental ── */}
-      <div className="absolute inset-x-0 top-[14%] sm:top-[12%] z-[1] flex flex-col items-center px-4">
+      <div className="absolute inset-x-0 top-[16%] sm:top-[12%] z-[1] flex flex-col items-center px-4">
         {/* Kicker editorial: hairline · KAUÃ SOUZA · hairline */}
         <motion.div
           custom={0}
@@ -83,16 +83,18 @@ export default function Hero() {
           <span aria-hidden className="h-px w-8 sm:w-14 bg-white/45" />
         </motion.div>
 
-        {/* ARTX — gradiente frio + brilho; a base mergulha atrás do Fuji */}
+        {/* ARTX — gradiente frio; a base mergulha atrás do Fuji.
+            Nada de text-shadow/máscara/filter aqui: o Safari do iPhone
+            quebra o background-clip:text e o nome some. */}
         <motion.h1
           custom={1}
           variants={reveal}
           initial="hidden"
           animate="show"
           aria-label={`${t('name')} — ${t('role')}`}
-          className="font-black leading-[0.82] tracking-[-0.03em] text-[30vw] sm:text-[21vw] lg:text-[18vw] select-none text-transparent bg-clip-text [background-image:linear-gradient(178deg,#ffffff_0%,#eef4ff_46%,#cdddf5_100%)] [text-shadow:0_0_60px_rgba(150,190,255,0.28)] [mask-image:linear-gradient(180deg,#000_82%,rgba(0,0,0,0.5)_100%)]"
+          className="font-black leading-[0.82] tracking-[-0.03em] text-[24vw] sm:text-[21vw] lg:text-[18vw] select-none text-transparent bg-clip-text [-webkit-background-clip:text] [background-image:linear-gradient(178deg,#ffffff_0%,#eef4ff_46%,#cdddf5_100%)]"
         >
-          <span aria-hidden className="drop-shadow-[0_6px_34px_rgba(4,12,30,0.6)]">ARTX</span>
+          ARTX
         </motion.h1>
       </div>
 
