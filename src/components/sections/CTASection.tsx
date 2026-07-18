@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Mountain } from 'lucide-react';
 
 export default function CTASection() {
   const t = useTranslations('cta_section');
@@ -24,6 +24,12 @@ export default function CTASection() {
           {/* Aurora interna */}
           <div className="orb w-[340px] h-[340px] -top-24 -left-16 bg-accent-bright/20 animate-float-slow" />
           <div className="orb w-[300px] h-[300px] -bottom-20 -right-12 bg-accent-2/20 animate-float-slower" />
+
+          <div className="relative flex items-center justify-center gap-3 mb-5">
+            <span aria-hidden className="h-px w-8 bg-gradient-to-r from-transparent to-accent/60" />
+            <Mountain size={16} className="text-accent-bright" />
+            <span aria-hidden className="h-px w-8 bg-gradient-to-l from-transparent to-accent/60" />
+          </div>
 
           <h2 className="relative text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter mb-5">
             <span className="text-gradient">{t('title')}</span>

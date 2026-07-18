@@ -594,7 +594,7 @@ export default function LoginGate() {
               <span className="block font-pixel text-[8px] sm:text-[9px] leading-[1.9] text-[#e9fbef] min-h-[4.75em]">
                 {typed}
                 {stage === 'open' && typed === fullMsg && (
-                  <span className="rpg-blink text-accent-bright"> ▼</span>
+                  <span className="rpg-blink text-[#9fdb6d]"> ▼</span>
                 )}
               </span>
               {stage === 'open' && (

@@ -1,25 +1,29 @@
 @import "tailwindcss";
 
-/* ── Design tokens — noite de aurora boreal ───────────── */
+/* ── Design tokens — expedição noturna (slate + laranja) ──
+   Abaixo do hero o site virou "pegada aventura": fundo slate
+   escuro neutro e acento laranja/âmbar de fogueira/pôr do sol.
+   (O hero do Fuji e o portal de login guardam suas próprias
+   cores e não dependem destes tokens.) */
 :root {
-  --bg:              #04100a;
-  --surface:         #081810;
-  --surface-el:      #0d2417;
-  --border-col:      #14301f;
-  --border-str:      #1f4a2e;
-  --fg:              #e9fbef;
-  --fg-muted:        #9fbfaa;
-  --fg-subtle:       #5c8069;
+  --bg:              #0d1117;
+  --surface:         #151b23;
+  --surface-el:      #1d2530;
+  --border-col:      #232c37;
+  --border-str:      #33414f;
+  --fg:              #eef2f6;
+  --fg-muted:        #98a4b2;
+  --fg-subtle:       #64717f;
 
-  /* Dupla: verde-aurora + ciano-aurora */
-  --accent:          #35e065;
-  --accent-bright:   #63f78d;
-  --accent-deep:     #8ffcb0;  /* no tema escuro, o "deep" é a variante clara legível */
-  --accent2:         #1fd3a7;
-  --accent2-bright:  #4beec6;
-  --accent2-deep:    #86f4d8;
+  /* Dupla: laranja-brasa + âmbar-pôr-do-sol */
+  --accent:          #f2691c;
+  --accent-bright:   #ff8a3d;
+  --accent-deep:     #ffb583;  /* no tema escuro, o "deep" é a variante clara legível */
+  --accent2:         #e79433;
+  --accent2-bright:  #ffb84d;
+  --accent2-deep:    #ffd694;
 
-  --ink-on-accent:   #04150c; /* texto sobre botões verdes */
+  --ink-on-accent:   #1a0d04; /* texto sobre botões laranja */
 }
 
 /* ── Tailwind v4 theme (inline = runtime CSS vars) ──── */
@@ -79,6 +83,12 @@
 @keyframes star-twinkle {
   0%, 100% { opacity: 0.9; }
   50%      { opacity: 0.35; }
+}
+
+/* Neve/brasas descendo devagar pelo céu de expedição */
+@keyframes snow-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: -140px 560px; }
 }
 
 /* ── Portal de entrada (tela de login estilo game) ───── */
@@ -241,33 +251,35 @@
     animation: aurora-sway var(--speed, 28s) ease-in-out infinite;
   }
 
+  /* Flocos de neve distantes (antes eram estrelas de aurora) */
   .stars-layer {
     background-image:
-      radial-gradient(1px 1px at 12% 22%, rgba(233, 251, 239, 0.9) 50%, transparent 51%),
-      radial-gradient(1px 1px at 38% 8%,  rgba(233, 251, 239, 0.7) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 64% 30%, rgba(143, 252, 176, 0.8) 50%, transparent 51%),
-      radial-gradient(1px 1px at 82% 12%, rgba(233, 251, 239, 0.75) 50%, transparent 51%),
-      radial-gradient(1px 1px at 51% 45%, rgba(233, 251, 239, 0.5) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 91% 38%, rgba(134, 244, 216, 0.7) 50%, transparent 51%);
+      radial-gradient(1px 1px at 12% 22%, rgba(236, 242, 248, 0.9) 50%, transparent 51%),
+      radial-gradient(1px 1px at 38% 8%,  rgba(236, 242, 248, 0.7) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 64% 30%, rgba(255, 236, 210, 0.75) 50%, transparent 51%),
+      radial-gradient(1px 1px at 82% 12%, rgba(236, 242, 248, 0.7) 50%, transparent 51%),
+      radial-gradient(1px 1px at 51% 45%, rgba(236, 242, 248, 0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 91% 38%, rgba(236, 242, 248, 0.65) 50%, transparent 51%);
     background-size: 560px 560px;
+    animation: snow-drift 90s linear infinite;
   }
 
   .stars-layer-2 {
     background-image:
-      radial-gradient(1px 1px at 22% 62%, rgba(233, 251, 239, 0.6) 50%, transparent 51%),
-      radial-gradient(1px 1px at 71% 71%, rgba(233, 251, 239, 0.5) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 45% 85%, rgba(143, 252, 176, 0.55) 50%, transparent 51%),
-      radial-gradient(1px 1px at 6% 90%, rgba(233, 251, 239, 0.45) 50%, transparent 51%);
+      radial-gradient(1px 1px at 22% 62%, rgba(236, 242, 248, 0.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 71% 71%, rgba(236, 242, 248, 0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 45% 85%, rgba(255, 236, 210, 0.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 6% 90%, rgba(236, 242, 248, 0.45) 50%, transparent 51%);
     background-size: 720px 720px;
-    animation: star-twinkle 5.5s ease-in-out infinite;
+    animation: snow-drift 60s linear infinite, star-twinkle 5.5s ease-in-out infinite;
   }
 
   .horizon-glow {
     background: radial-gradient(
-      60% 100% at 50% 100%,
-      color-mix(in srgb, var(--accent) 13%, transparent) 0%,
-      color-mix(in srgb, var(--accent2) 6%, transparent) 45%,
-      transparent 75%
+      66% 100% at 50% 100%,
+      color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+      color-mix(in srgb, var(--accent2) 9%, transparent) 42%,
+      transparent 74%
     );
   }
 
@@ -275,7 +287,7 @@
     background: radial-gradient(
       120% 90% at 50% 38%,
       transparent 50%,
-      rgba(2, 8, 5, 0.6) 100%
+      rgba(3, 6, 10, 0.66) 100%
     );
   }
 
@@ -479,6 +491,7 @@
 /* Respeita quem prefere menos movimento */
 @media (prefers-reduced-motion: reduce) {
   .aurora-curtain,
+  .stars-layer,
   .stars-layer-2,
   .animate-float-slow,
   .animate-float-slower,

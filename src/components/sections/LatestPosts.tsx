@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
-import { ArrowRight, PenLine } from 'lucide-react';
+import { ArrowRight, PenLine, Compass } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { Post } from '@/lib/supabase/types';
 
@@ -22,6 +22,10 @@ export default function LatestPosts({ posts }: { posts: Post[] }) {
           className="flex items-end justify-between mb-12"
         >
           <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <Compass size={15} className="text-accent-bright" />
+              <span aria-hidden className="h-px w-12 bg-gradient-to-r from-accent/60 to-transparent" />
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3">
               {t('title')}
             </h2>

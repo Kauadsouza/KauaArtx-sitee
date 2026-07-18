@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Handshake, Rocket, Youtube } from 'lucide-react';
+import { Handshake, Rocket, Youtube, Compass } from 'lucide-react';
 
 export default function WhatIDo() {
   const t = useTranslations('what_i_do');
@@ -31,9 +31,11 @@ export default function WhatIDo() {
       title: t('youtube_title'),
       tag: t('youtube_tag'),
       desc: t('youtube_desc'),
-      iconBg: 'bg-red-500/10 text-red-400',
-      tagStyle: 'text-red-400 bg-red-500/10 border-red-500/25',
-      glow: 'bg-red-500/12',
+      // Vermelho-brasa: fica na família quente da paleta (fogueira),
+      // mas ainda acena pro vermelho do YouTube
+      iconBg: 'bg-[#ff5a3c]/12 text-[#ff7a52]',
+      tagStyle: 'text-[#ff7a52] bg-[#ff5a3c]/12 border-[#ff5a3c]/30',
+      glow: 'bg-[#ff5a3c]/15',
     },
   ];
 
@@ -47,6 +49,10 @@ export default function WhatIDo() {
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
+          <div className="flex items-center gap-2.5 mb-4">
+            <Compass size={15} className="text-accent-bright" />
+            <span aria-hidden className="h-px w-12 bg-gradient-to-r from-accent/60 to-transparent" />
+          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3">
             {t('title')}
           </h2>
