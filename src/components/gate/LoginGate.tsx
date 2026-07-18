@@ -50,11 +50,13 @@ const ART: Record<'landscape' | 'portrait', ArtSpec> = {
     hOverW: 941 / 1672,
     card: { left: '50%', top: '26%', width: '26%' },
   },
+  // Celular: foto real de floresta com névoa (sem moldura pintada) — o
+  // site desenha o card de vidro centralizado por cima.
   portrait: {
     src: '/images/login-bg-mobile.webp',
-    ratio: '853 / 1844',
-    hOverW: 1844 / 853,
-    card: { left: '50%', top: '30%', width: '58%' },
+    ratio: '720 / 1285',
+    hOverW: 1285 / 720,
+    card: { left: '50%', top: '33%', width: '66%' },
   },
 };
 
@@ -269,6 +271,9 @@ export default function LoginGate() {
 
   const formActive = stage === 'open';
   const casting = stage === 'casting';
+  // O mago ergue o cajado (troca da arte parada → arte de conjuração) no
+  // instante em que agradece e mantém erguido durante o feitiço.
+  const armRaised = stage === 'thanks' || stage === 'casting';
   const art = portrait ? ART.portrait : ART.landscape;
 
   if (typeof document === 'undefined') return null;
@@ -506,9 +511,14 @@ export default function LoginGate() {
             aria-label={t('wizard_tap')}
             className="group absolute left-2 right-2 bottom-2 sm:right-auto sm:left-6 lg:left-[4%] sm:bottom-14 flex flex-row items-end gap-2 sm:flex-col sm:items-start sm:gap-2 cursor-pointer text-left sm:max-w-[300px]"
           >
-            {/* O mago não some no fade: ele é quem lança o feitiço */}
+            {/* O mago não some no fade: ele é quem lança o feitiço.
+                   Duas artes ancoradas na BASE: a parada (cajado abaixado) e
+                   a de conjuração (cajado erguido). Elas se alternam num
+                   crossfade — o corpo fica no lugar e só o cajado sobe.
+                   Larguras/offset medidos por script pros pés casarem. */}
             <motion.span
-              className="order-1 sm:order-2 relative shrink-0 sm:ml-3 w-14 sm:w-24 lg:w-28"
+              className="order-1 sm:order-2 relative block shrink-0 sm:ml-3 w-16 sm:w-28 lg:w-32"
+              style={{ aspectRatio: '829 / 1292' }}
               animate={
                 casting
                   ? { scale: [1, 1.05, 1.02, 1.06, 1.03, 1.09], y: [0, -3, -1, -5, -2, -7] }
@@ -516,68 +526,85 @@ export default function LoginGate() {
               }
               transition={{ duration: 2.4, ease: 'easeInOut' }}
             >
+              {/* Mago parado (cajado abaixado, orbe azul em descanso) */}
               <Image
-                src="/images/pixel-wizard.png"
+                src="/images/wizard-idle.webp"
                 alt=""
-                width={36}
-                height={52}
+                fill
                 priority
-                className={`w-full h-auto [image-rendering:pixelated] select-none transition-[filter] duration-500 group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.55)] ${
-                  casting
-                    ? 'drop-shadow-[0_0_30px_rgba(140,255,170,1)]'
-                    : stage === 'thanks'
-                      ? 'drop-shadow-[0_0_22px_rgba(99,247,141,0.95)]'
-                      : 'drop-shadow-[0_0_10px_rgba(53,224,101,0.4)]'
+                sizes="140px"
+                className={`object-contain object-bottom select-none transition-opacity duration-500 drop-shadow-[0_0_10px_rgba(53,224,101,0.35)] group-hover:drop-shadow-[0_0_14px_rgba(99,247,141,0.55)] ${
+                  armRaised ? 'opacity-0' : 'opacity-100'
                 }`}
               />
-              {/* ── O FEITIÇO: energia concentra no orbe do cajado (79% / 8%
-                     do sprite) e explode num clarão que engole a tela ── */}
-              {casting && (
-                <span
-                  aria-hidden
-                  className="absolute pointer-events-none"
-                  style={{ left: '79%', top: '8%' }}
-                >
-                  {/* orbe concentrando energia */}
-                  <motion.span
-                    className="absolute block w-10 h-10 rounded-full"
-                    style={{
-                      x: '-50%',
-                      y: '-50%',
-                      background:
-                        'radial-gradient(circle, #ffffff 0%, #c8ffdb 40%, rgba(140,255,170,0) 72%)',
-                      boxShadow: '0 0 34px 14px rgba(150,255,180,0.85)',
-                    }}
-                    initial={{ scale: 0.15, opacity: 0 }}
-                    animate={{
-                      scale: [0.15, 0.8, 0.55, 1.0, 0.7, 1.25, 0.9, 1.7],
-                      opacity: [0, 1, 0.85, 1, 0.9, 1, 1, 1],
-                    }}
-                    transition={{ duration: 1.5, ease: 'easeInOut' }}
-                  />
-                  {/* anel de choque disparando na frente do clarão */}
-                  <motion.span
-                    className="absolute block w-16 h-16 rounded-full border-2 border-[#d9ffe6]"
-                    style={{ x: '-50%', y: '-50%' }}
-                    initial={{ scale: 0.2, opacity: 0 }}
-                    animate={{ scale: 16, opacity: [0, 0.9, 0] }}
-                    transition={{ duration: 0.9, delay: 1.5, ease: 'easeOut' }}
-                  />
-                  {/* o clarão em si, crescendo do orbe até tomar tudo */}
-                  <motion.span
-                    className="absolute block w-24 h-24 rounded-full"
-                    style={{
-                      x: '-50%',
-                      y: '-50%',
-                      background:
-                        'radial-gradient(circle, #ffffff 0%, #eafff2 34%, #a5f7bd 60%, rgba(150,247,180,0.7) 80%, rgba(150,247,180,0) 100%)',
-                    }}
-                    initial={{ scale: 0, opacity: 0.9 }}
-                    animate={{ scale: 60, opacity: 1 }}
-                    transition={{ duration: 0.95, delay: 1.6, ease: [0.4, 0, 0.8, 0.4] }}
-                  />
-                </span>
-              )}
+
+              {/* Mago conjurando (cajado erguido): mais alto, ancorado embaixo
+                     e alinhado ao corpo da arte parada (feitiço nasce daqui) */}
+              <div
+                className="absolute bottom-0 pointer-events-none transition-opacity duration-500"
+                style={{ left: '2.4%', width: '87.6%', height: '112.7%', opacity: armRaised ? 1 : 0 }}
+              >
+                <Image
+                  src="/images/wizard-cast.webp"
+                  alt=""
+                  fill
+                  priority
+                  sizes="140px"
+                  className={`object-contain object-bottom select-none transition-[filter] duration-500 ${
+                    casting
+                      ? 'drop-shadow-[0_0_30px_rgba(140,255,170,1)]'
+                      : 'drop-shadow-[0_0_22px_rgba(99,247,141,0.95)]'
+                  }`}
+                />
+                {/* ── O FEITIÇO: energia concentra no orbe verde do cajado
+                       (84,4% / 8,1% do sprite) e explode num clarão ── */}
+                {casting && (
+                  <span
+                    aria-hidden
+                    className="absolute pointer-events-none"
+                    style={{ left: '84.4%', top: '8.1%' }}
+                  >
+                    {/* orbe concentrando energia */}
+                    <motion.span
+                      className="absolute block w-10 h-10 rounded-full"
+                      style={{
+                        x: '-50%',
+                        y: '-50%',
+                        background:
+                          'radial-gradient(circle, #ffffff 0%, #c8ffdb 40%, rgba(140,255,170,0) 72%)',
+                        boxShadow: '0 0 34px 14px rgba(150,255,180,0.85)',
+                      }}
+                      initial={{ scale: 0.15, opacity: 0 }}
+                      animate={{
+                        scale: [0.15, 0.8, 0.55, 1.0, 0.7, 1.25, 0.9, 1.7],
+                        opacity: [0, 1, 0.85, 1, 0.9, 1, 1, 1],
+                      }}
+                      transition={{ duration: 1.5, ease: 'easeInOut' }}
+                    />
+                    {/* anel de choque disparando na frente do clarão */}
+                    <motion.span
+                      className="absolute block w-16 h-16 rounded-full border-2 border-[#d9ffe6]"
+                      style={{ x: '-50%', y: '-50%' }}
+                      initial={{ scale: 0.2, opacity: 0 }}
+                      animate={{ scale: 16, opacity: [0, 0.9, 0] }}
+                      transition={{ duration: 0.9, delay: 1.5, ease: 'easeOut' }}
+                    />
+                    {/* o clarão em si, crescendo do orbe até tomar tudo */}
+                    <motion.span
+                      className="absolute block w-24 h-24 rounded-full"
+                      style={{
+                        x: '-50%',
+                        y: '-50%',
+                        background:
+                          'radial-gradient(circle, #ffffff 0%, #eafff2 34%, #a5f7bd 60%, rgba(150,247,180,0.7) 80%, rgba(150,247,180,0) 100%)',
+                      }}
+                      initial={{ scale: 0, opacity: 0.9 }}
+                      animate={{ scale: 60, opacity: 1 }}
+                      transition={{ duration: 0.95, delay: 1.6, ease: [0.4, 0, 0.8, 0.4] }}
+                    />
+                  </span>
+                )}
+              </div>
             </motion.span>
             <span className="order-2 sm:order-1 relative block flex-1 sm:flex-none sm:w-full rounded-lg border-2 border-[#68a14c]/50 bg-[#07130a]/95 backdrop-blur-sm p-3 shadow-[0_8px_30px_rgba(0,0,0,0.65),inset_0_0_0_1px_rgba(120,220,110,0.15)]">
               <span className="block font-pixel text-[8px] sm:text-[9px] leading-[1.9] text-[#e9fbef] min-h-[4.75em]">
