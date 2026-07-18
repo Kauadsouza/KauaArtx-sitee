@@ -15,6 +15,7 @@ export default function WhatIDo() {
       desc: t('loog_desc'),
       iconBg: 'bg-accent/10 text-accent-bright',
       tagStyle: 'text-accent-deep bg-accent/10 border-accent/25',
+      glow: 'bg-accent/15',
     },
     {
       icon: Rocket,
@@ -23,6 +24,7 @@ export default function WhatIDo() {
       desc: t('facility_desc'),
       iconBg: 'bg-accent-2/10 text-accent-2-bright',
       tagStyle: 'text-accent-2-deep bg-accent-2/10 border-accent-2/25',
+      glow: 'bg-accent-2/15',
     },
     {
       icon: Youtube,
@@ -31,6 +33,7 @@ export default function WhatIDo() {
       desc: t('youtube_desc'),
       iconBg: 'bg-red-500/10 text-red-400',
       tagStyle: 'text-red-400 bg-red-500/10 border-red-500/25',
+      glow: 'bg-red-500/12',
     },
   ];
 
@@ -51,7 +54,7 @@ export default function WhatIDo() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {cards.map(({ icon: Icon, title, tag, desc, iconBg, tagStyle }, i) => (
+          {cards.map(({ icon: Icon, title, tag, desc, iconBg, tagStyle, glow }, i) => (
             <motion.div
               key={title}
               initial={{ opacity: 0, y: 28 }}
@@ -59,11 +62,17 @@ export default function WhatIDo() {
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6 }}
-              className="group relative flex flex-col p-7 rounded-2xl bg-surface border border-border shadow-sm hover:shadow-xl hover:shadow-accent/5 hover:border-border-strong transition-all duration-300 overflow-hidden"
+              className="group relative flex flex-col p-7 rounded-2xl bg-surface/70 backdrop-blur-xl border border-border shadow-sm hover:shadow-xl hover:shadow-accent/5 hover:border-border-strong transition-all duration-300 overflow-hidden"
             >
               <div className="absolute top-0 left-0 right-0 h-px hairline-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              {/* Brilho de aurora que acende no hover, na cor do card */}
+              <div aria-hidden className={`absolute -top-24 -right-16 w-56 h-56 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none ${glow}`} />
+              {/* Numeração editorial em pixel */}
+              <span aria-hidden className="absolute top-7 right-7 font-pixel text-[9px] text-foreground-subtle/50 group-hover:text-foreground-subtle transition-colors">
+                {String(i + 1).padStart(2, '0')}
+              </span>
 
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ${iconBg}`}>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ring-1 ring-inset ring-white/5 transition-transform duration-300 group-hover:scale-105 ${iconBg}`}>
                 <Icon size={22} />
               </div>
 

@@ -30,6 +30,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function ContactPage() {
   const t = useTranslations('contact');
+  const tNav = useTranslations('nav');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const {
@@ -57,15 +58,19 @@ export default function ContactPage() {
 
   const inputClass = (hasError?: boolean) =>
     cn(
-      'w-full px-4 py-3 rounded-xl border bg-surface text-foreground text-base placeholder:text-foreground-subtle outline-none transition-all',
+      'w-full px-4 py-3 rounded-xl border bg-background/50 text-foreground text-base placeholder:text-foreground-subtle outline-none transition-all',
       hasError
         ? 'border-red-500/50 focus:border-red-500'
-        : 'border-border focus:border-accent-bright hover:border-border-strong'
+        : 'border-border focus:border-accent-bright focus:ring-2 focus:ring-accent/15 hover:border-border-strong'
     );
 
   return (
-    <div className="min-h-screen pt-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-32">
+    <div className="relative min-h-screen pt-24 overflow-hidden">
+      {/* Orbes de aurora respirando atrás do conteúdo */}
+      <div aria-hidden className="orb w-80 h-80 bg-accent/10 top-24 -left-24 animate-float-slow" />
+      <div aria-hidden className="orb w-96 h-96 bg-accent-2/10 bottom-10 -right-28 animate-float-slower" />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-32">
 
         {/* Hero */}
         <motion.div
@@ -74,6 +79,13 @@ export default function ContactPage() {
           transition={{ duration: 0.7 }}
           className="py-16 sm:py-24"
         >
+          {/* Kicker editorial: hairline · CONTATO */}
+          <div className="flex items-center gap-3 mb-6">
+            <span aria-hidden className="h-px w-10 hairline-gradient" />
+            <span className="font-pixel text-[9px] text-accent-bright tracking-[0.4em] uppercase">
+              {tNav('contact')}
+            </span>
+          </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tracking-tighter mb-6">
             {t('title')}
           </h1>
@@ -96,9 +108,9 @@ export default function ContactPage() {
                   href={href}
                   target={href.startsWith('mailto') ? undefined : '_blank'}
                   rel={href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
-                  className="group flex items-center gap-4 p-4 rounded-lg border border-border bg-surface hover:border-border-strong hover:bg-surface-elevated transition-all"
+                  className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-surface/60 backdrop-blur-xl hover:border-accent/30 hover:bg-surface-elevated/70 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-surface-elevated border border-border flex items-center justify-center group-hover:border-accent group-hover:text-accent-bright transition-all">
+                  <div className="w-10 h-10 rounded-lg bg-background/40 border border-border flex items-center justify-center group-hover:border-accent group-hover:shadow-[0_0_18px_rgba(99,247,141,0.2)] transition-all duration-300">
                     <Icon size={16} className="text-foreground-subtle group-hover:text-accent-bright transition-colors" />
                   </div>
                   <div>
@@ -115,7 +127,10 @@ export default function ContactPage() {
             initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
+            className="relative rounded-3xl border border-border bg-surface/60 backdrop-blur-xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)] overflow-hidden"
           >
+            {/* Fio de aurora no topo do cartão */}
+            <div aria-hidden className="absolute top-0 inset-x-0 h-px hairline-gradient opacity-70" />
             {status === 'success' ? (
               <div className="flex flex-col items-center justify-center h-full py-16 text-center">
                 <CheckCircle2 size={48} className="text-accent-bright mb-4" />
