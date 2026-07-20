@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
 import SetupNotice from '@/components/admin/SetupNotice';
+import RawHtmlContent from '@/components/blog/RawHtmlContent';
 import type { Post } from '@/lib/supabase/types';
 
 // Gera slug a partir do título: "Minha Viagem à Bahia!" → "minha-viagem-a-bahia"
@@ -36,6 +37,9 @@ export default function PostEditor({ post }: PostEditorProps) {
   const [content, setContent] = useState(post?.content ?? '');
   const [coverUrl, setCoverUrl] = useState(post?.cover_url ?? '');
   const [category, setCategory] = useState(post?.category ?? '');
+  const [contentFormat, setContentFormat] = useState<'markdown' | 'html'>(
+    post?.content_format ?? 'markdown'
+  );
   const [published, setPublished] = useState(post?.published ?? false);
   const [preview, setPreview] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -63,6 +67,7 @@ export default function PostEditor({ post }: PostEditorProps) {
       content,
       cover_url: coverUrl.trim() || null,
       category: category.trim() || null,
+      content_format: contentFormat,
       published,
     };
 
@@ -130,9 +135,13 @@ export default function PostEditor({ post }: PostEditorProps) {
               {title || 'Sem título'}
             </h1>
             {excerpt && <p className="text-xl text-foreground-muted mb-8">{excerpt}</p>}
-            <div className="prose-post">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-            </div>
+            {contentFormat === 'html' ? (
+              <RawHtmlContent html={content} />
+            ) : (
+              <div className="prose-post">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+              </div>
+            )}
           </article>
         ) : (
           <div className="space-y-6">
@@ -208,15 +217,49 @@ export default function PostEditor({ post }: PostEditorProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground-muted mb-1.5">
-                Conteúdo — escreva normalmente. Dicas: **negrito**, ## Título de seção, - lista
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-foreground-muted">
+                  {contentFormat === 'html'
+                    ? 'Conteúdo — HTML puro, com <style> e <script> se quiser'
+                    : 'Conteúdo — escreva normalmente. Dicas: **negrito**, ## Título de seção, - lista'}
+                </label>
+                {/* Toggle Markdown / HTML avançado */}
+                <div className="flex items-center gap-1 p-0.5 rounded-full bg-background border border-border shrink-0 ml-3">
+                  {(['markdown', 'html'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setContentFormat(mode)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        contentFormat === mode
+                          ? 'bg-accent text-[color:var(--ink-on-accent)]'
+                          : 'text-foreground-muted hover:text-foreground'
+                      }`}
+                    >
+                      {mode === 'markdown' ? 'Markdown' : 'HTML avançado'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {contentFormat === 'html' && (
+                <p className="text-xs text-foreground-subtle mb-2">
+                  O post inteiro é renderizado com o HTML/CSS/JS que você colar aqui. Só scripts
+                  embutidos (inline) rodam — links externos de script são bloqueados pela política
+                  de segurança do site.
+                </p>
+              )}
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={20}
-                placeholder={'Escreve aqui seu post...\n\n## Um título de seção\n\nUm parágrafo normal com **negrito** e *itálico*.\n\n- Um item de lista\n- Outro item'}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base leading-relaxed outline-none focus:border-accent transition-colors resize-y"
+                placeholder={
+                  contentFormat === 'html'
+                    ? '<section style="padding: 2rem; background: #111;">\n  <h2 style="color: #ff8a3d;">Título com estilo próprio</h2>\n  <p>Escreve seu HTML aqui...</p>\n  <script>\n    console.log("roda de verdade no navegador do visitante");\n  <\/script>\n</section>'
+                    : 'Escreve aqui seu post...\n\n## Um título de seção\n\nUm parágrafo normal com **negrito** e *itálico*.\n\n- Um item de lista\n- Outro item'
+                }
+                className={`w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base leading-relaxed outline-none focus:border-accent transition-colors resize-y ${
+                  contentFormat === 'html' ? 'font-mono text-sm' : ''
+                }`}
               />
             </div>
 
