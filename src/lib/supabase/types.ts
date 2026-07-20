@@ -6,6 +6,7 @@ export interface Post {
   content: string;
   cover_url: string | null;
   category: string | null;
+  content_format: 'markdown' | 'html';
   published: boolean;
   created_at: string;
   updated_at: string;

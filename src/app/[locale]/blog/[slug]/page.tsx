@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getPostBySlug } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
+import RawHtmlContent from '@/components/blog/RawHtmlContent';
 
 // Revalida a cada 60s — edições aparecem sozinhas
 export const revalidate = 60;
@@ -81,9 +82,13 @@ export default async function BlogPostPage({
         )}
 
         {/* Conteúdo */}
-        <div className="prose-post">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
-        </div>
+        {post.content_format === 'html' ? (
+          <RawHtmlContent html={post.content} />
+        ) : (
+          <div className="prose-post">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+          </div>
+        )}
       </article>
     </div>
   );
