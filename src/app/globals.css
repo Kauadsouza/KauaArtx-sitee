@@ -125,6 +125,12 @@
   100% { transform: translateX(22%); }
 }
 
+/* Curvas de nível do mapa respirando atrás do título de contato */
+@keyframes contour-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1); }
+  50%      { transform: translate3d(-26px, 10px, 0) scaleY(1.04); }
+}
+
 /* ── Base ─────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
@@ -382,6 +388,12 @@
     color: var(--fg-muted);
   }
 
+  /* Mapa topográfico decorativo (topo da página de contato) */
+  .contour-map {
+    animation: contour-drift 26s ease-in-out infinite;
+    will-change: transform;
+  }
+
   /* Botão primário — pill gradiente verde→ciano */
   .btn-pill-primary {
     display: inline-flex;
@@ -499,7 +511,8 @@
   .gate-firefly,
   .gate-sun-breathe,
   .gate-rays,
-  .gate-fog {
+  .gate-fog,
+  .contour-map {
     animation: none;
   }
 }
