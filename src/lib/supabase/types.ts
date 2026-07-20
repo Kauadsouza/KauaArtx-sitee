@@ -5,6 +5,7 @@ export interface Post {
   excerpt: string | null;
   content: string;
   cover_url: string | null;
+  category: string | null;
   published: boolean;
   created_at: string;
   updated_at: string;

@@ -233,7 +233,17 @@
     "coming_soon_desc": "Os primeiros posts estão sendo preparados. Volta logo!",
     "read_more": "Ler post",
     "back_to_blog": "Voltar pro blog",
-    "published_on": "Publicado em"
+    "published_on": "Publicado em",
+    "hero_cta": "Fale comigo",
+    "hero_cta_secondary": "Ver o canal",
+    "featured_kicker": "Em destaque",
+    "latest_kicker": "Últimos posts",
+    "sidebar_recent": "Mais recentes",
+    "sidebar_follow": "Me acompanhe",
+    "sidebar_cta_title": "Quer trocar uma ideia?",
+    "sidebar_cta_desc": "Proposta, parceria ou dúvida — respondo em até 24h.",
+    "sidebar_cta_button": "Falar comigo",
+    "by_author": "por"
   },
   "contact": {
     "title": "Fale comigo",

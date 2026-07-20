@@ -233,7 +233,17 @@
     "coming_soon_desc": "The first posts are on their way. Check back soon!",
     "read_more": "Read post",
     "back_to_blog": "Back to blog",
-    "published_on": "Published on"
+    "published_on": "Published on",
+    "hero_cta": "Get in touch",
+    "hero_cta_secondary": "Watch the channel",
+    "featured_kicker": "Featured",
+    "latest_kicker": "Latest posts",
+    "sidebar_recent": "Most recent",
+    "sidebar_follow": "Follow along",
+    "sidebar_cta_title": "Want to talk?",
+    "sidebar_cta_desc": "A proposal, a partnership, or a question — I reply within 24h.",
+    "sidebar_cta_button": "Talk to me",
+    "by_author": "by"
   },
   "contact": {
     "title": "Talk to me",
