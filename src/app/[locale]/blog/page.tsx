@@ -1,12 +1,20 @@
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 import { Link } from '@/i18n/navigation';
-import { ArrowRight, PenLine } from 'lucide-react';
+import { ArrowRight, PenLine, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react';
 import { getPublishedPosts } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
+import type { Post } from '@/lib/supabase/types';
 
 // Revalida a cada 60s — posts novos aparecem sozinhos
 export const revalidate = 60;
+
+const SOCIALS = [
+  { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram', handle: '@kauaartx' },
+  { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X', handle: '@KauaArtx' },
+  { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube', handle: '@KauartX' },
+  { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
+];
 
 export async function generateMetadata({
   params,
@@ -18,6 +26,64 @@ export async function generateMetadata({
   return { title: t('title'), description: t('subtitle') };
 }
 
+// Capa do post. Usa <img> em vez de next/image de propósito: o editor
+// aceita link de qualquer host, e o otimizador só libera **.supabase.co —
+// com next/image um link de fora derrubaria a página inteira.
+function Cover({ src, className }: { src: string | null; className?: string }) {
+  if (!src) {
+    // Sem capa: bloco de brasa em vez de buraco vazio no layout
+    return (
+      <div
+        aria-hidden
+        className={`bg-gradient-to-br from-surface-elevated via-surface to-background ${className ?? ''}`}
+      >
+        <div className="w-full h-full gradient-radial-top opacity-60" />
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt="" loading="lazy" className={`object-cover ${className ?? ''}`} />
+  );
+}
+
+function CategoryTag({ category }: { category: string | null }) {
+  if (!category) return null;
+  return (
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-strong bg-background/60 text-[11px] font-medium text-accent-deep">
+      <span aria-hidden className="w-1 h-1 rounded-full bg-accent-bright" />
+      {category}
+    </span>
+  );
+}
+
+// Assinatura: monograma + nome. É blog de uma pessoa só, então o autor
+// é sempre o Kauã — nada de lista de autores inventada.
+function Byline({ date }: { date: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="w-6 h-6 rounded-full bg-accent/15 border border-border-strong flex items-center justify-center text-[10px] font-bold text-accent-deep">
+        K
+      </span>
+      <span className="text-xs text-foreground-muted">Kauã</span>
+      <span aria-hidden className="text-foreground-subtle">·</span>
+      <span className="text-xs text-foreground-subtle">{date}</span>
+    </div>
+  );
+}
+
+// Título de seção com o filete atravessando a página, como no layout de revista
+function SectionRule({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-4 mb-8">
+      <h2 className="font-pixel text-[10px] tracking-[0.3em] uppercase text-foreground whitespace-nowrap">
+        <span className="text-accent-bright">#</span> {label}
+      </h2>
+      <span aria-hidden className="flex-1 h-px bg-border" />
+    </div>
+  );
+}
+
 export default async function BlogPage({
   params,
 }: {
@@ -27,22 +93,50 @@ export default async function BlogPage({
   const t = await getTranslations({ locale, namespace: 'blog' });
   const posts = await getPublishedPosts();
   const dateLocale = locale === 'pt' ? 'pt-BR' : 'en-US';
+  const when = (p: Post) => formatDate(new Date(p.created_at), dateLocale);
+
+  // O layout de revista se adapta à quantidade de posts: destaque, apoio
+  // e o resto vira feed. Com poucos posts as seções somem sozinhas.
+  const [featured, secondary, ...rest] = posts;
+  const recent = posts.slice(0, 5);
 
   return (
     <div className="min-h-screen pt-24 relative overflow-hidden">
-      <div className="orb w-[400px] h-[400px] top-[-8%] left-[-10%] bg-accent-bright/15" />
+      <div aria-hidden className="orb w-[420px] h-[420px] top-[-8%] left-[-12%] bg-accent/12 animate-float-slow" />
 
-      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-32">
-        {/* Hero */}
-        <div className="py-16 sm:py-20">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground mb-5">
-            {t('title')}
-          </h1>
-          <p className="text-xl text-foreground-muted max-w-2xl">{t('subtitle')}</p>
-        </div>
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-32">
+
+        {/* ══ Hero: título display à esquerda, resumo e ações à direita ══ */}
+        <header className="py-14 sm:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-8 lg:gap-16 items-end">
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tighter text-foreground">
+              {t('title')}
+            </h1>
+            <div className="lg:pb-3">
+              <p className="text-foreground-muted leading-relaxed mb-6">{t('subtitle')}</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link href="/contact" className="btn-pill-primary text-sm !py-2.5 !px-5">
+                  {t('hero_cta')}
+                  <ArrowRight size={14} />
+                </Link>
+                <a
+                  href="https://www.youtube.com/@KauartX"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-sm text-foreground-muted hover:text-foreground hover:border-border-strong transition-all"
+                >
+                  <Youtube size={14} />
+                  {t('hero_cta_secondary')}
+                </a>
+              </div>
+            </div>
+          </div>
+          {/* Filete grosso sob o título, como o do layout de revista */}
+          <div aria-hidden className="mt-10 h-0.5 w-full hairline-gradient opacity-60" />
+        </header>
 
         {posts.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-20 rounded-3xl bg-surface border border-dashed border-border-strong text-center">
+          <div className="flex flex-col items-center gap-4 py-24 rounded-3xl bg-surface border border-dashed border-border-strong text-center">
             <div className="w-14 h-14 rounded-2xl bg-accent/10 text-accent-deep flex items-center justify-center">
               <PenLine size={26} />
             </div>
@@ -50,29 +144,206 @@ export default async function BlogPage({
             <p className="text-foreground-muted max-w-sm">{t('coming_soon_desc')}</p>
           </div>
         ) : (
-          <div className="space-y-5">
-            {posts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/blog/${post.slug}`}
-                className="group flex flex-col gap-2 p-7 rounded-2xl bg-surface border border-border shadow-sm hover:shadow-xl hover:shadow-accent/5 hover:-translate-y-1 hover:border-border-strong transition-all duration-300"
-              >
-                <span className="text-xs text-foreground-subtle">
-                  {formatDate(new Date(post.created_at), dateLocale)}
-                </span>
-                <h2 className="text-2xl font-bold tracking-tight text-foreground group-hover:text-accent-deep transition-colors">
-                  {post.title}
-                </h2>
-                {post.excerpt && (
-                  <p className="text-foreground-muted leading-relaxed">{post.excerpt}</p>
+          <>
+            {/* ══ Destaque: cartão de texto + capa grande + cartão de apoio ══ */}
+            <section className="mb-20">
+              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)_minmax(0,0.95fr)] gap-6 items-stretch">
+
+                {/* Texto do post em destaque */}
+                <Link
+                  href={`/blog/${featured.slug}`}
+                  className="group flex flex-col justify-center rounded-2xl bg-surface border border-border p-7 hover:border-border-strong transition-colors duration-300"
+                >
+                  <div className="mb-4">
+                    <CategoryTag category={featured.category} />
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight mb-4 group-hover:text-accent-deep transition-colors">
+                    {featured.title}
+                  </h2>
+                  {featured.excerpt && (
+                    <p className="text-sm text-foreground-muted leading-relaxed mb-6 line-clamp-4">
+                      {featured.excerpt}
+                    </p>
+                  )}
+                  <div className="mt-auto pt-5 border-t border-border">
+                    <Byline date={when(featured)} />
+                  </div>
+                </Link>
+
+                {/* Capa grande do destaque */}
+                <Link
+                  href={`/blog/${featured.slug}`}
+                  className="group relative rounded-2xl overflow-hidden border border-border min-h-[280px] lg:min-h-[420px]"
+                >
+                  <Cover
+                    src={featured.cover_url}
+                    className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent"
+                  />
+                </Link>
+
+                {/* Post de apoio — só aparece quando existe um segundo post */}
+                {secondary ? (
+                  <Link
+                    href={`/blog/${secondary.slug}`}
+                    className="group flex flex-col rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong transition-colors duration-300"
+                  >
+                    <div className="relative h-40 overflow-hidden">
+                      <Cover
+                        src={secondary.cover_url}
+                        className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="flex flex-col flex-1 p-6">
+                      <div className="mb-3">
+                        <CategoryTag category={secondary.category} />
+                      </div>
+                      <h3 className="text-lg font-bold tracking-tight text-foreground leading-snug mb-3 group-hover:text-accent-deep transition-colors">
+                        {secondary.title}
+                      </h3>
+                      {secondary.excerpt && (
+                        <p className="text-sm text-foreground-muted leading-relaxed line-clamp-3">
+                          {secondary.excerpt}
+                        </p>
+                      )}
+                      <span className="mt-auto pt-5 text-xs text-foreground-subtle">
+                        {when(secondary)}
+                      </span>
+                    </div>
+                  </Link>
+                ) : (
+                  // Sem segundo post o espaço vira convite pra conversa
+                  <div className="flex flex-col justify-center rounded-2xl bg-surface border border-dashed border-border-strong p-7 text-center">
+                    <h3 className="text-lg font-bold text-foreground mb-2">
+                      {t('sidebar_cta_title')}
+                    </h3>
+                    <p className="text-sm text-foreground-muted mb-5">{t('sidebar_cta_desc')}</p>
+                    <Link
+                      href="/contact"
+                      className="btn-pill-primary text-xs !py-2.5 !px-4 w-fit mx-auto"
+                    >
+                      {t('sidebar_cta_button')}
+                      <ArrowRight size={13} />
+                    </Link>
+                  </div>
                 )}
-                <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-accent-deep">
-                  {t('read_more')}
-                  <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
-                </span>
-              </Link>
-            ))}
-          </div>
+              </div>
+            </section>
+
+            {/* ══ Feed principal + barra lateral ══ */}
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)] gap-10 lg:gap-14">
+
+              {/* Coluna do feed */}
+              <div>
+                <SectionRule label={t('latest_kicker')} />
+                {rest.length === 0 ? (
+                  <p className="text-sm text-foreground-subtle py-8">{t('coming_soon_desc')}</p>
+                ) : (
+                  <div className="space-y-5">
+                    {rest.map((post) => (
+                      <Link
+                        key={post.id}
+                        href={`/blog/${post.slug}`}
+                        className="group grid grid-cols-1 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)] gap-5 rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong hover:-translate-y-0.5 transition-all duration-300"
+                      >
+                        <div className="relative h-48 sm:h-full min-h-[180px] overflow-hidden">
+                          <Cover
+                            src={post.cover_url}
+                            className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
+                          />
+                        </div>
+                        <div className="flex flex-col p-6 sm:pl-0 sm:py-7 sm:pr-7">
+                          <div className="mb-3">
+                            <CategoryTag category={post.category} />
+                          </div>
+                          <h3 className="text-xl font-bold tracking-tight text-foreground leading-snug mb-2.5 group-hover:text-accent-deep transition-colors">
+                            {post.title}
+                          </h3>
+                          {post.excerpt && (
+                            <p className="text-sm text-foreground-muted leading-relaxed line-clamp-3 mb-5">
+                              {post.excerpt}
+                            </p>
+                          )}
+                          <div className="mt-auto pt-4 border-t border-border">
+                            <Byline date={when(post)} />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Barra lateral */}
+              <aside className="space-y-10">
+
+                {/* Mais recentes — miniatura + título + data */}
+                <div>
+                  <h2 className="text-xs font-semibold uppercase tracking-widest text-foreground-subtle mb-5">
+                    {t('sidebar_recent')}
+                  </h2>
+                  <ul className="divide-y divide-border border-y border-border">
+                    {recent.map((post) => (
+                      <li key={post.id}>
+                        <Link
+                          href={`/blog/${post.slug}`}
+                          className="group flex items-center gap-4 py-4"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-semibold text-foreground leading-snug line-clamp-2 group-hover:text-accent-deep transition-colors">
+                              {post.title}
+                            </h3>
+                            <span className="text-xs text-foreground-subtle">{when(post)}</span>
+                          </div>
+                          <div className="w-16 h-14 rounded-lg overflow-hidden border border-border shrink-0">
+                            <Cover src={post.cover_url} className="w-full h-full" />
+                          </div>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Me acompanhe — handles reais, sem contador inventado */}
+                <div>
+                  <h2 className="text-xs font-semibold uppercase tracking-widest text-foreground-subtle mb-5">
+                    {t('sidebar_follow')}
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {SOCIALS.map(({ href, icon: Icon, label, handle }) => (
+                      <a
+                        key={href}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={label}
+                        className="group flex flex-col gap-1 p-3 rounded-xl border border-border bg-surface hover:border-accent/40 transition-colors duration-300"
+                      >
+                        <Icon size={15} className="text-foreground-subtle group-hover:text-accent-bright transition-colors" />
+                        <span className="text-xs text-foreground-muted truncate">{handle}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Convite pra conversa no lugar do slot de anúncio da referência */}
+                <div className="relative rounded-2xl bg-surface border border-border p-6 overflow-hidden">
+                  <span aria-hidden className="absolute top-0 inset-x-0 h-px hairline-gradient" />
+                  <h2 className="text-lg font-bold text-foreground mb-2">{t('sidebar_cta_title')}</h2>
+                  <p className="text-sm text-foreground-muted leading-relaxed mb-5">
+                    {t('sidebar_cta_desc')}
+                  </p>
+                  <Link href="/contact" className="btn-pill-primary text-xs !py-2.5 !px-4 w-fit">
+                    {t('sidebar_cta_button')}
+                    <ArrowRight size={13} />
+                  </Link>
+                </div>
+              </aside>
+            </div>
+          </>
         )}
       </div>
     </div>

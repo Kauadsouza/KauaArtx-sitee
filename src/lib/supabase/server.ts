@@ -17,7 +17,7 @@ export async function getPublishedPosts(limit?: number): Promise<Post[]> {
   if (!supabase) return [];
   let query = supabase
     .from('posts')
-    .select('id, title, slug, excerpt, content, cover_url, published, created_at, updated_at')
+    .select('id, title, slug, excerpt, content, cover_url, category, published, created_at, updated_at')
     .eq('published', true)
     .order('created_at', { ascending: false });
   if (limit) query = query.limit(limit);
@@ -31,7 +31,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('posts')
-    .select('id, title, slug, excerpt, content, cover_url, published, created_at, updated_at')
+    .select('id, title, slug, excerpt, content, cover_url, category, published, created_at, updated_at')
     .eq('slug', slug)
     .eq('published', true)
     .single();

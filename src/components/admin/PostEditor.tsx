@@ -35,6 +35,7 @@ export default function PostEditor({ post }: PostEditorProps) {
   const [excerpt, setExcerpt] = useState(post?.excerpt ?? '');
   const [content, setContent] = useState(post?.content ?? '');
   const [coverUrl, setCoverUrl] = useState(post?.cover_url ?? '');
+  const [category, setCategory] = useState(post?.category ?? '');
   const [published, setPublished] = useState(post?.published ?? false);
   const [preview, setPreview] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -61,6 +62,7 @@ export default function PostEditor({ post }: PostEditorProps) {
       excerpt: excerpt.trim() || null,
       content,
       cover_url: coverUrl.trim() || null,
+      category: category.trim() || null,
       published,
     };
 
@@ -172,6 +174,25 @@ export default function PostEditor({ post }: PostEditorProps) {
                   className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base outline-none focus:border-accent transition-colors"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-foreground-muted mb-1.5">
+                Categoria (vira a tarja no blog, opcional)
+              </label>
+              <input
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                list="categorias-sugeridas"
+                placeholder="Aventura"
+                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base outline-none focus:border-accent transition-colors"
+              />
+              {/* Sugestões: dá pra escolher uma ou digitar a sua */}
+              <datalist id="categorias-sugeridas">
+                {['Aventura', 'Vendas', 'Negócios', 'Bastidores', 'Viagem', 'Reflexão'].map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
             </div>
 
             <div>
