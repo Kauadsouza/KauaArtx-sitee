@@ -77,6 +77,13 @@ export async function POST(req: NextRequest) {
     const message = escapeHtml(data.message);
     const email = escapeHtml(data.email);
 
+    // Sem chave o envio nunca sai — avisa nos logs em vez de estourar
+    // um "Erro interno" genérico que não diz nada.
+    if (!process.env.RESEND_API_KEY) {
+      console.error('[contact] RESEND_API_KEY ausente — email não enviado');
+      return NextResponse.json({ error: 'Falha no envio' }, { status: 500 });
+    }
+
     // Instantiate inside the handler so it only runs at request time
     const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -105,6 +112,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
+      // O motivo real (chave inválida, cota, destinatário bloqueado no modo
+      // teste do Resend) só aparece aqui — sem isso o log da Vercel fica mudo.
+      console.error('[contact] Resend recusou o envio:', error);
       return NextResponse.json({ error: 'Falha no envio' }, { status: 500 });
     }
 
@@ -113,6 +123,7 @@ export async function POST(req: NextRequest) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
+    console.error('[contact] Erro inesperado:', err);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
 }
