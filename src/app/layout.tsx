@@ -21,17 +21,17 @@ const scriptFont = Dancing_Script({
 });
 
 const DESCRIPTION =
-  'Vendedor na Loog.ai, CEO do Facility e aventureiro documentando a jornada pelo mundo.';
+  'Vendedor na Loog.ai, CEO do Facility e nômade documentando a jornada pelo mundo.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Vendedor & Aventureiro`,
+    default: `${SITE_NAME} — Nômade & Vendedor`,
     template: `%s | ${SITE_NAME}`,
   },
   description: DESCRIPTION,
   keywords: [
-    'Kauã Souza', 'Vendedor', 'Aventureiro', 'Empreendedor', 'Facility',
+    'Kauã Souza', 'Vendedor', 'Nômade', 'Empreendedor', 'Facility',
     'Loog.ai', 'YouTube', 'Viagens', 'Crescimento pessoal',
   ],
   authors: [{ name: SITE_NAME }],
@@ -41,15 +41,15 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     alternateLocale: 'en_US',
     url: SITE_URL,
-    title: `${SITE_NAME} — Vendedor & Aventureiro`,
+    title: `${SITE_NAME} — Nômade & Vendedor`,
     description: DESCRIPTION,
     siteName: SITE_NAME,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — Vendedor & Aventureiro`,
+    title: `${SITE_NAME} — Nômade & Vendedor`,
     description:
-      'Vendedor, CEO do Facility e aventureiro documentando a jornada pelo mundo.',
+      'Vendedor, CEO do Facility e nômade documentando a jornada pelo mundo.',
     creator: '@KauaArtx',
   },
   robots: { index: true, follow: true },
@@ -62,7 +62,7 @@ const personJsonLd = {
   name: SITE_NAME,
   url: SITE_URL,
   image: `${SITE_URL}/images/kaua-pixel.png`,
-  jobTitle: 'Vendedor & Aventureiro',
+  jobTitle: 'Nômade & Vendedor',
   worksFor: { '@type': 'Organization', name: 'Loog.ai' },
   sameAs: SOCIAL_PROFILES,
 };

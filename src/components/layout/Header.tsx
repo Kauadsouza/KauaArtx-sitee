@@ -36,7 +36,7 @@ export default function Header({ locale }: HeaderProps) {
   }, []);
 
   // "Conta vinculada" (por enquanto): entrou pelo portal COM nome de
-  // aventureiro salvo. Quando a Supabase for ligada, este check vira a
+  // nômade salvo. Quando a Supabase for ligada, este check vira a
   // sessão real. O portal avisa via evento quando o login muda.
   useEffect(() => {
     const check = () => {

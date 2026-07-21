@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Kauã Souza — Vendedor & Aventureiro',
+    name: 'Kauã Souza — Nômade & Vendedor',
     short_name: 'Kauã Artx',
     description:
-      'Vendedor na Loog.ai, CEO do Facility e aventureiro documentando a jornada pelo mundo.',
+      'Vendedor na Loog.ai, CEO do Facility e nômade documentando a jornada pelo mundo.',
     start_url: '/',
     display: 'standalone',
     background_color: '#04100a',

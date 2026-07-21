@@ -358,7 +358,7 @@ export default function LoginGate() {
                   </p>
                 </div>
 
-                {/* Aventureiro — label flutuante */}
+                {/* Nômade — label flutuante */}
                 <div className="relative mb-3">
                   <input
                     id="gate-user"
