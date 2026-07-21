@@ -3,16 +3,15 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Handshake, Rocket, Youtube, Compass } from 'lucide-react';
+import { Handshake, Youtube, Compass, Instagram } from 'lucide-react';
 
-// Seção 1 da estrutura de aventura: à ESQUERDA um bloco de 4 features com
+// Seção 1 da estrutura de aventura: à ESQUERDA um bloco de features com
 // ícones redondos laranja; à DIREITA duas artes verticais em destaque
 // (jornada + canal). Espelha o "features + 2 image cards" do print.
 const FEATURES = [
   { icon: Handshake, k: 'sales' },
-  { icon: Rocket, k: 'startup' },
   { icon: Youtube, k: 'content' },
-  { icon: Compass, k: 'adventure' },
+  { icon: Instagram, k: 'instagram' },
 ] as const;
 
 const HIGHLIGHTS = [

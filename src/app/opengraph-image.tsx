@@ -113,7 +113,7 @@ export default async function OpenGraphImage() {
               lineHeight: 1.4,
             }}
           >
-            Vendas na Loog.ai · CEO do Facility · YouTube @KauartX
+            Vendas na Loog.ai · YouTube @KauartX · Instagram @kauaartx
           </div>
         </div>
 

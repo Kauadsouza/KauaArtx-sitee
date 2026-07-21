@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Kauã Souza — Vendedor & Aventureiro',
     short_name: 'Kauã Artx',
     description:
-      'Vendedor na Loog.ai, CEO do Facility e aventureiro documentando a jornada pelo mundo.',
+      'Vendedor na Loog.ai e criador no YouTube: eu mostro o caminho pra sair do país, não só conto.',
     start_url: '/',
     display: 'standalone',
     background_color: '#04100a',

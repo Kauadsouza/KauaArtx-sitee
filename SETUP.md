@@ -1,6 +1,6 @@
 # Site pessoal — Kauã Souza
 
-Site sobre o Kauã: vendedor na Loog.ai, CEO do Facility e criador de conteúdo
+Site sobre o Kauã: vendedor na Loog.ai e criador de conteúdo no YouTube
 no YouTube sobre viagens e crescimento pessoal.
 
 ## Stack

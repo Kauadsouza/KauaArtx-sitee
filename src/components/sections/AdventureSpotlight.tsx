@@ -4,15 +4,24 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Handshake, Rocket, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { Handshake, Youtube, ArrowRight, ArrowUpRight } from 'lucide-react';
 
 // Seção 4 da estrutura de aventura: à esquerda DOIS cards pequenos
-// (Loog.ai / Facility); à direita UM card-destaque grande com foto de
+// (Loog.ai / canal); à direita UM card-destaque grande com foto de
 // fundo + CTA de contato. Espelha o "2 small + 1 big" do print.
 const SMALL = [
-  { icon: Handshake, titleKey: 'spot_loog_title', descKey: 'spot_loog_desc', href: '/about' },
-  { icon: Rocket, titleKey: 'spot_facility_title', descKey: 'spot_facility_desc', href: '/contact' },
+  { icon: Handshake, titleKey: 'spot_loog_title', descKey: 'spot_loog_desc', href: '/about', external: false },
+  {
+    icon: Youtube,
+    titleKey: 'spot_channel_title',
+    descKey: 'spot_channel_desc',
+    href: 'https://www.youtube.com/@KauartX',
+    external: true,
+  },
 ] as const;
+
+const CARD_CLASS =
+  'group relative flex flex-col justify-center h-full rounded-3xl bg-surface border border-border p-7 hover:border-border-strong hover:-translate-y-1 transition-all duration-300 overflow-hidden';
 
 export default function AdventureSpotlight() {
   const t = useTranslations('home');
@@ -23,18 +32,9 @@ export default function AdventureSpotlight() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.35fr] gap-6">
           {/* ── Dois cards pequenos ── */}
           <div className="grid grid-rows-2 gap-6">
-            {SMALL.map(({ icon: Icon, titleKey, descKey, href }, i) => (
-              <motion.div
-                key={href}
-                initial={{ opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-              >
-                <Link
-                  href={href}
-                  className="group relative flex flex-col justify-center h-full rounded-3xl bg-surface border border-border p-7 hover:border-border-strong hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-                >
+            {SMALL.map(({ icon: Icon, titleKey, descKey, href, external }, i) => {
+              const body = (
+                <>
                   <div aria-hidden className="absolute -top-16 -right-12 w-44 h-44 rounded-full blur-3xl bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   <div className="relative w-12 h-12 rounded-2xl bg-accent/12 text-accent-bright flex items-center justify-center mb-4">
                     <Icon size={22} />
@@ -49,9 +49,29 @@ export default function AdventureSpotlight() {
                   <p className="relative text-sm text-foreground-muted leading-relaxed">
                     {t(descKey)}
                   </p>
-                </Link>
-              </motion.div>
-            ))}
+                </>
+              );
+
+              return (
+                <motion.div
+                  key={href}
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                >
+                  {external ? (
+                    <a href={href} target="_blank" rel="noopener noreferrer" className={CARD_CLASS}>
+                      {body}
+                    </a>
+                  ) : (
+                    <Link href={href} className={CARD_CLASS}>
+                      {body}
+                    </Link>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* ── Card-destaque com CTA ── */}

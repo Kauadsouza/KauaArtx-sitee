@@ -43,7 +43,7 @@
     "open_to": "Sempre em movimento",
     "route": "BRA → MUNDO",
     "chip_sales": "Vendas na Loog.ai",
-    "chip_ceo": "CEO do Facility",
+    "chip_ceo": "Criador de conteúdo",
     "chip_youtube": "Criador no YouTube",
     "watch_tour": "Assistir o tour",
     "learn_more": "Saiba mais",
@@ -52,19 +52,17 @@
   "home": {
     "features_kicker": "O que eu faço",
     "features_title": "Três frentes, uma só jornada",
-    "features_sub": "Vender, criar e documentar o caminho — tudo começa e termina em pessoas.",
+    "features_sub": "Vender, criar e documentar o caminho — tudo começa e termina em experiências.",
     "feat_sales": "Vendas",
-    "feat_sales_desc": "Discovery, qualificação e reuniões comerciais na Loog.ai.",
-    "feat_startup": "Facility",
-    "feat_startup_desc": "Sistemas sob medida pra cada cliente, sem enrolação.",
-    "feat_content": "Conteúdo",
-    "feat_content_desc": "Viagens e crescimento pessoal no canal @KauartX.",
-    "feat_adventure": "Aventura",
-    "feat_adventure_desc": "Do Brasil pro mundo, documentando cada passo.",
+    "feat_sales_desc": "Especialista em comunicação e negociação: escutar, entender e fechar.",
+    "feat_content": "Conteúdo no YouTube",
+    "feat_content_desc": "Eu não só conto: eu te mostro como sair do país, passo a passo, no @KauartX.",
+    "feat_instagram": "Instagram",
+    "feat_instagram_desc": "A jornada em tempo real, todo dia, no @kauaartx.",
     "highlight_journey_title": "A jornada real",
     "highlight_journey_desc": "Os bastidores de quem está construindo a própria história, sem filtro.",
     "highlight_channel_title": "No canal @KauartX",
-    "highlight_channel_desc": "Viagens, lições e evolução — tudo em vídeo.",
+    "highlight_channel_desc": "Eu te mostro como sair do país de verdade — o caminho inteiro em vídeo.",
     "split_kicker": "A jornada pelo mundo",
     "split_title": "Vendedor de dia, aventureiro o tempo todo",
     "split_p1": "Eu acredito que tudo na vida é sobre pessoas. Então eu vendo, crio, viajo e documento cada passo — os lugares, os aprendizados e o foco que me move.",
@@ -80,10 +78,10 @@
     "spot_kicker": "Bora construir junto",
     "spot_loog_title": "Loog.ai",
     "spot_loog_desc": "Logística com IA — é onde eu vendo e resolvo problema de verdade.",
-    "spot_facility_title": "Facility",
-    "spot_facility_desc": "Seu sistema sob medida: escutar, resolver e entregar.",
+    "spot_channel_title": "Canal @KauartX",
+    "spot_channel_desc": "O caminho pra sair do país, em vídeo — sem teoria, só o passo a passo.",
     "spot_cta_title": "Vamos conversar?",
-    "spot_cta_desc": "Negócios, uma ideia, o Facility ou só uma boa conversa — minha porta está aberta.",
+    "spot_cta_desc": "Negócios, uma parceria de conteúdo ou só uma boa conversa — minha porta está aberta.",
     "spot_cta_button": "Entrar em contato"
   },
   "what_i_do": {
@@ -92,12 +90,12 @@
     "loog_title": "Vendas na Loog.ai",
     "loog_tag": "Vendedor",
     "loog_desc": "Faço parte do time comercial da Loog.ai, plataforma brasileira de logística com inteligência artificial. Discovery, qualificação de leads, follow-up e apresentações — meu trabalho é ouvir e mostrar como a tecnologia resolve problemas reais.",
-    "facility_title": "Facility",
-    "facility_tag": "CEO & Fundador",
-    "facility_desc": "No Facility, a gente conversa com o cliente, entende a necessidade dele e entrega o sistema sob medida que ele pediu. Sem enrolação: escutar, resolver e entregar.",
+    "instagram_title": "Instagram",
+    "instagram_tag": "@kauaartx",
+    "instagram_desc": "É onde a jornada acontece em tempo real: os bastidores do dia a dia, os perrengues e as vitórias na hora em que acontecem.",
     "youtube_title": "Canal no YouTube",
     "youtube_tag": "Criador de conteúdo",
-    "youtube_desc": "No meu canal eu mostro viagens e falo sobre crescimento pessoal. É onde documento a jornada de verdade — os lugares, os aprendizados e a evolução."
+    "youtube_desc": "É o meu foco principal fora das vendas. No canal eu não fico só contando história: eu mostro o caminho pra sair do país — como eu me planejo, quanto custa, o que dá errado e o que eu aprendo em cada passo."
   },
   "youtube_section": {
     "title": "A jornada pelo mundo",
@@ -119,7 +117,7 @@
   },
   "cta_section": {
     "title": "Vamos conversar?",
-    "subtitle": "Seja sobre negócios, uma ideia, o Facility ou só pra trocar uma boa conversa — minha porta está aberta.",
+    "subtitle": "Seja sobre negócios, uma parceria de conteúdo ou só pra trocar uma boa conversa — minha porta está aberta.",
     "button": "Entrar em contato"
   },
   "about": {
@@ -132,7 +130,7 @@
     "portrait_alt": "Retrato do Kauã em pixel art — cabelo cacheado, capuz verde e mochila de aventureiro",
     "bio_1": "Meu nome é Kauã, tenho 18 anos e, antes de qualquer cargo ou título, eu sou uma pessoa que gosta de gente. Desde cedo entendi que vender não é empurrar produto — é escutar, entender o que a pessoa precisa e ajudar de verdade. Hoje, ser vendedor é o meu foco e é o que eu amo fazer.",
     "bio_2": "Comecei no marketing digital como gestor de tráfego: passei por agências e empresas gerenciando campanhas no Google Ads e Meta Ads, gerando leads e otimizando resultados. Numa dessas empresas, a HLTS, o time vivia travado esperando terceiros criarem landing pages — então eu mesmo resolvi: criei do zero um sistema de páginas e captação de leads que a empresa passou a usar. Ali eu aprendi minha maior lição: entender o problema vale mais do que qualquer ferramenta.",
-    "bio_3": "Hoje eu vivo três frentes: sou vendedor na Loog.ai, plataforma brasileira de logística com IA, onde faço discovery, qualificação e reuniões comerciais; sou CEO do Facility, onde entendemos a necessidade de cada cliente e entregamos o sistema que ele precisa; e crio conteúdo no YouTube sobre viagens e crescimento pessoal.",
+    "bio_3": "Hoje meu foco é vender e criar. Sou vendedor na Loog.ai, plataforma brasileira de logística com IA, onde faço discovery, qualificação e reuniões comerciais. E toco o canal no YouTube, onde eu documento a jornada e mostro na prática o caminho pra sair do país — não é só contar história, é mostrar como se faz. No meio do caminho também tive o Facility, meu projeto como empreendedor, que hoje ficou pra trás mas me ensinou muito sobre escutar cliente e entregar o que foi combinado.",
     "bio_4": "Tecnologia pra mim é ferramenta, não identidade: eu gosto de automatizar, criar sistemas e estudar IA — mas sempre a serviço de resolver problemas de negócio. Meu jogo é gente, vendas e evolução constante: crescer 1% todos os dias e levar o máximo de pessoas junto comigo.",
     "experience_title": "Por onde já passei",
     "projects_title": "Projetos que tirei do papel",
@@ -151,7 +149,7 @@
     "facility": {
       "role": "CEO & Fundador",
       "place": "Facility",
-      "desc": "Meu projeto como empreendedor: conversamos com o cliente, entendemos a operação dele e entregamos o sistema sob medida que resolve o problema de verdade."
+      "desc": "Meu projeto como empreendedor: conversávamos com o cliente, entendíamos a operação dele e entregávamos o sistema sob medida. Não é mais o meu foco, mas foi onde eu aprendi a escutar e entregar de verdade."
     },
     "diamond": {
       "role": "Gestor de Tráfego",
@@ -202,7 +200,7 @@
     "in_progress_badge": "Em andamento",
     "locked_badge": "Próxima fase",
     "youtube_title": "Canal @KauartX",
-    "youtube_desc": "Comecei a documentar a jornada em vídeo: viagens, lições e evolução.",
+    "youtube_desc": "Onde eu documento a jornada em vídeo e mostro o caminho pra sair do país — não só conto, mostro como se faz.",
     "london_title": "Viagem para Londres",
     "london_desc": "Primeiro carimbo internacional que quero no passaporte.",
     "final_title": "GO FAR · O MUNDO",
@@ -219,7 +217,7 @@
     },
     "real_delivery": {
       "title": "Entrega de verdade",
-      "description": "Prometeu, cumpriu. No Facility e na vida: escutar, resolver e entregar o que foi combinado."
+      "description": "Prometeu, cumpriu. No trabalho e na vida: escutar, resolver e entregar o que foi combinado."
     },
     "share_the_journey": {
       "title": "Compartilhar a jornada",
@@ -247,7 +245,7 @@
   },
   "contact": {
     "title": "Fale comigo",
-    "subtitle": "Negócios, parcerias, Facility, YouTube ou só uma boa conversa. Geralmente respondo em 24h.",
+    "subtitle": "Negócios, parcerias, YouTube ou só uma boa conversa. Geralmente respondo em 24h.",
     "form_name": "Nome",
     "form_email": "Email",
     "form_subject": "Assunto",
@@ -275,12 +273,12 @@
     "card_channels_cta": "Mandar email",
     "form_kicker": "Tem alguma ideia?",
     "form_title": "ENVIE SUA MENSAGEM",
-    "form_desc": "Conta o que você tem em mente: proposta de negócio, parceria de conteúdo, uma dúvida sobre o Facility ou só uma boa conversa. Quanto mais contexto, mais rápida e útil é a resposta.",
+    "form_desc": "Conta o que você tem em mente: proposta de negócio, parceria de conteúdo, uma dúvida sobre o canal ou só uma boa conversa. Quanto mais contexto, mais rápida e útil é a resposta.",
     "talk_title": "Bora conversar",
     "talk_desc": "Toda parceria começa com uma mensagem. A minha caixa de entrada está sempre aberta."
   },
   "footer": {
-    "tagline": "Vendedor, CEO do Facility e aventureiro documentando a jornada pelo mundo.",
+    "tagline": "Vendedor, criador de conteúdo e aventureiro mostrando o caminho pro mundo.",
     "built_with": "Feito com muito café e boas conversas.",
     "rights": "Todos os direitos reservados.",
     "nav_title": "Navegação",

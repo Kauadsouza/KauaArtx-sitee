@@ -21,7 +21,7 @@ const scriptFont = Dancing_Script({
 });
 
 const DESCRIPTION =
-  'Vendedor na Loog.ai, CEO do Facility e aventureiro documentando a jornada pelo mundo.';
+  'Vendedor na Loog.ai e criador no YouTube: eu mostro o caminho pra sair do país, não só conto.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   keywords: [
-    'Kauã Souza', 'Vendedor', 'Aventureiro', 'Empreendedor', 'Facility',
-    'Loog.ai', 'YouTube', 'Viagens', 'Crescimento pessoal',
+    'Kauã Souza', 'Vendedor', 'Aventureiro', 'Criador de conteúdo', 'KauartX',
+    'Loog.ai', 'YouTube', 'Viagens', 'Morar fora', 'Crescimento pessoal',
   ],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${SITE_NAME} — Vendedor & Aventureiro`,
     description:
-      'Vendedor, CEO do Facility e aventureiro documentando a jornada pelo mundo.',
+      'Vendedor, criador de conteúdo e aventureiro mostrando o caminho pro mundo.',
     creator: '@KauaArtx',
   },
   robots: { index: true, follow: true },
