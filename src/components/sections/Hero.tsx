@@ -31,13 +31,13 @@ const kenBurns = {
   transition: { duration: 24, ease: 'easeInOut' as const, repeat: Infinity, repeatType: 'reverse' as const },
 };
 
-// No celular a foto ganha um zoom ancorado na base: a crista do Fuji sobe
-// até a altura do nome e a oclusão funciona também em telas estreitas.
+// No celular a foto ganha um zoom ancorado na base: a crista sobe até a
+// altura do nome e a oclusão funciona também em telas estreitas.
 const PHOTO_WRAP = 'absolute inset-0 scale-[1.12] origin-bottom sm:scale-100';
 
-// Hero editorial: o nome monumental fica ENTRE a foto e um recorte real do
-// Fuji (fuji-cutout.webp, céu removido) — a montanha passa na frente da base
-// das letras, como um cartaz de viagem.
+// Hero editorial: o nome monumental fica ENTRE a foto e um recorte real da
+// montanha (hero-mountain-cutout.webp, céu removido) — a crista passa na
+// frente da base das letras, como um cartaz de viagem.
 export default function Hero() {
   const t = useTranslations('hero');
 
@@ -46,13 +46,13 @@ export default function Hero() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-      className="relative h-[100svh] min-h-[600px] overflow-hidden bg-[#0a1526]"
+      className="relative h-[100svh] min-h-[600px] overflow-hidden bg-[#051F20]"
     >
       {/* ── Camada 1: a foto completa ── */}
       <div aria-hidden className={PHOTO_WRAP}>
         <motion.div className="absolute inset-0" {...kenBurns}>
           <Image
-            src="/images/hero-photo.webp"
+            src="/images/hero-mountain.webp"
             alt=""
             fill
             priority
@@ -64,7 +64,7 @@ export default function Hero() {
       </div>
 
       {/* Véu no topo pro menu respirar sobre o céu */}
-      <div aria-hidden className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#0a1526]/85 via-[#0a1526]/25 to-transparent" />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#051F20]/85 via-[#051F20]/25 to-transparent" />
 
       {/* ── Camada 2: o nome monumental ── */}
       <div className="absolute inset-x-0 top-[16%] sm:top-[12%] z-[1] flex flex-col items-center px-4">
@@ -83,7 +83,7 @@ export default function Hero() {
           <span aria-hidden className="h-px w-8 sm:w-14 bg-white/45" />
         </motion.div>
 
-        {/* ARTX — gradiente frio; a base mergulha atrás do Fuji.
+        {/* ARTX — gradiente frio; a base mergulha atrás da montanha.
             Nada de text-shadow/máscara/filter aqui: o Safari do iPhone
             quebra o background-clip:text e o nome some. */}
         <motion.h1
@@ -98,11 +98,11 @@ export default function Hero() {
         </motion.h1>
       </div>
 
-      {/* ── Camada 3: o Fuji recortado, na frente do nome ── */}
+      {/* ── Camada 3: a montanha recortada, na frente do nome ── */}
       <div aria-hidden className={`${PHOTO_WRAP} z-[2] pointer-events-none`}>
         <motion.div className="absolute inset-0" {...kenBurns}>
           <Image
-            src="/images/fuji-cutout.webp"
+            src="/images/hero-mountain-cutout.webp"
             alt=""
             fill
             priority
@@ -114,8 +114,8 @@ export default function Hero() {
       </div>
 
       {/* ── Camada 4: atmosfera por cima de tudo ── */}
-      <div aria-hidden className="absolute inset-0 z-[3] pointer-events-none [background:radial-gradient(120%_90%_at_50%_36%,transparent_48%,rgba(6,14,30,0.5)_100%)]" />
-      {/* Emenda com o site: a noite do hero derrete no slate da expedição */}
+      <div aria-hidden className="absolute inset-0 z-[3] pointer-events-none [background:radial-gradient(120%_90%_at_50%_36%,transparent_48%,rgba(5,31,32,0.55)_100%)]" />
+      {/* Emenda com o site: a noite do hero derrete no verde da floresta */}
       <div aria-hidden className="absolute inset-x-0 bottom-0 z-[3] h-56 pointer-events-none bg-gradient-to-t from-[#051F20] via-[#051F20]/55 to-transparent" />
 
       {/* ── Chamada central ── */}
@@ -133,7 +133,7 @@ export default function Hero() {
           href={YOUTUBE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2.5 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-white/70 text-white text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase backdrop-blur-md bg-white/5 transition-all duration-300 hover:bg-white hover:text-[#0a1526] hover:border-white hover:shadow-[0_10px_40px_rgba(180,210,255,0.4)] hover:scale-[1.03]"
+          className="group inline-flex items-center gap-2.5 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-white/70 text-white text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase backdrop-blur-md bg-white/5 transition-all duration-300 hover:bg-white hover:text-[#051F20] hover:border-white hover:shadow-[0_10px_40px_rgba(218,241,222,0.35)] hover:scale-[1.03]"
         >
           <Youtube size={16} className="transition-transform group-hover:scale-110" />
           {t('watch_tour')}
