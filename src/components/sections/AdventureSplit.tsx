@@ -13,7 +13,8 @@ export default function AdventureSplit() {
   const t = useTranslations('home');
 
   return (
-    <section className="py-16 sm:py-24">
+    // Faixa escura: o painel de texto e a foto ganham destaque em cima dela
+    <section className="deep-band py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
           {/* ── Painel de texto ── */}

@@ -24,7 +24,7 @@ export default function Footer() {
   const nav = useTranslations('nav');
 
   return (
-    <footer className="relative z-10 border-t border-border mt-32 bg-surface/80 backdrop-blur-sm">
+    <footer className="relative z-10 border-t border-border mt-32 bg-deep">
       {/* Hairline gradiente no topo */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px hairline-gradient" />
 

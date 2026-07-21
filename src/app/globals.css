@@ -7,7 +7,9 @@
    da escala, um menta quase branco, usado no texto e nos botões.
    (O hero do Fuji e o portal de login têm cores próprias.) */
 :root {
-  --bg:              #051F20;  /* o mais escuro: fundo do site */
+  --bg:              #051F20;  /* o mais escuro da escala: fundo do site */
+  --deep:            #031514;  /* um degrau ABAIXO da escala — faixas de
+                                  destaque, onde os cards devem saltar */
   --surface:         #0B2B26;  /* cards */
   --surface-el:      #163832;  /* superfície elevada */
   --border-col:      #163832;
@@ -30,6 +32,7 @@
 /* ── Tailwind v4 theme (inline = runtime CSS vars) ──── */
 @theme inline {
   --color-background:        var(--bg);
+  --color-deep:              var(--deep);
   --color-surface:           var(--surface);
   --color-surface-elevated:  var(--surface-el);
   --color-border:            var(--border-col);
@@ -237,6 +240,38 @@
   .hairline-gradient {
     background: linear-gradient(90deg, transparent, var(--accent-bright), var(--accent2-bright), transparent);
   }
+
+  /* ── Faixa de destaque ──────────────────────────────────
+     Laje de verde bem escuro (um degrau abaixo do fundo) com
+     halo suave no topo e fios de luz nas duas bordas. Alterna
+     com as seções abertas e faz cards e fotos saltarem. */
+  .deep-band {
+    position: relative;
+    background:
+      radial-gradient(
+        72% 55% at 50% 0%,
+        color-mix(in srgb, var(--accent) 9%, transparent),
+        transparent 70%
+      ),
+      var(--deep);
+  }
+  .deep-band::before,
+  .deep-band::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--accent) 50%, transparent),
+      transparent
+    );
+  }
+  .deep-band::before { top: 0; }
+  .deep-band::after  { bottom: 0; }
 
   /* Brilho radial no topo da dobra */
   .gradient-radial-top {

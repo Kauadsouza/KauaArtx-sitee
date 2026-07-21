@@ -29,7 +29,8 @@ export default function AdventureSpotlight() {
   const t = useTranslations('home');
 
   return (
-    <section className="py-16 sm:py-24">
+    // Faixa escura fechando a home: os dois cards e o CTA saltam nela
+    <section className="deep-band py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.35fr] gap-6">
           {/* ── Dois cards pequenos ── */}
