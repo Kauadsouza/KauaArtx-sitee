@@ -4,14 +4,25 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Handshake, Rocket, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { Youtube, Instagram, ArrowRight, ArrowUpRight } from 'lucide-react';
 
 // Seção 4 da estrutura de aventura: à esquerda DOIS cards pequenos
-// (Loog.ai / Facility); à direita UM card-destaque grande com foto de
-// fundo + CTA de contato. Espelha o "2 small + 1 big" do print.
+// (canal do YouTube / Instagram — links externos, abrem em nova aba);
+// à direita UM card-destaque grande com foto de fundo + CTA de contato.
+// Espelha o "2 small + 1 big" do print.
 const SMALL = [
-  { icon: Handshake, titleKey: 'spot_loog_title', descKey: 'spot_loog_desc', href: '/about' },
-  { icon: Rocket, titleKey: 'spot_facility_title', descKey: 'spot_facility_desc', href: '/contact' },
+  {
+    icon: Youtube,
+    titleKey: 'spot_youtube_title',
+    descKey: 'spot_youtube_desc',
+    href: 'https://www.youtube.com/@KauartX',
+  },
+  {
+    icon: Instagram,
+    titleKey: 'spot_instagram_title',
+    descKey: 'spot_instagram_desc',
+    href: 'https://www.instagram.com/kauaartx/',
+  },
 ] as const;
 
 export default function AdventureSpotlight() {
@@ -31,8 +42,10 @@ export default function AdventureSpotlight() {
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <Link
+                <a
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group relative flex flex-col justify-center h-full rounded-3xl bg-surface border border-border p-7 hover:border-border-strong hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                 >
                   <div aria-hidden className="absolute -top-16 -right-12 w-44 h-44 rounded-full blur-3xl bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -49,7 +62,7 @@ export default function AdventureSpotlight() {
                   <p className="relative text-sm text-foreground-muted leading-relaxed">
                     {t(descKey)}
                   </p>
-                </Link>
+                </a>
               </motion.div>
             ))}
           </div>
