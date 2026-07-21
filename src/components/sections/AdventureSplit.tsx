@@ -58,12 +58,15 @@ export default function AdventureSplit() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="relative rounded-3xl overflow-hidden border border-border min-h-[300px] lg:min-h-0"
           >
-            {/* Foto é vertical e o painel é deitado: o object-cover corta em
-                cima/embaixo e o centro guarda justamente o sol e o mochileiro */}
+            {/* A foto já vem recortada na proporção exata do painel (1,303),
+                então nada é cortado aqui e cada pixel salvo é pixel visível —
+                é o que mantém a nitidez máxima. 95 = topo permitido pelo
+                next.config (images.qualities), igual ao hero e ao login. */}
             <Image
               src="/images/journey-sunset.webp"
               alt=""
               fill
+              quality={95}
               sizes="(min-width: 1024px) 600px, 100vw"
               className="object-cover object-center"
             />
