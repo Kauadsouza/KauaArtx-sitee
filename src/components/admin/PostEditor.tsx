@@ -22,6 +22,44 @@ function slugify(text: string): string {
     .replace(/[\s-]+/g, '-');
 }
 
+// Checa se o link parece uma IMAGEM DIRETA (o arquivo em si) ou uma página.
+// Um link de "compartilhar" do Pinterest/Instagram/Drive abre uma página, não
+// a imagem — o navegador não consegue exibir isso como <img>. Retorna o texto
+// do aviso, ou null quando o link parece ok.
+function coverUrlWarning(url: string): string | null {
+  const u = url.trim();
+  if (!u) return null;
+  if (!/^https?:\/\//i.test(u)) return 'O link precisa começar com https://';
+
+  let host = '';
+  try {
+    host = new URL(u).hostname.replace(/^www\./, '');
+  } catch {
+    return 'Link inválido.';
+  }
+
+  // Hosts que entregam PÁGINA, não o arquivo da imagem
+  const pageHosts: Record<string, string> = {
+    'pin.it': 'Pinterest',
+    'pinterest.com': 'Pinterest',
+    'br.pinterest.com': 'Pinterest',
+    'instagram.com': 'Instagram',
+    'drive.google.com': 'Google Drive',
+    'photos.app.goo.gl': 'Google Fotos',
+    'imgur.com': 'Imgur (use o link que termina em .jpg)',
+    'unsplash.com': 'Unsplash (abra a foto e use "Download")',
+  };
+  if (pageHosts[host]) {
+    return `Esse é um link de página do ${pageHosts[host]}, não da imagem em si — por isso a capa não aparece. Abra a imagem, clique com o botão direito → "Copiar endereço da imagem", e cole o link que termina em .jpg, .png ou .webp.`;
+  }
+
+  // Sem extensão de imagem: pode funcionar (Supabase, CDNs), então é só um alerta leve
+  if (!/\.(jpe?g|png|webp|gif|avif)(\?|#|$)/i.test(u)) {
+    return 'Dica: o link ideal termina em .jpg, .png ou .webp. Se a capa não aparecer, é porque esse link não é a imagem direta.';
+  }
+  return null;
+}
+
 interface PostEditorProps {
   post?: Post;
 }
@@ -234,11 +272,18 @@ export default function PostEditor({ post }: PostEditorProps) {
                   placeholder="https://..."
                   className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base outline-none focus:border-accent transition-colors"
                 />
-                <p className="mt-1.5 text-xs text-foreground-subtle">
-                  Tamanho exato: <strong className="text-foreground-muted">1600 × 900</strong> (16:9
-                  deitada). O corte é centralizado, então deixe o assunto no meio. Link quebrado vira
-                  um bloco de degradê, sem imagem quebrada no blog.
-                </p>
+                {coverUrlWarning(coverUrl) ? (
+                  <p className="mt-1.5 flex items-start gap-1.5 text-xs text-amber-300/90">
+                    <AlertCircle size={13} className="mt-0.5 shrink-0" />
+                    <span>{coverUrlWarning(coverUrl)}</span>
+                  </p>
+                ) : (
+                  <p className="mt-1.5 text-xs text-foreground-subtle">
+                    Tamanho exato: <strong className="text-foreground-muted">1600 × 900</strong> (16:9
+                    deitada). O corte é centralizado, então deixe o assunto no meio. Link quebrado
+                    vira um bloco de degradê, sem imagem quebrada no blog.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -353,6 +398,12 @@ export default function PostEditor({ post }: PostEditorProps) {
                       Inserir
                     </button>
                   </div>
+                  {coverUrlWarning(imgUrl) && (
+                    <p className="mt-2 flex items-start gap-1.5 text-xs text-amber-300/90">
+                      <AlertCircle size={13} className="mt-0.5 shrink-0" />
+                      <span>{coverUrlWarning(imgUrl)}</span>
+                    </p>
+                  )}
                   <p className="mt-2 text-xs text-foreground-subtle">
                     {contentFormat === 'html' ? (
                       <>

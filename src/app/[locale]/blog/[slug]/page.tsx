@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm';
 import { getPostBySlug } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import RawHtmlContent from '@/components/blog/RawHtmlContent';
+import PostCover from '@/components/blog/PostCover';
 
 // Revalida a cada 60s — edições aparecem sozinhas
 export const revalidate = 60;
@@ -77,13 +78,13 @@ export default async function BlogPostPage({
           <div className="mt-8 h-px w-24 hairline-gradient" />
         </header>
 
-        {/* Capa */}
+        {/* Capa — PostCover cai no degradê se o link estiver quebrado, em vez
+              de mostrar o ícone de imagem quebrada (ex.: link do Pinterest,
+              que não é imagem direta). Só aparece quando há URL. */}
         {post.cover_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <PostCover
             src={post.cover_url}
-            alt={post.title}
-            className="w-full rounded-2xl mb-10 border border-border"
+            className="w-full aspect-[16/9] rounded-2xl mb-10 border border-border"
           />
         )}
 
