@@ -3,16 +3,17 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Handshake, Rocket, Youtube, Compass } from 'lucide-react';
+import { Handshake, Youtube, Instagram, Compass } from 'lucide-react';
 
-// Seção 1 da estrutura de aventura: à ESQUERDA um bloco de 4 features com
-// ícones redondos laranja; à DIREITA duas artes verticais em destaque
+// Seção 1 da estrutura de aventura: à ESQUERDA as três frentes (casa com o
+// título "Três frentes"); à DIREITA duas artes verticais em destaque
 // (jornada + canal). Espelha o "features + 2 image cards" do print.
+// Conteúdo aponta pro canal e Aventura pro Instagram — por isso os ícones
+// são os das próprias plataformas.
 const FEATURES = [
   { icon: Handshake, k: 'sales' },
-  { icon: Rocket, k: 'startup' },
   { icon: Youtube, k: 'content' },
-  { icon: Compass, k: 'adventure' },
+  { icon: Instagram, k: 'adventure' },
 ] as const;
 
 const HIGHLIGHTS = [
@@ -50,7 +51,9 @@ export default function AdventureFeatures() {
               {t('features_sub')}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
+            {/* Empilhadas: com três frentes e descrições mais longas, uma
+                coluna só dá largura de leitura melhor que o grid 2x2 */}
+            <div className="grid grid-cols-1 gap-y-7">
               {FEATURES.map(({ icon: Icon, k }, i) => (
                 <motion.div
                   key={k}
