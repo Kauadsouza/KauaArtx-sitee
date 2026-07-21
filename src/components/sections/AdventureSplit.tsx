@@ -70,7 +70,7 @@ export default function AdventureSplit() {
               sizes="(min-width: 1024px) 600px, 100vw"
               className="object-cover object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#0a0e14]/75 via-[#0a0e14]/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#04191A]/75 via-[#04191A]/10 to-transparent" />
             <div className="absolute bottom-4 left-4 boarding-tag text-xs">
               <Mountain size={13} className="text-accent-bright" />
               BRA → MUNDO · GO FAR

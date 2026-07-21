@@ -1,29 +1,30 @@
 @import "tailwindcss";
 
-/* ── Design tokens — expedição noturna (slate + laranja) ──
-   Abaixo do hero o site virou "pegada aventura": fundo slate
-   escuro neutro e acento laranja/âmbar de fogueira/pôr do sol.
-   (O hero do Fuji e o portal de login guardam suas próprias
-   cores e não dependem destes tokens.) */
+/* ── Design tokens — floresta profunda (paleta verde do Kauã) ──
+   Escala exata que ele mandou, do mais escuro ao mais claro:
+   #051F20 · #0B2B26 · #163832 · #235347 · #8EB69B · #DAF1DE
+   O verde domina (fundos e superfícies) e o contraste vem do topo
+   da escala, um menta quase branco, usado no texto e nos botões.
+   (O hero do Fuji e o portal de login têm cores próprias.) */
 :root {
-  --bg:              #0d1117;
-  --surface:         #151b23;
-  --surface-el:      #1d2530;
-  --border-col:      #232c37;
-  --border-str:      #33414f;
-  --fg:              #eef2f6;
-  --fg-muted:        #98a4b2;
-  --fg-subtle:       #64717f;
+  --bg:              #051F20;  /* o mais escuro: fundo do site */
+  --surface:         #0B2B26;  /* cards */
+  --surface-el:      #163832;  /* superfície elevada */
+  --border-col:      #163832;
+  --border-str:      #235347;
+  --fg:              #DAF1DE;  /* menta quase branco — o contraste */
+  --fg-muted:        #8EB69B;
+  --fg-subtle:       #5C8574;  /* degrau entre #235347 e #8EB69B */
 
-  /* Dupla: laranja-brasa + âmbar-pôr-do-sol */
-  --accent:          #f2691c;
-  --accent-bright:   #ff8a3d;
-  --accent-deep:     #ffb583;  /* no tema escuro, o "deep" é a variante clara legível */
-  --accent2:         #e79433;
-  --accent2-bright:  #ffb84d;
-  --accent2-deep:    #ffd694;
+  /* Realces: sálvia + menta (o topo claro da mesma escala) */
+  --accent:          #8EB69B;
+  --accent-bright:   #DAF1DE;
+  --accent-deep:     #8EB69B;  /* no tema escuro, o "deep" é a variante clara legível */
+  --accent2:         #235347;
+  --accent2-bright:  #8EB69B;
+  --accent2-deep:    #DAF1DE;
 
-  --ink-on-accent:   #1a0d04; /* texto sobre botões laranja */
+  --ink-on-accent:   #051F20; /* verde escuro sobre botões claros */
 }
 
 /* ── Tailwind v4 theme (inline = runtime CSS vars) ──── */
@@ -260,22 +261,22 @@
   /* Flocos de neve distantes (antes eram estrelas de aurora) */
   .stars-layer {
     background-image:
-      radial-gradient(1px 1px at 12% 22%, rgba(236, 242, 248, 0.9) 50%, transparent 51%),
-      radial-gradient(1px 1px at 38% 8%,  rgba(236, 242, 248, 0.7) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 64% 30%, rgba(255, 236, 210, 0.75) 50%, transparent 51%),
-      radial-gradient(1px 1px at 82% 12%, rgba(236, 242, 248, 0.7) 50%, transparent 51%),
-      radial-gradient(1px 1px at 51% 45%, rgba(236, 242, 248, 0.5) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 91% 38%, rgba(236, 242, 248, 0.65) 50%, transparent 51%);
+      radial-gradient(1px 1px at 12% 22%, rgba(218, 241, 222, 0.9) 50%, transparent 51%),
+      radial-gradient(1px 1px at 38% 8%,  rgba(218, 241, 222, 0.7) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 64% 30%, rgba(142, 182, 155, 0.75) 50%, transparent 51%),
+      radial-gradient(1px 1px at 82% 12%, rgba(218, 241, 222, 0.7) 50%, transparent 51%),
+      radial-gradient(1px 1px at 51% 45%, rgba(218, 241, 222, 0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 91% 38%, rgba(218, 241, 222, 0.65) 50%, transparent 51%);
     background-size: 560px 560px;
     animation: snow-drift 90s linear infinite;
   }
 
   .stars-layer-2 {
     background-image:
-      radial-gradient(1px 1px at 22% 62%, rgba(236, 242, 248, 0.6) 50%, transparent 51%),
-      radial-gradient(1px 1px at 71% 71%, rgba(236, 242, 248, 0.5) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 45% 85%, rgba(255, 236, 210, 0.5) 50%, transparent 51%),
-      radial-gradient(1px 1px at 6% 90%, rgba(236, 242, 248, 0.45) 50%, transparent 51%);
+      radial-gradient(1px 1px at 22% 62%, rgba(218, 241, 222, 0.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 71% 71%, rgba(218, 241, 222, 0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 45% 85%, rgba(142, 182, 155, 0.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 6% 90%, rgba(218, 241, 222, 0.45) 50%, transparent 51%);
     background-size: 720px 720px;
     animation: snow-drift 60s linear infinite, star-twinkle 5.5s ease-in-out infinite;
   }
@@ -293,7 +294,7 @@
     background: radial-gradient(
       120% 90% at 50% 38%,
       transparent 50%,
-      rgba(3, 6, 10, 0.66) 100%
+      rgba(2, 14, 15, 0.66) 100%
     );
   }
 

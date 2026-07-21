@@ -116,7 +116,7 @@ export default function Hero() {
       {/* ── Camada 4: atmosfera por cima de tudo ── */}
       <div aria-hidden className="absolute inset-0 z-[3] pointer-events-none [background:radial-gradient(120%_90%_at_50%_36%,transparent_48%,rgba(6,14,30,0.5)_100%)]" />
       {/* Emenda com o site: a noite do hero derrete no slate da expedição */}
-      <div aria-hidden className="absolute inset-x-0 bottom-0 z-[3] h-56 pointer-events-none bg-gradient-to-t from-[#0d1117] via-[#0d1117]/55 to-transparent" />
+      <div aria-hidden className="absolute inset-x-0 bottom-0 z-[3] h-56 pointer-events-none bg-gradient-to-t from-[#051F20] via-[#051F20]/55 to-transparent" />
 
       {/* ── Chamada central ── */}
       <motion.div

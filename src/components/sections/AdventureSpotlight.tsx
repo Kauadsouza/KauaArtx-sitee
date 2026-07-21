@@ -82,7 +82,7 @@ export default function AdventureSpotlight() {
               sizes="(min-width: 1024px) 680px, 100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e14] via-[#0a0e14]/75 to-[#0a0e14]/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#04191A] via-[#04191A]/75 to-[#04191A]/20" />
             <div className="relative max-w-md">
               <span className="font-pixel text-[10px] tracking-[0.3em] uppercase text-accent-deep">
                 {t('spot_kicker')}

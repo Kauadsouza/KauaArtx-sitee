@@ -97,7 +97,7 @@ export default function AdventureFeatures() {
                   sizes="(min-width: 1024px) 280px, 45vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e14] via-[#0a0e14]/35 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#04191A] via-[#04191A]/35 to-transparent" />
                 <div aria-hidden className="absolute top-0 inset-x-0 h-px hairline-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-x-0 bottom-0 p-4">
                   <h3 className="text-sm sm:text-base font-bold text-white mb-1 [text-shadow:0_1px_6px_rgba(0,0,0,0.85)]">

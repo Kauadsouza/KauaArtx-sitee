@@ -66,7 +66,7 @@ export default function AdventureGrid({ posts }: { posts: Post[] }) {
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-surface-elevated to-[#0a0e14] flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-br from-surface-elevated to-[#04191A] flex items-center justify-center">
                         <Mountain size={30} className="text-accent/40" />
                       </div>
                     )}
@@ -91,7 +91,7 @@ export default function AdventureGrid({ posts }: { posts: Post[] }) {
                 </Link>
               ) : (
                 <div className="flex flex-col h-full rounded-2xl overflow-hidden bg-surface border border-dashed border-border-strong">
-                  <div className="relative aspect-[4/3] bg-gradient-to-br from-surface-elevated to-[#0a0e14] flex items-center justify-center">
+                  <div className="relative aspect-[4/3] bg-gradient-to-br from-surface-elevated to-[#04191A] flex items-center justify-center">
                     <PenLine size={26} className="text-accent/40" />
                   </div>
                   <div className="p-5">
