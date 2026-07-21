@@ -58,12 +58,14 @@ export default function AdventureSplit() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="relative rounded-3xl overflow-hidden border border-border min-h-[300px] lg:min-h-0"
           >
+            {/* Foto é vertical e o painel é deitado: o object-cover corta em
+                cima/embaixo e o centro guarda justamente o sol e o mochileiro */}
             <Image
-              src="/images/login-bg.webp"
+              src="/images/journey-sunset.webp"
               alt=""
               fill
               sizes="(min-width: 1024px) 600px, 100vw"
-              className="object-cover"
+              className="object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-[#0a0e14]/75 via-[#0a0e14]/10 to-transparent" />
             <div className="absolute bottom-4 left-4 boarding-tag text-xs">
