@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation';
 import { ArrowRight, PenLine, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react';
 import { getPublishedPosts } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
+import PostCover from '@/components/blog/PostCover';
 import type { Post } from '@/lib/supabase/types';
 
 // Revalida a cada 60s — posts novos aparecem sozinhos
@@ -24,27 +25,6 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'blog' });
   return { title: t('title'), description: t('subtitle') };
-}
-
-// Capa do post. Usa <img> em vez de next/image de propósito: o editor
-// aceita link de qualquer host, e o otimizador só libera **.supabase.co —
-// com next/image um link de fora derrubaria a página inteira.
-function Cover({ src, className }: { src: string | null; className?: string }) {
-  if (!src) {
-    // Sem capa: bloco de brasa em vez de buraco vazio no layout
-    return (
-      <div
-        aria-hidden
-        className={`bg-gradient-to-br from-surface-elevated via-surface to-background ${className ?? ''}`}
-      >
-        <div className="w-full h-full gradient-radial-top opacity-60" />
-      </div>
-    );
-  }
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt="" loading="lazy" className={`object-cover ${className ?? ''}`} />
-  );
 }
 
 function CategoryTag({ category }: { category: string | null }) {
@@ -145,9 +125,17 @@ export default async function BlogPage({
           </div>
         ) : (
           <>
-            {/* ══ Destaque: cartão de texto + capa grande + cartão de apoio ══ */}
+            {/* ══ Destaque: cartão de texto + capa grande + cartão de apoio ══
+                   Com um post só a terceira coluna sai de cena e o texto ganha
+                   o espaço dela — em três colunas o título ficava espremido. */}
             <section className="mb-20">
-              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)_minmax(0,0.95fr)] gap-6 items-stretch">
+              <div
+                className={`grid grid-cols-1 gap-6 items-stretch ${
+                  secondary
+                    ? 'lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)_minmax(0,0.95fr)]'
+                    : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]'
+                }`}
+              >
 
                 {/* Texto do post em destaque */}
                 <Link
@@ -175,7 +163,7 @@ export default async function BlogPage({
                   href={`/blog/${featured.slug}`}
                   className="group relative rounded-2xl overflow-hidden border border-border min-h-[280px] lg:min-h-[420px]"
                 >
-                  <Cover
+                  <PostCover
                     src={featured.cover_url}
                     className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
                   />
@@ -185,14 +173,16 @@ export default async function BlogPage({
                   />
                 </Link>
 
-                {/* Post de apoio — só aparece quando existe um segundo post */}
-                {secondary ? (
+                {/* Post de apoio — só existe quando há um segundo post. Sem
+                       ele a grade já é de duas colunas e o convite pra conversa
+                       fica só na barra lateral, sem repetir. */}
+                {secondary && (
                   <Link
                     href={`/blog/${secondary.slug}`}
                     className="group flex flex-col rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong transition-colors duration-300"
                   >
                     <div className="relative h-40 overflow-hidden">
-                      <Cover
+                      <PostCover
                         src={secondary.cover_url}
                         className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
                       />
@@ -214,21 +204,6 @@ export default async function BlogPage({
                       </span>
                     </div>
                   </Link>
-                ) : (
-                  // Sem segundo post o espaço vira convite pra conversa
-                  <div className="flex flex-col justify-center rounded-2xl bg-surface border border-dashed border-border-strong p-7 text-center">
-                    <h3 className="text-lg font-bold text-foreground mb-2">
-                      {t('sidebar_cta_title')}
-                    </h3>
-                    <p className="text-sm text-foreground-muted mb-5">{t('sidebar_cta_desc')}</p>
-                    <Link
-                      href="/contact"
-                      className="btn-pill-primary text-xs !py-2.5 !px-4 w-fit mx-auto"
-                    >
-                      {t('sidebar_cta_button')}
-                      <ArrowRight size={13} />
-                    </Link>
-                  </div>
                 )}
               </div>
             </section>
@@ -250,7 +225,7 @@ export default async function BlogPage({
                         className="group grid grid-cols-1 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)] gap-5 rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong hover:-translate-y-0.5 transition-all duration-300"
                       >
                         <div className="relative h-48 sm:h-full min-h-[180px] overflow-hidden">
-                          <Cover
+                          <PostCover
                             src={post.cover_url}
                             className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
                           />
@@ -299,7 +274,7 @@ export default async function BlogPage({
                             <span className="text-xs text-foreground-subtle">{when(post)}</span>
                           </div>
                           <div className="w-16 h-14 rounded-lg overflow-hidden border border-border shrink-0">
-                            <Cover src={post.cover_url} className="w-full h-full" />
+                            <PostCover src={post.cover_url} className="w-full h-full" />
                           </div>
                         </Link>
                       </li>

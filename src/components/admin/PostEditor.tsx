@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Eye, Pencil, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Pencil, AlertCircle, ImagePlus, Link2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
@@ -45,7 +45,59 @@ export default function PostEditor({ post }: PostEditorProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Inserção de imagem e link direto no conteúdo
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [imgUrl, setImgUrl] = useState('');
+  const [imgWidth, setImgWidth] = useState<'400' | '700' | 'full'>('full');
+  const [linkText, setLinkText] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+
   if (!supabase) return <SetupNotice />;
+
+  // Escreve no ponto onde o cursor está, em vez de jogar tudo no fim
+  const insertAtCursor = (snippet: string) => {
+    const ta = contentRef.current;
+    if (!ta) {
+      setContent((c) => `${c}\n${snippet}`);
+      return;
+    }
+    const start = ta.selectionStart ?? content.length;
+    const end = ta.selectionEnd ?? content.length;
+    setContent(content.slice(0, start) + snippet + content.slice(end));
+    requestAnimationFrame(() => {
+      ta.focus();
+      const pos = start + snippet.length;
+      ta.setSelectionRange(pos, pos);
+    });
+  };
+
+  // No modo HTML dá pra fixar a largura em pixels; no Markdown a imagem
+  // ocupa a largura da coluna de leitura (que já é um tamanho previsível).
+  const insertImage = () => {
+    const url = imgUrl.trim();
+    if (!url) return;
+    const snippet =
+      contentFormat === 'html'
+        ? imgWidth === 'full'
+          ? `\n<img src="${url}" alt="" style="width:100%;height:auto;border-radius:12px;" />\n`
+          : `\n<img src="${url}" alt="" width="${imgWidth}" style="max-width:100%;height:auto;border-radius:12px;" />\n`
+        : `\n![](${url})\n`;
+    insertAtCursor(snippet);
+    setImgUrl('');
+  };
+
+  const insertLink = () => {
+    const url = linkUrl.trim();
+    if (!url) return;
+    const text = linkText.trim() || url;
+    const snippet =
+      contentFormat === 'html'
+        ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
+        : `[${text}](${url})`;
+    insertAtCursor(snippet);
+    setLinkText('');
+    setLinkUrl('');
+  };
 
   const handleTitleChange = (value: string) => {
     setTitle(value);
@@ -182,6 +234,11 @@ export default function PostEditor({ post }: PostEditorProps) {
                   placeholder="https://..."
                   className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base outline-none focus:border-accent transition-colors"
                 />
+                <p className="mt-1.5 text-xs text-foreground-subtle">
+                  Tamanho exato: <strong className="text-foreground-muted">1600 × 900</strong> (16:9
+                  deitada). O corte é centralizado, então deixe o assunto no meio. Link quebrado vira
+                  um bloco de degradê, sem imagem quebrada no blog.
+                </p>
               </div>
             </div>
 
@@ -248,7 +305,105 @@ export default function PostEditor({ post }: PostEditorProps) {
                   de segurança do site.
                 </p>
               )}
+              {/* ── Inserir imagem e link no ponto do cursor ── */}
+              <div className="mb-3 rounded-xl border border-border bg-surface p-4 space-y-4">
+                {/* Imagem */}
+                <div>
+                  <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-foreground-muted">
+                    <ImagePlus size={14} className="text-accent-deep" />
+                    Inserir imagem no conteúdo
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      value={imgUrl}
+                      onChange={(e) => setImgUrl(e.target.value)}
+                      placeholder="Cole o link da imagem (https://...)"
+                      className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm outline-none focus:border-accent transition-colors"
+                    />
+                    {contentFormat === 'html' && (
+                      <div className="flex items-center gap-1 p-0.5 rounded-lg bg-background border border-border shrink-0">
+                        {(
+                          [
+                            ['400', 'Pequena'],
+                            ['700', 'Média'],
+                            ['full', 'Inteira'],
+                          ] as const
+                        ).map(([value, label]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setImgWidth(value)}
+                            className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                              imgWidth === value
+                                ? 'bg-accent text-[color:var(--ink-on-accent)]'
+                                : 'text-foreground-muted hover:text-foreground'
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={insertImage}
+                      disabled={!imgUrl.trim()}
+                      className="btn-pill-primary text-xs !py-2 !px-4 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Inserir
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-foreground-subtle">
+                    {contentFormat === 'html' ? (
+                      <>
+                        Pequena = 400px · Média = 700px · Inteira = toda a largura. Mande a
+                        imagem com <strong className="text-foreground-muted">1600px de largura</strong>{' '}
+                        pra ficar nítida em qualquer tela.
+                      </>
+                    ) : (
+                      <>
+                        No Markdown a imagem ocupa a largura da coluna (
+                        <strong className="text-foreground-muted">768px</strong>). Pra escolher o
+                        tamanho exato, troque pra HTML avançado. Envie com{' '}
+                        <strong className="text-foreground-muted">1600px de largura</strong>.
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                {/* Link */}
+                <div className="pt-3 border-t border-border">
+                  <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-foreground-muted">
+                    <Link2 size={14} className="text-accent-deep" />
+                    Inserir link
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      value={linkText}
+                      onChange={(e) => setLinkText(e.target.value)}
+                      placeholder="Texto que aparece"
+                      className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm outline-none focus:border-accent transition-colors"
+                    />
+                    <input
+                      value={linkUrl}
+                      onChange={(e) => setLinkUrl(e.target.value)}
+                      placeholder="https://..."
+                      className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm outline-none focus:border-accent transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={insertLink}
+                      disabled={!linkUrl.trim()}
+                      className="btn-pill-primary text-xs !py-2 !px-4 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Inserir
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <textarea
+                ref={contentRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={20}

@@ -43,9 +43,15 @@ export default async function BlogPostPage({
   const t = await getTranslations({ locale, namespace: 'blog' });
   const dateLocale = locale === 'pt' ? 'pt-BR' : 'en-US';
 
+  // Post em HTML traz layout próprio (cards, grades, seções largas), então
+  // ganha mais espaço; texto corrido continua na largura boa de leitura.
+  const isHtml = post.content_format === 'html';
+
   return (
     <div className="min-h-screen pt-24">
-      <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pb-32">
+      <article
+        className={`mx-auto px-4 sm:px-6 lg:px-8 pb-32 ${isHtml ? 'max-w-5xl' : 'max-w-3xl'}`}
+      >
         {/* Voltar */}
         <div className="py-10">
           <Link
@@ -82,7 +88,7 @@ export default async function BlogPostPage({
         )}
 
         {/* Conteúdo */}
-        {post.content_format === 'html' ? (
+        {isHtml ? (
           <RawHtmlContent html={post.content} />
         ) : (
           <div className="prose-post">
