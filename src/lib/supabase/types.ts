@@ -5,6 +5,7 @@ export interface Post {
   excerpt: string | null;
   content: string;
   cover_url: string | null;
+  cover_position: string | null;
   category: string | null;
   content_format: 'markdown' | 'html';
   published: boolean;

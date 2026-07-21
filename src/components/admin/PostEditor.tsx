@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
 import SetupNotice from '@/components/admin/SetupNotice';
 import RawHtmlContent from '@/components/blog/RawHtmlContent';
+import CoverPositionPicker from '@/components/admin/CoverPositionPicker';
 import type { Post } from '@/lib/supabase/types';
 
 // Gera slug a partir do título: "Minha Viagem à Bahia!" → "minha-viagem-a-bahia"
@@ -74,6 +75,7 @@ export default function PostEditor({ post }: PostEditorProps) {
   const [excerpt, setExcerpt] = useState(post?.excerpt ?? '');
   const [content, setContent] = useState(post?.content ?? '');
   const [coverUrl, setCoverUrl] = useState(post?.cover_url ?? '');
+  const [coverPosition, setCoverPosition] = useState(post?.cover_position ?? '50% 50%');
   const [category, setCategory] = useState(post?.category ?? '');
   const [contentFormat, setContentFormat] = useState<'markdown' | 'html'>(
     post?.content_format ?? 'markdown'
@@ -150,20 +152,36 @@ export default function PostEditor({ post }: PostEditorProps) {
     setError(null);
     setSaving(true);
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       title: title.trim(),
       slug: slugify(slug),
       excerpt: excerpt.trim() || null,
       content,
       cover_url: coverUrl.trim() || null,
+      cover_position: coverPosition,
       category: category.trim() || null,
       content_format: contentFormat,
       published,
     };
 
-    const { error: dbError } = post
-      ? await supabase.from('posts').update(payload).eq('id', post.id)
-      : await supabase.from('posts').insert(payload);
+    const save = (body: Record<string, unknown>) =>
+      post
+        ? supabase.from('posts').update(body).eq('id', post.id)
+        : supabase.from('posts').insert(body);
+
+    let { error: dbError } = await save(payload);
+
+    // Rede de segurança: se a coluna cover_position ainda não existe (SQL não
+    // rodado), salva sem ela em vez de dar erro. Postgres 42703 = coluna
+    // desconhecida. Assim o editor nunca trava por causa da migração.
+    if (
+      dbError &&
+      (dbError.code === '42703' || /cover_position/.test(dbError.message))
+    ) {
+      const { cover_position: _omit, ...rest } = payload;
+      void _omit;
+      ({ error: dbError } = await save(rest));
+    }
 
     if (dbError) {
       setError(
@@ -279,13 +297,28 @@ export default function PostEditor({ post }: PostEditorProps) {
                   </p>
                 ) : (
                   <p className="mt-1.5 text-xs text-foreground-subtle">
-                    Tamanho exato: <strong className="text-foreground-muted">1600 × 900</strong> (16:9
-                    deitada). O corte é centralizado, então deixe o assunto no meio. Link quebrado
-                    vira um bloco de degradê, sem imagem quebrada no blog.
+                    Ideal: <strong className="text-foreground-muted">1600 × 900</strong> (16:9). Se
+                    vier em outro tamanho, a capa corta pra 16:9 sozinha — e você escolhe o
+                    enquadramento abaixo. Link quebrado vira um bloco de degradê.
                   </p>
                 )}
               </div>
             </div>
+
+            {/* Enquadramento da capa: corta sempre em 16:9 e deixa escolher o
+                   foco. Só aparece quando há um link de capa que carrega. */}
+            {coverUrl.trim() && (
+              <div>
+                <label className="block text-xs font-semibold text-foreground-muted mb-1.5">
+                  Enquadramento da capa
+                </label>
+                <CoverPositionPicker
+                  src={coverUrl.trim()}
+                  value={coverPosition}
+                  onChange={setCoverPosition}
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-foreground-muted mb-1.5">

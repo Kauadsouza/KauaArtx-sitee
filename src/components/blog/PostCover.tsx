@@ -5,6 +5,9 @@ import { useState } from 'react';
 interface PostCoverProps {
   src: string | null;
   className?: string;
+  // object-position CSS (ex.: "50% 30%") — qual parte da foto fica visível
+  // depois do corte automático pra proporção do container.
+  position?: string | null;
 }
 
 // Capa do post.
@@ -15,7 +18,7 @@ interface PostCoverProps {
 //
 // Se o link estiver quebrado (ou vazio), cai no bloco de degradê em vez de
 // mostrar o ícone de imagem quebrada, que era o que estava feando o blog.
-export default function PostCover({ src, className }: PostCoverProps) {
+export default function PostCover({ src, className, position }: PostCoverProps) {
   const [failed, setFailed] = useState(false);
 
   if (!src || failed) {
@@ -36,6 +39,7 @@ export default function PostCover({ src, className }: PostCoverProps) {
       alt=""
       loading="lazy"
       onError={() => setFailed(true)}
+      style={{ objectPosition: position ?? '50% 50%' }}
       className={`object-cover ${className ?? ''}`}
     />
   );

@@ -165,6 +165,7 @@ export default async function BlogPage({
                 >
                   <PostCover
                     src={featured.cover_url}
+                    position={featured.cover_position}
                     className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
                   />
                   <span
@@ -184,6 +185,7 @@ export default async function BlogPage({
                     <div className="relative h-40 overflow-hidden">
                       <PostCover
                         src={secondary.cover_url}
+                    position={secondary.cover_position}
                         className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
                       />
                     </div>
@@ -227,6 +229,7 @@ export default async function BlogPage({
                         <div className="relative h-48 sm:h-full min-h-[180px] overflow-hidden">
                           <PostCover
                             src={post.cover_url}
+                    position={post.cover_position}
                             className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
                           />
                         </div>
@@ -274,7 +277,8 @@ export default async function BlogPage({
                             <span className="text-xs text-foreground-subtle">{when(post)}</span>
                           </div>
                           <div className="w-16 h-14 rounded-lg overflow-hidden border border-border shrink-0">
-                            <PostCover src={post.cover_url} className="w-full h-full" />
+                            <PostCover src={post.cover_url}
+                    position={post.cover_position} className="w-full h-full" />
                           </div>
                         </Link>
                       </li>

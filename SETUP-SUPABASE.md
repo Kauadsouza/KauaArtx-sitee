@@ -22,6 +22,11 @@ O site já está no ar, mas o blog e o painel admin precisam do **Supabase**
 2. Abra o arquivo `supabase/schema.sql` deste projeto, copie **tudo**
 3. Cole no SQL Editor e clique em **Run**
 4. Deve aparecer "Success. No rows returned" — perfeito ✅
+5. Rode também, do mesmo jeito, cada arquivo extra da pasta `supabase/` para
+   ligar os recursos novos (pode rodar todos, na ordem, sem problema):
+   - `add-category.sql` — categoria/tarja do post
+   - `add-content-format.sql` — modo HTML avançado
+   - `add-cover-position.sql` — enquadramento da capa (arrastar o foco)
 
 ## Passo 3 — Criar SEU usuário de admin
 

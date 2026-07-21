@@ -84,6 +84,7 @@ export default async function BlogPostPage({
         {post.cover_url && (
           <PostCover
             src={post.cover_url}
+            position={post.cover_position}
             className="w-full aspect-[16/9] rounded-2xl mb-10 border border-border"
           />
         )}

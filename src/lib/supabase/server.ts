@@ -15,9 +15,11 @@ function createPublicClient() {
 export async function getPublishedPosts(limit?: number): Promise<Post[]> {
   const supabase = createPublicClient();
   if (!supabase) return [];
+  // select('*'): resiliente a colunas novas (ex.: cover_position) — o blog
+  // não quebra se uma migração ainda não foi rodada; o campo só vem vazio.
   let query = supabase
     .from('posts')
-    .select('id, title, slug, excerpt, content, cover_url, category, content_format, published, created_at, updated_at')
+    .select('*')
     .eq('published', true)
     .order('created_at', { ascending: false });
   if (limit) query = query.limit(limit);
@@ -31,7 +33,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('posts')
-    .select('id, title, slug, excerpt, content, cover_url, category, content_format, published, created_at, updated_at')
+    .select('*')
     .eq('slug', slug)
     .eq('published', true)
     .single();
