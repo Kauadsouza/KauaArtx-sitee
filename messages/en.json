@@ -170,7 +170,7 @@
   "side_projects": {
     "kadenduo": {
       "name": "Kadenduo",
-      "tag": "Current project",
+      "tag": "Past project",
       "desc": "Sales prospecting automation: finds companies in any city in Brazil, separates those with and without a website, and organizes contacts ready for outreach."
     },
     "finance_card": {
@@ -201,8 +201,8 @@
     "locked_badge": "Next level",
     "youtube_title": "@KauartX channel",
     "youtube_desc": "I started documenting the journey on video: travels, lessons, and growth.",
-    "london_title": "Trip to London",
-    "london_desc": "The first international stamp I want in my passport.",
+    "uk_title": "Trip to the UK",
+    "uk_desc": "The first international stamp I want in my passport.",
     "final_title": "GO FAR · THE WORLD",
     "final_desc": "The trail doesn't end — there's always a next level to unlock."
   },

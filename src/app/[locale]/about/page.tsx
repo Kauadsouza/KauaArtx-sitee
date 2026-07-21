@@ -42,24 +42,29 @@ export default function AboutPage() {
   const values = useTranslations('values');
   const j = useTranslations('journey');
 
-  // Do começo (feira da escola) até onde ele quer chegar — em ordem de caminhada
+  // Ordem exata que o Kauã ditou. Kadenduo e Facility saíram de "em
+  // andamento": ele não toca mais nos dois. A Loog.ai é o projeto atual,
+  // o UK é o próximo passo e o canal vem logo depois, como frente viva.
   const trail: TrailStop[] = [
+    { key: 'diamond', icon: Building2, state: 'done', title: exp('diamond.place'), tag: exp('diamond.role'), desc: exp('diamond.desc') },
+    { key: 'hlts', icon: Wrench, state: 'done', title: exp('hlts.place'), tag: exp('hlts.role'), desc: exp('hlts.desc') },
     { key: 'finance_card', icon: School, state: 'done', title: projects('finance_card.name'), tag: projects('finance_card.tag'), desc: projects('finance_card.desc') },
     { key: 'agencies', icon: Megaphone, state: 'done', title: exp('agencies.place'), tag: exp('agencies.role'), desc: exp('agencies.desc') },
-    { key: 'hlts', icon: Wrench, state: 'done', title: exp('hlts.place'), tag: exp('hlts.role'), desc: exp('hlts.desc') },
-    { key: 'diamond', icon: Building2, state: 'done', title: exp('diamond.place'), tag: exp('diamond.role'), desc: exp('diamond.desc') },
     { key: 'null_forge', icon: Share2, state: 'done', title: projects('null_forge.name'), tag: projects('null_forge.tag'), desc: projects('null_forge.desc') },
-    { key: 'youtube_ch', icon: Youtube, state: 'done', title: j('youtube_title'), desc: j('youtube_desc') },
-    { key: 'facility', icon: Rocket, state: 'progress', title: exp('facility.place'), tag: exp('facility.role'), desc: exp('facility.desc') },
-    { key: 'kadenduo', icon: Sparkles, state: 'progress', title: projects('kadenduo.name'), tag: projects('kadenduo.tag'), desc: projects('kadenduo.desc') },
+    { key: 'kadenduo', icon: Sparkles, state: 'done', title: projects('kadenduo.name'), tag: projects('kadenduo.tag'), desc: projects('kadenduo.desc') },
+    { key: 'facility', icon: Rocket, state: 'done', title: exp('facility.place'), tag: exp('facility.role'), desc: exp('facility.desc') },
     { key: 'loog', icon: Briefcase, state: 'current', title: exp('loog.place'), tag: exp('loog.role'), desc: exp('loog.desc') },
-    { key: 'london', icon: Plane, state: 'locked', title: j('london_title'), desc: j('london_desc') },
+    { key: 'uk', icon: Plane, state: 'locked', title: j('uk_title'), desc: j('uk_desc') },
+    { key: 'youtube_ch', icon: Youtube, state: 'progress', title: j('youtube_title'), desc: j('youtube_desc') },
     { key: 'international', icon: Globe2, state: 'locked', title: goals('international') },
     { key: 'abroad', icon: Luggage, state: 'locked', title: goals('abroad') },
     { key: 'usa', icon: GraduationCap, state: 'locked', title: goals('usa') },
     { key: 'youtube_goal', icon: Youtube, state: 'locked', title: goals('youtube') },
     { key: 'final', icon: Flag, state: 'final', title: j('final_title'), desc: j('final_desc') },
   ];
+
+  // Tudo a partir de onde ele está hoje é caminho ainda não trilhado
+  const currentIdx = trail.findIndex((s) => s.state === 'current');
 
   return (
     <div className="min-h-screen pt-24 relative overflow-hidden">
@@ -148,9 +153,10 @@ export default function AboutPage() {
               const isLast = i === trail.length - 1;
               // Zigue-zague: no desktop os cards alternam o lado da linha
               const leftSide = i % 2 === 0;
-              // O trecho do caminho depois de onde ele está ainda não foi trilhado
-              const pathAhead =
-                stop.state === 'current' || stop.state === 'locked';
+              // Tudo daqui pra frente ainda não foi trilhado — agora medido
+              // pela posição, senão o canal (em andamento) reacendia o
+              // caminho no meio das fases futuras
+              const pathAhead = i >= currentIdx;
 
               const node = {
                 done: 'w-12 h-12 bg-accent/15 border-2 border-accent text-accent-deep',
