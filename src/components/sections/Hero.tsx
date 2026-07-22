@@ -60,7 +60,7 @@ export default function Hero() {
       <div aria-hidden className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#051F20]/85 via-[#051F20]/25 to-transparent" />
 
       {/* ── Camada 2: o nome monumental ── */}
-      <div className="absolute inset-x-0 top-[16%] sm:top-[12%] z-[1] flex flex-col items-center px-4">
+      <div className="absolute inset-x-0 top-[11%] sm:top-[7%] z-[1] flex flex-col items-center px-4">
         {/* Kicker editorial: hairline · KAUÃ SOUZA · hairline */}
         <motion.div
           custom={0}
@@ -109,7 +109,7 @@ export default function Hero() {
              mesma tipografia/posição do nome real, bem sutil, só pra que a
              parte das letras coberta pela crista continue LEGÍVEL em vez de
              sumir de vez. Espelha a Camada 2 (mesmas classes/posição). */}
-      <div aria-hidden className="absolute inset-x-0 top-[16%] sm:top-[12%] z-[2] flex flex-col items-center px-4 pointer-events-none">
+      <div aria-hidden className="absolute inset-x-0 top-[11%] sm:top-[7%] z-[2] flex flex-col items-center px-4 pointer-events-none">
         <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 opacity-0">
           <span className="h-px w-8 sm:w-14" />
           <span className="font-pixel text-[8px] sm:text-[10px] tracking-[0.42em] uppercase">
@@ -117,7 +117,7 @@ export default function Hero() {
           </span>
           <span className="h-px w-8 sm:w-14" />
         </div>
-        <span className="font-black leading-[0.82] tracking-[-0.03em] text-[24vw] sm:text-[21vw] lg:text-[18vw] select-none text-white/25 [text-shadow:0_0_22px_rgba(218,241,222,0.3)]">
+        <span className="font-black leading-[0.82] tracking-[-0.03em] text-[24vw] sm:text-[21vw] lg:text-[18vw] select-none text-white/15 [text-shadow:0_0_20px_rgba(218,241,222,0.22)]">
           ARTX
         </span>
       </div>
