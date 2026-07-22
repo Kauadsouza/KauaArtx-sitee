@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Eye, Pencil, AlertCircle, ImagePlus, Link2 } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Pencil, AlertCircle, ImagePlus, Link2, LogIn } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
@@ -61,6 +61,32 @@ function coverUrlWarning(url: string): string | null {
   return null;
 }
 
+// Traduz os erros mais comuns do Supabase pra uma causa clara e acionável,
+// em vez de um código críptico. É o que aparece quando o salvar falha.
+function describeSaveError(err: { code?: string; message?: string; details?: string } | null): string {
+  const code = err?.code ?? '';
+  const msg = err?.message ?? '';
+
+  if (code === '23505') {
+    return 'Já existe um post com esse slug. Troque o slug e tente de novo.';
+  }
+  if (code === '42501' || /row-level security|violates row-level/i.test(msg)) {
+    return 'Você não está logado como admin (ou a sessão expirou). Abra /admin/login, entre de novo e tente salvar.';
+  }
+  if (/jwt|token|expired|not authenticated|invalid.*(claim|signature)/i.test(msg)) {
+    return 'Sua sessão expirou. Abra /admin/login, entre de novo e tente salvar.';
+  }
+  if (
+    code === 'PGRST204' ||
+    code === '42703' ||
+    code === '42P01' ||
+    /could not find the .* column|schema cache|relation .* does not exist/i.test(msg)
+  ) {
+    return `O banco não está com a estrutura esperada: "${msg}". No Supabase, abra o SQL Editor e rode os arquivos da pasta supabase/ (schema.sql e os add-*.sql). Depois tente salvar de novo.`;
+  }
+  return `Erro ao salvar: ${msg || 'motivo desconhecido'}${code ? ` (código ${code})` : ''}`;
+}
+
 interface PostEditorProps {
   post?: Post;
 }
@@ -91,6 +117,20 @@ export default function PostEditor({ post }: PostEditorProps) {
   const [imgWidth, setImgWidth] = useState<'400' | '700' | 'full'>('full');
   const [linkText, setLinkText] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
+
+  // Sessão: sem login, o RLS do banco barra o salvar sem avisar. Verifica na
+  // hora de abrir o editor pra avisar ANTES de o Kauã escrever o post todo.
+  const [needsLogin, setNeedsLogin] = useState(false);
+  useEffect(() => {
+    if (!supabase) return;
+    let alive = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (alive) setNeedsLogin(!data.session);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [supabase]);
 
   if (!supabase) return <SetupNotice />;
 
@@ -169,32 +209,46 @@ export default function PostEditor({ post }: PostEditorProps) {
         ? supabase.from('posts').update(body).eq('id', post.id)
         : supabase.from('posts').insert(body);
 
-    let { error: dbError } = await save(payload);
+    // Uma coluna nova pode não existir ainda (SQL não rodado) OU o PostgREST
+    // pode estar com o cache do schema velho: 42703 (Postgres) / PGRST204
+    // (cache). Nesses casos tenta de novo sem os campos "novos", em vez de
+    // travar o salvamento inteiro por causa de uma migração pendente.
+    const isMissingColumn = (e: { code?: string; message?: string } | null) =>
+      !!e &&
+      (e.code === '42703' ||
+        e.code === 'PGRST204' ||
+        /cover_position|could not find the .* column|schema cache/i.test(e.message ?? ''));
 
-    // Rede de segurança: se a coluna cover_position ainda não existe (SQL não
-    // rodado), salva sem ela em vez de dar erro. Postgres 42703 = coluna
-    // desconhecida. Assim o editor nunca trava por causa da migração.
-    if (
-      dbError &&
-      (dbError.code === '42703' || /cover_position/.test(dbError.message))
-    ) {
-      const { cover_position: _omit, ...rest } = payload;
-      void _omit;
-      ({ error: dbError } = await save(rest));
-    }
+    try {
+      let { error: dbError } = await save(payload);
 
-    if (dbError) {
+      // Remove SÓ a coluna que a mensagem apontou como faltando (senão a
+      // retentativa perderia category/content_format que existem). Se não der
+      // pra identificar, assume cover_position (a mais nova).
+      if (isMissingColumn(dbError)) {
+        const named = (dbError?.message ?? '').match(/'([a-z_]+)'\s+column/i);
+        const missing = named ? named[1] : 'cover_position';
+        const retry = { ...payload };
+        delete retry[missing];
+        ({ error: dbError } = await save(retry));
+      }
+
+      if (dbError) {
+        console.error('Erro ao salvar post:', dbError);
+        setError(describeSaveError(dbError));
+        setSaving(false);
+        return;
+      }
+
+      router.push('/admin');
+      router.refresh();
+    } catch (e) {
+      console.error('Falha inesperada ao salvar:', e);
       setError(
-        dbError.code === '23505'
-          ? 'Já existe um post com esse slug. Troque o slug e tente de novo.'
-          : `Erro ao salvar: ${dbError.message}`
+        'Não consegui falar com o servidor. Verifique sua conexão e se o Supabase está no ar, e tente de novo.'
       );
       setSaving(false);
-      return;
     }
-
-    router.push('/admin');
-    router.refresh();
   };
 
   return (
@@ -230,6 +284,24 @@ export default function PostEditor({ post }: PostEditorProps) {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
+        {needsLogin && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-200">
+            <div className="flex items-start gap-2 flex-1">
+              <AlertCircle size={16} className="mt-0.5 shrink-0" />
+              <span>
+                Você não está logado como admin — sem isso o Supabase bloqueia o salvar. Faça login
+                antes de escrever, senão perde o trabalho.
+              </span>
+            </div>
+            <Link
+              href="/admin/login"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-amber-400 text-[#1a0d04] font-semibold text-xs shrink-0"
+            >
+              <LogIn size={14} />
+              Fazer login
+            </Link>
+          </div>
+        )}
         {error && (
           <div className="flex items-center gap-2 text-red-400 text-sm mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
             <AlertCircle size={15} />
