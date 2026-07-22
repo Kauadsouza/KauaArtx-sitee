@@ -290,13 +290,17 @@ export default function AboutPage() {
           transition={{ duration: 0.6 }}
           className="rounded-3xl overflow-hidden border border-border shadow-lg mb-16 sm:mb-20"
         >
+          {/* Foto do mochileiro no vale — banda a 72% da altura mantém ele
+              inteiro na trilha, com rio e árvores em volta. quality 95 =
+              teto permitido pelo next.config (mesmo nível do hero). */}
           <Image
-            src="/images/kaua-journey.png"
+            src="/images/journey-strip.webp"
             alt=""
-            width={960}
-            height={1440}
+            width={1672}
+            height={941}
+            quality={95}
             sizes="(min-width: 896px) 832px, 100vw"
-            className="w-full h-36 sm:h-52 object-cover object-[center_72%] [image-rendering:pixelated]"
+            className="w-full h-36 sm:h-52 object-cover object-[center_72%]"
           />
         </motion.div>
 
