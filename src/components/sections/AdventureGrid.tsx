@@ -2,10 +2,10 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight, Mountain, PenLine } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import PostCover from '@/components/blog/PostCover';
 import type { Post } from '@/lib/supabase/types';
 
 // Seção 3 da estrutura de aventura: grade de 4 cards (imagem + botão +
@@ -58,12 +58,14 @@ export default function AdventureGrid({ posts }: { posts: Post[] }) {
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
                     {post.cover_url ? (
-                      <Image
+                      // PostCover em vez de next/image: o otimizador do Next só
+                      // libera **.supabase.co e quebrava capas de outros hosts.
+                      // Ele também cai no degradê se o link estiver quebrado e
+                      // respeita o enquadramento escolhido no editor.
+                      <PostCover
                         src={post.cover_url}
-                        alt=""
-                        fill
-                        sizes="(min-width: 1024px) 280px, 90vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        position={post.cover_position}
+                        className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-surface-elevated to-[#04191A] flex items-center justify-center">
