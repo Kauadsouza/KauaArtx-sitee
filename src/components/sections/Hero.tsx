@@ -24,13 +24,6 @@ const reveal = {
   }),
 };
 
-// Ken-burns compartilhado pelas duas camadas de foto (base e recorte) —
-// mesmos parâmetros = movimento perfeitamente sincronizado.
-const kenBurns = {
-  animate: { scale: [1, 1.06] },
-  transition: { duration: 24, ease: 'easeInOut' as const, repeat: Infinity, repeatType: 'reverse' as const },
-};
-
 // No celular a foto ganha um zoom ancorado na base: a crista sobe até a
 // altura do nome e a oclusão funciona também em telas estreitas.
 const PHOTO_WRAP = 'absolute inset-0 scale-[1.12] origin-bottom sm:scale-100';
@@ -48,9 +41,9 @@ export default function Hero() {
       transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
       className="relative h-[100svh] min-h-[600px] overflow-hidden bg-[#051F20]"
     >
-      {/* ── Camada 1: a foto completa ── */}
+      {/* ── Camada 1: a foto completa (parada — sem zoom em loop) ── */}
       <div aria-hidden className={PHOTO_WRAP}>
-        <motion.div className="absolute inset-0" {...kenBurns}>
+        <div className="absolute inset-0">
           <Image
             src="/images/hero-mountain.webp"
             alt=""
@@ -60,7 +53,7 @@ export default function Hero() {
             sizes="100vw"
             className="object-cover select-none"
           />
-        </motion.div>
+        </div>
       </div>
 
       {/* Véu no topo pro menu respirar sobre o céu */}
@@ -84,23 +77,22 @@ export default function Hero() {
         </motion.div>
 
         {/* ARTX — gradiente frio; a base mergulha atrás da montanha.
-            Nada de text-shadow/máscara/filter aqui: o Safari do iPhone
-            quebra o background-clip:text e o nome some. */}
-        <motion.h1
-          custom={1}
-          variants={reveal}
-          initial="hidden"
-          animate="show"
+            ESTÁTICO de propósito (sem animação de entrada): o nome é essencial
+            e a reveal do framer-motion às vezes travava no estado inicial
+            (translateY + opacity 0), fazendo o ARTX "cair" e sumir. Sem
+            text-shadow/máscara/filter aqui: o Safari do iPhone quebra o
+            background-clip:text e o nome some. */}
+        <h1
           aria-label={`${t('name')} — ${t('role')}`}
           className="font-black leading-[0.82] tracking-[-0.03em] text-[24vw] sm:text-[21vw] lg:text-[18vw] select-none text-transparent bg-clip-text [-webkit-background-clip:text] [background-image:linear-gradient(178deg,#ffffff_0%,#eef4ff_46%,#cdddf5_100%)]"
         >
           ARTX
-        </motion.h1>
+        </h1>
       </div>
 
-      {/* ── Camada 3: a montanha recortada, na frente do nome ── */}
+      {/* ── Camada 3: a montanha recortada, na frente do nome (parada) ── */}
       <div aria-hidden className={`${PHOTO_WRAP} z-[2] pointer-events-none`}>
-        <motion.div className="absolute inset-0" {...kenBurns}>
+        <div className="absolute inset-0">
           <Image
             src="/images/hero-mountain-cutout.webp"
             alt=""
@@ -110,7 +102,24 @@ export default function Hero() {
             sizes="100vw"
             className="object-cover select-none"
           />
-        </motion.div>
+        </div>
+      </div>
+
+      {/* ── Camada 3b: fantasma do ARTX POR CIMA da montanha ──
+             mesma tipografia/posição do nome real, bem sutil, só pra que a
+             parte das letras coberta pela crista continue LEGÍVEL em vez de
+             sumir de vez. Espelha a Camada 2 (mesmas classes/posição). */}
+      <div aria-hidden className="absolute inset-x-0 top-[16%] sm:top-[12%] z-[2] flex flex-col items-center px-4 pointer-events-none">
+        <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 opacity-0">
+          <span className="h-px w-8 sm:w-14" />
+          <span className="font-pixel text-[8px] sm:text-[10px] tracking-[0.42em] uppercase">
+            {t('name')}
+          </span>
+          <span className="h-px w-8 sm:w-14" />
+        </div>
+        <span className="font-black leading-[0.82] tracking-[-0.03em] text-[24vw] sm:text-[21vw] lg:text-[18vw] select-none text-white/25 [text-shadow:0_0_22px_rgba(218,241,222,0.3)]">
+          ARTX
+        </span>
       </div>
 
       {/* ── Camada 4: atmosfera por cima de tudo ── */}
