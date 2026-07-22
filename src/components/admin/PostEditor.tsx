@@ -110,6 +110,8 @@ export default function PostEditor({ post }: PostEditorProps) {
   const [preview, setPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Aviso amarelo: salvou, mas alguma coluna nova ainda não existe no banco
+  const [notice, setNotice] = useState<string | null>(null);
 
   // Inserção de imagem e link direto no conteúdo
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -190,6 +192,7 @@ export default function PostEditor({ post }: PostEditorProps) {
       return;
     }
     setError(null);
+    setNotice(null);
     setSaving(true);
 
     const payload: Record<string, unknown> = {
@@ -204,39 +207,74 @@ export default function PostEditor({ post }: PostEditorProps) {
       published,
     };
 
+    // .select() é o que revela se ALGO foi realmente gravado: sob RLS, um
+    // UPDATE/INSERT sem sessão volta SEM erro, mas com 0 linhas (o "salvei mas
+    // nada mudou" que o Kauã viu). Sem o select isso passava batido.
     const save = (body: Record<string, unknown>) =>
       post
-        ? supabase.from('posts').update(body).eq('id', post.id)
-        : supabase.from('posts').insert(body);
+        ? supabase.from('posts').update(body).eq('id', post.id).select()
+        : supabase.from('posts').insert(body).select();
 
-    // Uma coluna nova pode não existir ainda (SQL não rodado) OU o PostgREST
-    // pode estar com o cache do schema velho: 42703 (Postgres) / PGRST204
-    // (cache). Nesses casos tenta de novo sem os campos "novos", em vez de
-    // travar o salvamento inteiro por causa de uma migração pendente.
+    // Coluna inexistente (SQL não rodado) ou cache do PostgREST velho:
+    // 42703 (Postgres) / PGRST204 (cache).
     const isMissingColumn = (e: { code?: string; message?: string } | null) =>
       !!e &&
       (e.code === '42703' ||
         e.code === 'PGRST204' ||
-        /cover_position|could not find the .* column|schema cache/i.test(e.message ?? ''));
+        /could not find the .* column|schema cache/i.test(e.message ?? ''));
 
     try {
-      let { error: dbError } = await save(payload);
+      const attempt: Record<string, unknown> = { ...payload };
+      const dropped: string[] = [];
+      let data: unknown[] | null = null;
+      let dbError: { code?: string; message?: string } | null = null;
 
-      // Remove SÓ a coluna que a mensagem apontou como faltando (senão a
-      // retentativa perderia category/content_format que existem). Se não der
-      // pra identificar, assume cover_position (a mais nova).
-      if (isMissingColumn(dbError)) {
-        const named = (dbError?.message ?? '').match(/'([a-z_]+)'\s+column/i);
-        const missing = named ? named[1] : 'cover_position';
-        const retry = { ...payload };
-        delete retry[missing];
-        ({ error: dbError } = await save(retry));
+      // Tenta salvar; se o banco reclamar de coluna que não existe, remove
+      // SÓ aquela coluna e tenta de novo (guardando o que caiu, pra AVISAR
+      // o Kauã em vez de sumir com o dado silenciosamente).
+      for (let i = 0; i < 5; i++) {
+        ({ data, error: dbError } = await save(attempt));
+        if (!dbError) break;
+        if (isMissingColumn(dbError)) {
+          const named = (dbError.message ?? '').match(/'([a-z_]+)'\s+column/i);
+          const missing = named ? named[1] : 'cover_position';
+          if (missing in attempt) {
+            dropped.push(missing);
+            delete attempt[missing];
+            continue;
+          }
+        }
+        break;
       }
 
       if (dbError) {
         console.error('Erro ao salvar post:', dbError);
         setError(describeSaveError(dbError));
         setSaving(false);
+        return;
+      }
+
+      // Sem erro mas 0 linhas = RLS barrou (sessão ausente/expirada). Foi o
+      // "parece que salvou mas não voltou nada".
+      if (!data || data.length === 0) {
+        setError(
+          'Nada foi salvo. Você não está logado como admin (ou a sessão expirou) — o banco aceitou o pedido mas não gravou nada. Abra /admin/login, entre de novo e salve.'
+        );
+        setSaving(false);
+        return;
+      }
+
+      // Salvou, mas alguma coluna nova não existe no banco ainda: avisa em vez
+      // de fingir que deu tudo certo (era por isso que o enquadramento sumia).
+      if (dropped.length) {
+        const arquivo = `supabase/add-${dropped[0].replace(/_/g, '-')}.sql`;
+        const campo = dropped.includes('cover_position')
+          ? 'o enquadramento da capa'
+          : `o campo "${dropped.join(', ')}"`;
+        setSaving(false);
+        setNotice(
+          `Post salvo — MAS ${campo} não foi gravado porque falta rodar o SQL no Supabase (${arquivo}). Rode esse arquivo no SQL Editor e salve de novo pra guardar isso também.`
+        );
         return;
       }
 
@@ -306,6 +344,12 @@ export default function PostEditor({ post }: PostEditorProps) {
           <div className="flex items-center gap-2 text-red-400 text-sm mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
             <AlertCircle size={15} />
             {error}
+          </div>
+        )}
+        {notice && (
+          <div className="flex items-start gap-2 text-amber-200 text-sm mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/25">
+            <AlertCircle size={16} className="mt-0.5 shrink-0" />
+            <span>{notice}</span>
           </div>
         )}
 
