@@ -99,6 +99,12 @@
   50%      { opacity: 0.7; box-shadow: 0 0 0 5px transparent; }
 }
 
+/* Rota do mapa da jornada: um sinal bem lento viajando pela linha
+   pontilhada — sugere movimento sem chamar atenção. */
+@keyframes route-flow {
+  to { stroke-dashoffset: -340; }
+}
+
 /* Cortinas de aurora dançando no céu */
 @keyframes aurora-sway {
   0%, 100% { transform: rotate(var(--tilt, -16deg)) translateX(0) scaleY(1); opacity: var(--glow, 0.32); }
@@ -217,6 +223,7 @@
   .animate-float-slower { animation: float-slower 18s ease-in-out infinite; }
 
   .animate-pulse-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
+  .animate-route-flow { animation: route-flow 20s linear infinite; }
 
   /* Hairline gradiente (topo de cards) */
   .hairline-gradient {
@@ -457,6 +464,7 @@
   .stars-layer-2,
   .animate-float-slow,
   .animate-float-slower,
+  .animate-route-flow,
   .text-gradient,
   .contour-map {
     animation: none;

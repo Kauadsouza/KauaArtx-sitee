@@ -3,6 +3,10 @@
 //
 // Pra adicionar um lugar novo é só copiar um bloco e trocar os dados:
 //
+//   name / country / note: sempre { pt: '...', en: '...' } — o site é
+//   bilíngue, então cada lugar precisa do nome nos dois idiomas (ex.:
+//   name: { pt: 'Londres', en: 'London' }).
+//
 //   coords: [longitude, latitude]
 //   → No Google Maps, clique com o botão direito no lugar e copie os
 //     números. ATENÇÃO: o Google mostra "latitude, longitude" e aqui
@@ -22,7 +26,7 @@ export type TravelStatus = 'lived' | 'visited' | 'planned';
 
 export interface TravelStop {
   id: string;
-  name: string; // cidade ou lugar
+  name: { pt: string; en: string }; // cidade ou lugar — "Londres" muda pra "London" em inglês
   country: { pt: string; en: string };
   coords: [number, number]; // [longitude, latitude]
   year?: string; // "2024" ou "2019 — hoje"
@@ -33,7 +37,7 @@ export interface TravelStop {
 export const TRAVELS: TravelStop[] = [
   {
     id: 'brasil-base',
-    name: 'Brasil',
+    name: { pt: 'Brasil', en: 'Brazil' },
     country: { pt: 'Brasil', en: 'Brazil' },
     coords: [-43.94, -19.92],
     year: 'hoje',
@@ -44,10 +48,10 @@ export const TRAVELS: TravelStop[] = [
     },
   },
   {
-    id: 'reino-unido',
-    name: 'Reino Unido',
+    id: 'londres',
+    name: { pt: 'Londres', en: 'London' },
     country: { pt: 'Reino Unido', en: 'United Kingdom' },
-    coords: [-0.13, 51.51],
+    coords: [-0.1276, 51.5072],
     status: 'planned',
     note: {
       pt: 'A próxima parada da jornada.',
@@ -55,14 +59,14 @@ export const TRAVELS: TravelStop[] = [
     },
   },
   {
-    id: 'estados-unidos',
-    name: 'Estados Unidos',
+    id: 'nova-york',
+    name: { pt: 'Nova York', en: 'New York' },
     country: { pt: 'Estados Unidos', en: 'United States' },
-    coords: [-74.01, 40.71],
+    coords: [-74.006, 40.7128],
     status: 'planned',
     note: {
-      pt: 'Meta de longo prazo: estudar por lá.',
-      en: 'Long-term goal: studying there.',
+      pt: 'De Londres pra Nova York — o passo seguinte da rota.',
+      en: 'From London to New York — the next leg of the route.',
     },
   },
 ];

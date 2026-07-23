@@ -100,7 +100,7 @@ export default async function MapPage({
                 }`}
               >
                 <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                  <h3 className="font-bold text-foreground">{stop.name}</h3>
+                  <h3 className="font-bold text-foreground">{stop.name[loc]}</h3>
                   <span
                     className={`text-[11px] px-2 py-0.5 rounded-full border font-bold ${BADGE[stop.status]}`}
                   >

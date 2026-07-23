@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { geoNaturalEarth1, geoPath } from 'd3-geo';
+import { geoNaturalEarth1, geoPath, geoGraticule10 } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import type { FeatureCollection, Geometry } from 'geojson';
@@ -14,26 +14,23 @@ import { TRAVELS, type TravelStatus } from '@/data/travels';
 const W = 980;
 const H = 520;
 
-// Cores do mapa, na paleta da floresta noturna do site
-const LAND_FILL = '#0A2622';
-const LAND_STROKE = '#16382F';
+// Verde vívido usado só pra glow de destaque (mesmo tom do "você está
+// aqui" da trilha em /about — rgba(53,224,101,…)). Fora daqui o mapa usa
+// só os tokens reais de globals.css: a marca é um verde monocromático
+// (escuro → menta), sem ciano — isso era invenção da versão anterior.
+const GLOW_GREEN = '#35E065';
 
-const STATUS_COLOR: Record<TravelStatus, string> = {
-  lived: '#35E065', // base — verde vivo (mesmo do "você está aqui" da trilha)
-  visited: '#7FD8A4', // visitado — sálvia clara
-  planned: '#5CC8DA', // planejado — ciano da segunda cor da marca
-};
-
-// Mapa-múndi da jornada: continentes em silhueta escura, pinos nos
-// lugares da lista TRAVELS e a rota tracejada ligando os pontos na ordem.
-// Passar o mouse (ou tocar) num pino abre o cartão com os detalhes.
+// Mapa-múndi da jornada, estilo "rede brilhante": contorno com glow em
+// vez de preenchimento sólido, malha de latitude/longitude por trás (a
+// textura de rede), pinos nos lugares de TRAVELS e a rota pontilhada
+// ligando-os na ordem. Passar o mouse (ou tocar) num pino abre o cartão.
 export default function WorldMap() {
   const t = useTranslations('map');
   const locale = useLocale() as 'pt' | 'en';
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // Toda a geometria é calculada UMA vez — daí em diante é só desenhar
-  const { countryPaths, stops, routeD } = useMemo(() => {
+  const { countryPaths, graticuleD, stops, routeD } = useMemo(() => {
     const topo = worldTopo as unknown as Topology<{
       countries: GeometryCollection;
     }>;
@@ -56,6 +53,10 @@ export default function WorldMap() {
       .map((f) => path(f))
       .filter(Boolean) as string[];
 
+    // Malha de 10° de latitude/longitude — é ela que dá a sensação de
+    // rede/globo conectado, sem precisar inventar pontos de dados falsos
+    const graticuleD = path(geoGraticule10());
+
     const stops = TRAVELS.map((s) => {
       const pos = projection(s.coords);
       return { ...s, x: pos?.[0] ?? 0, y: pos?.[1] ?? 0 };
@@ -71,7 +72,7 @@ export default function WorldMap() {
           })
         : null;
 
-    return { countryPaths, stops, routeD };
+    return { countryPaths, graticuleD, stops, routeD };
   }, []);
 
   const active = stops.find((s) => s.id === activeId) ?? null;
@@ -89,7 +90,8 @@ export default function WorldMap() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="relative rounded-3xl bg-surface border border-border overflow-hidden p-3 sm:p-6"
+        className="relative rounded-3xl border border-border overflow-hidden p-3 sm:p-6"
+        style={{ background: 'var(--deep)' }}
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
@@ -97,35 +99,74 @@ export default function WorldMap() {
           aria-label={t('map_alt')}
           className="w-full h-auto select-none"
         >
-          {/* Continentes */}
-          <g>
+          <defs>
+            {/* Mesma receita do fio de luz usado nos cards do site
+                (.hairline-gradient): transparente → menta → sálvia →
+                transparente. Aqui vira o contorno dos continentes e a rota. */}
+            <linearGradient id="map-line" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="var(--accent2)" stopOpacity="0.25" />
+              <stop offset="45%" stopColor="var(--accent-bright)" stopOpacity="0.95" />
+              <stop offset="100%" stopColor="var(--accent2-bright)" stopOpacity="0.35" />
+            </linearGradient>
+            {/* Glow: desenha borrado por baixo e nítido por cima — o
+                clássico contorno neon, sem precisar de sombra por elemento */}
+            <filter id="map-glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="2.2" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="pin-glow" x="-200%" y="-200%" width="500%" height="500%">
+              <feGaussianBlur stdDeviation="3" />
+            </filter>
+          </defs>
+
+          {/* Malha de latitude/longitude — a textura de rede do fundo */}
+          {graticuleD && (
+            <path
+              d={graticuleD}
+              fill="none"
+              stroke="var(--fg-subtle)"
+              strokeOpacity={0.14}
+              strokeWidth={0.5}
+            />
+          )}
+
+          {/* Continentes: contorno com glow, sem preenchimento sólido */}
+          <g filter="url(#map-glow)">
             {countryPaths.map((d, i) => (
               <path
                 key={i}
                 d={d}
-                fill={LAND_FILL}
-                stroke={LAND_STROKE}
-                strokeWidth={0.6}
+                fill="var(--accent)"
+                fillOpacity={0.05}
+                stroke="url(#map-line)"
+                strokeWidth={0.7}
               />
             ))}
           </g>
 
-          {/* Rota da jornada */}
+          {/* Rota da jornada — pulso lento de "sinal viajando" */}
           {routeD && (
             <path
               d={routeD}
               fill="none"
-              stroke="#35E065"
-              strokeOpacity={0.5}
-              strokeWidth={1.6}
-              strokeDasharray="2 6"
+              stroke="url(#map-line)"
+              strokeWidth={1.8}
+              strokeDasharray="1.5 7"
               strokeLinecap="round"
+              filter="url(#map-glow)"
+              className="animate-route-flow"
             />
           )}
 
           {/* Pinos */}
           {stops.map((s, i) => {
-            const color = STATUS_COLOR[s.status];
+            const isLived = s.status === 'lived';
+            const isPlanned = s.status === 'planned';
+            const fillColor = isLived ? GLOW_GREEN : isPlanned ? 'var(--deep)' : 'var(--accent)';
+            const ringColor = isPlanned ? 'var(--fg-subtle)' : GLOW_GREEN;
             const isActive = activeId === s.id;
             return (
               <motion.g
@@ -139,52 +180,62 @@ export default function WorldMap() {
                 onMouseLeave={() => setActiveId((cur) => (cur === s.id ? null : cur))}
                 onClick={() => setActiveId((cur) => (cur === s.id ? null : s.id))}
               >
-                {/* Pulso da base (onde ele está agora) */}
-                {s.status === 'lived' && (
-                  <circle
-                    cx={s.x}
-                    cy={s.y}
-                    r={9}
-                    fill={color}
-                    opacity={0.35}
-                    className="animate-ping [transform-box:fill-box] origin-center"
-                  />
-                )}
-                {/* Halo suave */}
-                <circle cx={s.x} cy={s.y} r={s.status === 'lived' ? 11 : 9} fill={color} opacity={0.14} />
-                {/* O pino em si */}
-                {s.status === 'planned' ? (
-                  <circle
-                    cx={s.x}
-                    cy={s.y}
-                    r={5}
-                    fill="#051F20"
-                    stroke={color}
-                    strokeWidth={1.6}
-                    strokeDasharray="2.5 2.5"
-                  />
-                ) : (
-                  <circle
-                    cx={s.x}
-                    cy={s.y}
-                    r={s.status === 'lived' ? 6 : 5}
-                    fill={color}
-                    stroke="#04100a"
-                    strokeWidth={1.4}
-                  />
-                )}
-                {/* Nome ao lado do pino */}
+                <g filter="url(#pin-glow)">
+                  {/* Pulso da base (onde ele está agora) */}
+                  {isLived && (
+                    <circle
+                      cx={s.x}
+                      cy={s.y}
+                      r={9}
+                      fill={GLOW_GREEN}
+                      opacity={0.35}
+                      className="animate-ping [transform-box:fill-box] origin-center"
+                    />
+                  )}
+                  {/* Halo suave — lugares "na mira" não brilham ainda */}
+                  {!isPlanned && (
+                    <circle
+                      cx={s.x}
+                      cy={s.y}
+                      r={isLived ? 11 : 9}
+                      fill={fillColor}
+                      opacity={0.16}
+                    />
+                  )}
+                  {/* O pino em si */}
+                  {isPlanned ? (
+                    <circle
+                      cx={s.x}
+                      cy={s.y}
+                      r={5}
+                      fill={fillColor}
+                      stroke={ringColor}
+                      strokeWidth={1.6}
+                      strokeDasharray="2.5 2.5"
+                    />
+                  ) : (
+                    <circle
+                      cx={s.x}
+                      cy={s.y}
+                      r={isLived ? 6 : 5}
+                      fill={fillColor}
+                      stroke="var(--deep)"
+                      strokeWidth={1.4}
+                    />
+                  )}
+                </g>
+                {/* Nome ao lado do pino — sem blur, sempre legível */}
                 <text
                   x={s.x + 11}
                   y={s.y + 4}
                   fontSize={12}
                   fontWeight={isActive ? 700 : 500}
-                  fill={isActive ? '#EAF7EF' : '#BFDCCB'}
-                  stroke="#04100a"
+                  fill={isActive ? 'var(--fg)' : isPlanned ? 'var(--fg-subtle)' : 'var(--fg-muted)'}
+                  stroke="var(--deep)"
                   strokeWidth={3}
                   paintOrder="stroke"
                 >
-                  {s.name}
+                  {s.name[locale]}
                 </text>
                 {/* Área de toque generosa (invisível) */}
                 <circle cx={s.x} cy={s.y} r={16} fill="transparent" />
@@ -206,7 +257,9 @@ export default function WorldMap() {
               <span
                 aria-hidden
                 className="w-2 h-2 rounded-full"
-                style={{ background: STATUS_COLOR[active.status] }}
+                style={{
+                  background: active.status === 'lived' ? GLOW_GREEN : 'var(--accent)',
+                }}
               />
               <span className="text-[10px] font-semibold uppercase tracking-widest text-foreground-subtle">
                 {statusLabel[active.status]}
@@ -214,8 +267,8 @@ export default function WorldMap() {
               </span>
             </div>
             <p className="font-bold text-foreground text-sm mb-1">
-              {active.name}
-              {active.country[locale] !== active.name ? ` — ${active.country[locale]}` : ''}
+              {active.name[locale]}
+              {active.country[locale] !== active.name[locale] ? ` — ${active.country[locale]}` : ''}
             </p>
             {active.note && (
               <p className="text-xs text-foreground-muted leading-relaxed">
@@ -234,13 +287,13 @@ export default function WorldMap() {
               <span
                 aria-hidden
                 className="w-3 h-3 rounded-full border-2 border-dashed"
-                style={{ borderColor: STATUS_COLOR[s] }}
+                style={{ borderColor: 'var(--fg-subtle)' }}
               />
             ) : (
               <span
                 aria-hidden
                 className="w-3 h-3 rounded-full"
-                style={{ background: STATUS_COLOR[s] }}
+                style={{ background: s === 'lived' ? GLOW_GREEN : 'var(--accent)' }}
               />
             )}
             {statusLabel[s]}
