@@ -27,6 +27,12 @@
   --accent2-deep:    #DAF1DE;
 
   --ink-on-accent:   #051F20; /* verde escuro sobre botões claros */
+
+  /* ── Apelidos estilo shadcn (componentes de /components/ui) ──
+     O cadastro de vidro (sign-up.tsx) usa var(--background)/var(--foreground)
+     cru dentro de oklch(from ...) — estes apelidos ligam ele à paleta. */
+  --background:      var(--bg);
+  --foreground:      var(--fg);
 }
 
 /* ── Tailwind v4 theme (inline = runtime CSS vars) ──── */
@@ -46,6 +52,21 @@
   --color-accent-2:          var(--accent2);
   --color-accent-2-bright:   var(--accent2-bright);
   --color-accent-2-deep:     var(--accent2-deep);
+
+  /* Vocabulário shadcn usado pelos componentes de /components/ui:
+     primary = sálvia, card = superfície, destructive = vermelho de erro,
+     charts = a escala verde + um toque de âmbar pro fundo ter contraste */
+  --color-card:               var(--surface);
+  --color-muted-foreground:   var(--fg-muted);
+  --color-primary:            var(--accent);
+  --color-primary-foreground: var(--ink-on-accent);
+  --color-secondary:          #235347;
+  --color-destructive:        #e24b4a;
+  --color-chart-1:            #8EB69B;
+  --color-chart-2:            #DAF1DE;
+  --color-chart-3:            #235347;
+  --color-chart-4:            #F5C97B;
+  --color-chart-5:            #163832;
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -93,40 +114,6 @@
 @keyframes snow-drift {
   0%   { background-position: 0 0; }
   100% { background-position: -140px 560px; }
-}
-
-/* ── Portal de entrada (tela de login estilo game) ───── */
-@keyframes portal-spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes firefly-drift {
-  0%, 100% { transform: translate(0, 0); opacity: 0.15; }
-  20%      { opacity: 0.9; }
-  50%      { transform: translate(18px, -26px); opacity: 0.4; }
-  80%      { opacity: 0.85; }
-}
-
-/* Cursor ▼ piscando no diálogo RPG */
-@keyframes rpg-blink {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.15; }
-}
-
-/* ── Atmosfera do cenário (vira cena viva, não foto) ── */
-@keyframes sun-breathe {
-  0%, 100% { opacity: 0.22; transform: translate(-50%, -50%) scale(1); }
-  50%      { opacity: 0.45; transform: translate(-50%, -50%) scale(1.12); }
-}
-
-@keyframes rays-sway {
-  0%, 100% { opacity: 0.1; }
-  50%      { opacity: 0.28; }
-}
-
-@keyframes fog-drift {
-  0%   { transform: translateX(-22%); }
-  100% { transform: translateX(22%); }
 }
 
 /* Curvas de nível do mapa respirando atrás do título de contato */
@@ -200,11 +187,6 @@
   .font-pixel {
     font-family: var(--font-pixel), var(--font-mono), monospace;
     letter-spacing: 0.1em;
-  }
-
-  /* Cursiva manuscrita (card de login) */
-  .font-script {
-    font-family: var(--font-script), cursive;
   }
 
   /* Texto gradiente verde → ciano (luz de aurora) */
@@ -331,74 +313,6 @@
       transparent 50%,
       rgba(2, 14, 15, 0.66) 100%
     );
-  }
-
-  /* ── Portal de entrada (login estilo game) ─────────── */
-  /* Vagalumes flutuando na floresta */
-  .gate-firefly {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    border-radius: 9999px;
-    background: #8ffcb0;
-    box-shadow: 0 0 8px 2px rgba(99, 247, 141, 0.65);
-    animation: firefly-drift var(--dur, 9s) ease-in-out infinite;
-    animation-delay: var(--delay, 0s);
-    pointer-events: none;
-  }
-
-  .rpg-blink {
-    animation: rpg-blink 1s steps(1) infinite;
-  }
-
-  /* Sol da cena respirando devagar */
-  .gate-sun-breathe {
-    background: radial-gradient(
-      circle,
-      rgba(255, 214, 120, 0.5),
-      rgba(255, 170, 60, 0.16) 45%,
-      transparent 70%
-    );
-    mix-blend-mode: screen;
-    animation: sun-breathe 7s ease-in-out infinite;
-  }
-
-  /* Raios de luz descendo por entre as árvores */
-  .gate-rays {
-    background: repeating-conic-gradient(
-      from -12deg at 50% 0%,
-      rgba(255, 230, 160, 0.14) 0deg 5deg,
-      transparent 5deg 14deg
-    );
-    -webkit-mask-image: linear-gradient(180deg, #000, transparent 75%);
-    mask-image: linear-gradient(180deg, #000, transparent 75%);
-    mix-blend-mode: screen;
-    animation: rays-sway 9s ease-in-out infinite;
-  }
-
-  /* Névoa rasteira cruzando a cena */
-  .gate-fog {
-    position: absolute;
-    left: -30%;
-    width: 160%;
-    height: 34%;
-    filter: blur(2px);
-    mix-blend-mode: screen;
-    pointer-events: none;
-  }
-  .gate-fog-a {
-    top: 46%;
-    background:
-      radial-gradient(50% 60% at 30% 50%, rgba(180, 240, 200, 0.1), transparent 70%),
-      radial-gradient(40% 55% at 70% 50%, rgba(200, 255, 220, 0.08), transparent 70%);
-    animation: fog-drift 46s ease-in-out infinite alternate;
-  }
-  .gate-fog-b {
-    top: 62%;
-    background:
-      radial-gradient(45% 60% at 60% 50%, rgba(180, 240, 200, 0.09), transparent 70%),
-      radial-gradient(35% 50% at 25% 50%, rgba(200, 255, 220, 0.07), transparent 70%);
-    animation: fog-drift 62s ease-in-out infinite alternate-reverse;
   }
 
   /* Trilha da jornada (página Sobre): pegadas em pares descendo o caminho */
@@ -544,10 +458,6 @@
   .animate-float-slow,
   .animate-float-slower,
   .text-gradient,
-  .gate-firefly,
-  .gate-sun-breathe,
-  .gate-rays,
-  .gate-fog,
   .contour-map {
     animation: none;
   }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
-import { Press_Start_2P, Dancing_Script } from 'next/font/google';
+import { Press_Start_2P } from 'next/font/google';
 import { SITE_URL, SITE_NAME, SOCIAL_PROFILES } from '@/lib/site';
 import './globals.css';
 
@@ -9,14 +9,6 @@ const pixelFont = Press_Start_2P({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-pixel',
-  display: 'swap',
-});
-
-// Cursiva do card de login (o "Sign Up" manuscrito da referência)
-const scriptFont = Dancing_Script({
-  weight: '600',
-  subsets: ['latin'],
-  variable: '--font-script',
   display: 'swap',
 });
 
@@ -71,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="pt"
-      className={`${GeistSans.variable} ${GeistMono.variable} ${pixelFont.variable} ${scriptFont.variable}`}
+      className={`${GeistSans.variable} ${GeistMono.variable} ${pixelFont.variable}`}
     >
       <body>
         {children}
