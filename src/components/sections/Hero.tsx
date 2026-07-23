@@ -122,23 +122,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── Camada 3b: fantasma do ARTX POR CIMA da montanha ──
-             mesma tipografia/posição do nome real, bem sutil, só pra que a
-             parte das letras coberta pela crista continue LEGÍVEL em vez de
-             sumir de vez. Espelha a Camada 2 (mesmas classes/posição). */}
-      <div aria-hidden className="absolute inset-x-0 top-[11%] sm:top-[7%] z-[2] flex flex-col items-center px-4 pointer-events-none">
-        <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 opacity-0">
-          <span className="h-px w-8 sm:w-14" />
-          <span className="font-pixel text-[8px] sm:text-[10px] tracking-[0.42em] uppercase">
-            {t('name')}
-          </span>
-          <span className="h-px w-8 sm:w-14" />
-        </div>
-        <span className="font-black leading-[0.82] tracking-[-0.03em] text-[24vw] sm:text-[21vw] lg:text-[18vw] select-none text-white/15 [text-shadow:0_0_20px_rgba(218,241,222,0.22)]">
-          ARTX
-        </span>
-      </div>
-
       {/* ── Camada 4: atmosfera por cima de tudo ── */}
       <div aria-hidden className="absolute inset-0 z-[3] pointer-events-none [background:radial-gradient(120%_90%_at_50%_36%,transparent_48%,rgba(5,31,32,0.55)_100%)]" />
       {/* Emenda com o site: a noite do hero derrete no verde da floresta */}
