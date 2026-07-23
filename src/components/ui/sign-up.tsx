@@ -160,7 +160,12 @@ const DefaultLogo = () => ( <div className="bg-primary text-primary-foreground r
 // --- COMPONENTE PRINCIPAL ---
 interface AuthComponentProps {
   logo?: React.ReactNode;
-  brandName?: string;
+  // Aceita JSX (não só texto) pra permitir destacar parte do nome, tipo
+  // "Kauã <span className="text-gradient">Artx</span>".
+  brandName?: React.ReactNode;
+  // Foto de fundo, desfocada atrás do cadastro. Quando presente, os fundos
+  // sólidos internos (bg-background/bg-card) somem pra ela aparecer.
+  backgroundImageUrl?: string;
   // Chamado quando a pessoa conclui o cadastro (teatral) — é aqui que o
   // portal do site persiste a entrada e revela o conteúdo.
   onComplete?: (email: string) => void;
@@ -168,7 +173,7 @@ interface AuthComponentProps {
   onGuest?: () => void;
 }
 
-export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", onComplete, onGuest }: AuthComponentProps) => {
+export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", backgroundImageUrl, onComplete, onGuest }: AuthComponentProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -351,7 +356,20 @@ useEffect(() => {
   );
 
   return (
-    <div className="bg-background min-h-screen w-full flex flex-col">
+    <div className={cn("min-h-screen w-full flex flex-col relative", !backgroundImageUrl && "bg-background")}>
+        {/* Foto de fundo desfocada — fica ATRÁS de tudo (primeiro no DOM,
+              dentro do mesmo container fixo). Sem ela, o fundo é sólido. */}
+        {backgroundImageUrl && (
+          <div aria-hidden className="fixed inset-0 z-0 overflow-hidden bg-background">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={backgroundImageUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl"
+            />
+            <div className="absolute inset-0 bg-background/70" />
+          </div>
+        )}
         <style>{`
             input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display: none !important; } input[type="password"]::-webkit-credentials-auto-fill-button, input[type="password"]::-webkit-strong-password-auto-fill-button { display: none !important; } input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active { -webkit-box-shadow: 0 0 0 30px transparent inset !important; -webkit-text-fill-color: var(--foreground) !important; background-color: transparent !important; background-clip: content-box !important; transition: background-color 5000s ease-in-out 0s !important; color: var(--foreground) !important; caret-color: var(--foreground) !important; } input:autofill { background-color: transparent !important; background-clip: content-box !important; -webkit-text-fill-color: var(--foreground) !important; color: var(--foreground) !important; } input:-internal-autofill-selected { background-color: transparent !important; background-image: none !important; color: var(--foreground) !important; -webkit-text-fill-color: var(--foreground) !important; } input:-webkit-autofill::first-line { color: var(--foreground) !important; -webkit-text-fill-color: var(--foreground) !important; }
             @property --angle-1 { syntax: "<angle>"; inherits: false; initial-value: -75deg; } @property --angle-2 { syntax: "<angle>"; inherits: false; initial-value: -45deg; }
@@ -363,13 +381,13 @@ useEffect(() => {
         <Confetti ref={confettiRef} manualstart globalOptions={{ resize: true, useWorker: false }} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[999]" />
         <Modal />
 
-        <div className={cn( "fixed top-4 left-4 z-20 flex items-center gap-2", "md:left-1/2 md:-translate-x-1/2" )}>
+        <div className={cn( "fixed top-4 left-4 z-20 flex items-center", logo ? "gap-2" : "gap-0", "md:left-1/2 md:-translate-x-1/2" )}>
             {logo}
             <h1 className="text-base font-bold text-foreground">{brandName}</h1>
         </div>
 
-        <div className={cn("flex w-full flex-1 h-full items-center justify-center bg-card", "relative overflow-hidden")}>
-            <div className="absolute inset-0 z-0"><GradientBackground /></div>
+        <div className={cn("flex w-full flex-1 h-full items-center justify-center relative overflow-hidden", !backgroundImageUrl && "bg-card")}>
+            {!backgroundImageUrl && <div className="absolute inset-0 z-0"><GradientBackground /></div>}
             <fieldset disabled={modalStatus !== 'closed'} className="relative z-10 flex flex-col items-center gap-8 w-[280px] mx-auto p-4">
                 <AnimatePresence mode="wait">
                     {authStep === "email" && <motion.div key="email-content" initial={{ y: 6, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full flex flex-col items-center gap-4">

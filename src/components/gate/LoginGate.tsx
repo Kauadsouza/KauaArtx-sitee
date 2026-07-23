@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Mountain } from 'lucide-react';
 import { AuthComponent } from '@/components/ui/sign-up';
 import { createClient } from '@/lib/supabase/client';
 
@@ -112,12 +111,9 @@ export default function LoginGate() {
             className="fixed inset-0 z-[100] overflow-y-auto bg-background"
           >
             <AuthComponent
-              brandName="Kauã Artx"
-              logo={
-                <span className="inline-flex rounded-md bg-[#DAF1DE] p-1.5 text-[#051F20]">
-                  <Mountain className="h-4 w-4" />
-                </span>
-              }
+              logo={null}
+              brandName={<>Kauã <span className="text-gradient">Artx</span></>}
+              backgroundImageUrl="/images/login-leaves-bg.webp"
               onComplete={(email) => finish(email)}
               onGuest={() => finish()}
             />
