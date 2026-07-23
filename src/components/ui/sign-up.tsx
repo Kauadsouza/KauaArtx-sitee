@@ -365,7 +365,7 @@ useEffect(() => {
             <img
               src={backgroundImageUrl}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl"
+              className="absolute inset-0 h-full w-full object-cover scale-110 blur-[20px]"
             />
             <div className="absolute inset-0 bg-background/70" />
           </div>
