@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Youtube, Instagram, Linkedin, Twitter, ArrowDown } from 'lucide-react';
+import { SITE_ENTER_EVENT } from '@/components/gate/LoginGate';
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
@@ -34,8 +36,23 @@ const PHOTO_WRAP = 'absolute inset-0 scale-[1.12] origin-bottom sm:scale-100';
 export default function Hero() {
   const t = useTranslations('hero');
 
+  // A cascata acima toca no carregamento da página — mas quem chega pelo
+  // portal passa esse momento atrás do véu e nunca vê. Quando o portal
+  // fecha (SITE_ENTER_EVENT), o `key` muda e a entrada toca de novo, na
+  // frente da pessoa. Quem pediu menos movimento no sistema não re-vê.
+  const [entrance, setEntrance] = useState(0);
+  useEffect(() => {
+    const replay = () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      setEntrance((n) => n + 1);
+    };
+    window.addEventListener(SITE_ENTER_EVENT, replay);
+    return () => window.removeEventListener(SITE_ENTER_EVENT, replay);
+  }, []);
+
   return (
     <motion.section
+      key={entrance}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}

@@ -6,7 +6,7 @@ import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Globe, Youtube, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ENTERED_KEY, NAME_KEY, AUTH_EVENT } from '@/components/gate/LoginGate';
+import { ENTERED_KEY, NAME_KEY, AUTH_EVENT, SITE_ENTER_EVENT } from '@/components/gate/LoginGate';
 import { createClient } from '@/lib/supabase/client';
 
 const LOCALES = [
@@ -29,6 +29,18 @@ export default function Header({ locale }: HeaderProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
+  // Quando o portal fecha, a barra desliza de cima junto com a cascata do
+  // Hero — em carregamento normal (entrance = 0) ela nem se mexe.
+  const [entrance, setEntrance] = useState(0);
+
+  useEffect(() => {
+    const replay = () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      setEntrance((n) => n + 1);
+    };
+    window.addEventListener(SITE_ENTER_EVENT, replay);
+    return () => window.removeEventListener(SITE_ENTER_EVENT, replay);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 20);
@@ -92,7 +104,13 @@ export default function Header({ locale }: HeaderProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 lg:px-8">
+    <motion.header
+      key={entrance}
+      initial={entrance > 0 ? { y: -18, opacity: 0 } : false}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 lg:px-8"
+    >
       {/* Barra flutuante — vira uma pill de vidro ao rolar */}
       <div
         className={cn(
@@ -273,6 +291,6 @@ export default function Header({ locale }: HeaderProps) {
           onClick={() => setIsLangOpen(false)}
         />
       )}
-    </header>
+    </motion.header>
   );
 }

@@ -17,6 +17,11 @@ import { createClient } from '@/lib/supabase/client';
 export const ENTERED_KEY = 'kaua-portal-entered';
 export const NAME_KEY = 'kaua-adventurer';
 export const AUTH_EVENT = 'kaua-auth-changed';
+// Disparado no instante em que o portal começa a se despedir. Hero e
+// Header escutam e retocam suas entradas — sem isso, as animações deles
+// tocam no carregamento da página, escondidas atrás do portal, e o site
+// aparece já parado quando o véu levanta.
+export const SITE_ENTER_EVENT = 'kaua-site-enter';
 
 function persistLocal(email?: string) {
   try {
@@ -75,6 +80,9 @@ export default function LoginGate() {
   const finish = (email?: string) => {
     persistLocal(email);
     setOpen(false);
+    // Avisa o site que a pessoa está entrando AGORA — a cascata do Hero
+    // toca junto com a despedida do portal, uma coisa emendando na outra.
+    window.dispatchEvent(new Event(SITE_ENTER_EVENT));
   };
 
   // Esc = pular o portal (acessibilidade)
@@ -106,17 +114,32 @@ export default function LoginGate() {
             aria-label="Portal de entrada do site"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 1.04 }}
+            // Despedida em duas fases: o conteúdo do cadastro se recolhe
+            // rápido (motion.div interno) e este véu escuro se dissolve
+            // devagar por cima do site, que entra em cena por baixo.
+            exit={{
+              opacity: 0,
+              scale: 1.015,
+              transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] },
+            }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-[100] overflow-y-auto bg-background"
           >
-            <AuthComponent
-              logo={null}
-              brandName={<>Kauã <span className="text-gradient">Artx</span></>}
-              backgroundImageUrl="/images/login-leaves-bg.webp"
-              onComplete={(email) => finish(email)}
-              onGuest={() => finish()}
-            />
+            <motion.div
+              exit={{
+                opacity: 0,
+                y: 14,
+                transition: { duration: 0.4, ease: 'easeOut' },
+              }}
+            >
+              <AuthComponent
+                logo={null}
+                brandName={<>Kauã <span className="text-gradient">Artx</span></>}
+                backgroundImageUrl="/images/login-leaves-bg.webp"
+                onComplete={(email) => finish(email)}
+                onGuest={() => finish()}
+              />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
