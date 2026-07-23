@@ -4,17 +4,9 @@ import { createServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { SITE_URL } from '@/lib/site';
+import { isAdminEmail } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
-
-// Quem pode disparar o aviso (e-mails de admin). Pode sobrescrever com a
-// env ADMIN_EMAILS="a@x.com,b@y.com" na Vercel sem mexer no código.
-const ADMIN_EMAILS = (
-  process.env.ADMIN_EMAILS ?? 'kauaartx@gmail.com,kauadsouza@gmail.com'
-)
-  .split(',')
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
 
 function escapeHtml(text: string): string {
   return text
@@ -34,6 +26,14 @@ function escapeHtml(text: string): string {
 // 4) dispara os emails em lotes pela Resend.
 export async function POST(req: NextRequest) {
   try {
+    // Só aceita chamadas vindas do próprio site (defesa extra anti-CSRF,
+    // além do cookie SameSite e da checagem de admin logo abaixo).
+    const origin = req.headers.get('origin');
+    const host = req.headers.get('host');
+    if (origin && host && new URL(origin).host !== host) {
+      return NextResponse.json({ error: 'Origem não permitida' }, { status: 403 });
+    }
+
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!url || !anonKey) {
@@ -51,8 +51,7 @@ export async function POST(req: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    const callerEmail = user?.email?.toLowerCase();
-    if (!callerEmail || !ADMIN_EMAILS.includes(callerEmail)) {
+    if (!isAdminEmail(user?.email)) {
       return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
     }
 

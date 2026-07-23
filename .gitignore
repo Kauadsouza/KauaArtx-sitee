@@ -23,8 +23,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
+# local env files — TODA variante, pra nenhum segredo vazar pro Git.
+# .env*.local sozinho NÃO cobria um .env puro (sem .local): se alguém
+# criasse .env com a service_role do Supabase, ele seria commitado.
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel

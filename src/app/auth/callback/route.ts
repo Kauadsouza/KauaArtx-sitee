@@ -7,13 +7,22 @@ import { createServerClient } from '@supabase/ssr';
 // idioma (ver src/middleware.ts).
 export const dynamic = 'force-dynamic';
 
+// O destino pós-login só pode ser um caminho INTERNO do site. Sem esta
+// checagem, ?next=https://evil.com (ou //evil.com) viraria um open
+// redirect: um link de phishing começando pelo nosso domínio confiável e
+// terminando num site malicioso. "Vem do nosso próprio código" não protege
+// nada — a URL é pública e qualquer um monta a query que quiser.
+function safeNext(next: string | null): string {
+  if (!next) return '/';
+  if (!next.startsWith('/')) return '/'; // absoluto (https://…) — fora
+  if (next.startsWith('//') || next.startsWith('/\\')) return '/'; // protocolo-relativo — fora
+  return next;
+}
+
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const next = url.searchParams.get('next') ?? '/';
-  // "next" vem do próprio site (window.location.pathname no momento do
-  // clique) — nunca de fora, então é seguro usar como destino do redirect.
-  const redirectUrl = new URL(next, url.origin);
+  const redirectUrl = new URL(safeNext(url.searchParams.get('next')), url.origin);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

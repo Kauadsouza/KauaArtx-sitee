@@ -2,6 +2,7 @@ import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { routing } from './i18n/routing';
+import { isAdminEmail } from './lib/admin';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -58,6 +59,18 @@ async function adminMiddleware(request: NextRequest) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/admin/login';
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Sessão válida NÃO basta: o portal da home cria conta real pra qualquer
+  // visitante (email/Google/GitHub). O painel só abre pra email de admin —
+  // sem isso, qualquer pessoa cadastrada veria o painel inteiro (o RLS
+  // barra a escrita no banco, mas a porta é a primeira camada). Não-admin
+  // logado volta pra home, inclusive na página de login (senão entraria em
+  // loop /admin/login → /admin → /admin/login).
+  if (user && !isAdminEmail(user.email)) {
+    const homeUrl = request.nextUrl.clone();
+    homeUrl.pathname = '/';
+    return NextResponse.redirect(homeUrl);
   }
 
   if (user && isLoginPage) {
