@@ -13,6 +13,13 @@ export default async function middleware(request: NextRequest) {
     return adminMiddleware(request);
   }
 
+  // Callback do login social (Google/GitHub): rota técnica, sem prefixo de
+  // idioma — se passasse pelo next-intl, seria redirecionada pra /pt/auth/...
+  // e o código de troca da sessão se perderia no meio do caminho.
+  if (pathname === '/auth/callback') {
+    return NextResponse.next();
+  }
+
   return intlMiddleware(request);
 }
 

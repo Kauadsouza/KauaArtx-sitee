@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Globe, Youtube, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTERED_KEY, NAME_KEY, AUTH_EVENT } from '@/components/gate/LoginGate';
+import { createClient } from '@/lib/supabase/client';
 
 const LOCALES = [
   { code: 'pt', label: 'PT', flag: '🇧🇷' },
@@ -57,13 +58,18 @@ export default function Header({ locale }: HeaderProps) {
     };
   }, []);
 
-  // Sai da conta e volta pra tela de login (o portal reabre na home)
-  const logout = () => {
+  // Sai da conta e volta pra tela de login (o portal reabre na home).
+  // Encerra a sessão REAL do Supabase também — só limpar o storage local
+  // não bastaria pra quem entrou com e-mail/Google/GitHub, já que o
+  // LoginGate checa a sessão do servidor antes de decidir se reabre.
+  const logout = async () => {
     try {
       localStorage.removeItem(ENTERED_KEY);
       sessionStorage.removeItem(ENTERED_KEY);
       localStorage.removeItem(NAME_KEY);
     } catch {}
+    const supabase = createClient();
+    if (supabase) await supabase.auth.signOut();
     window.location.href = locale === 'pt' ? '/' : `/${locale}`;
   };
 

@@ -5,28 +5,62 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Mountain } from 'lucide-react';
 import { AuthComponent } from '@/components/ui/sign-up';
+import { createClient } from '@/lib/supabase/client';
 
-// Portal de entrada do site — agora com o cadastro de vidro (sign-up.tsx),
-// no lugar do antigo portal-jogo do mago. Continua TEATRAL: qualquer
-// email/senha entra, nada é enviado a servidor nenhum. A mecânica é a
-// mesma de sempre: abre só na primeira visita, a escolha fica salva e o
-// Header (botão Sair) escuta as mesmas chaves.
+// Portal de entrada do site, com o cadastro de vidro (sign-up.tsx).
+// Duas formas de "estar entrado":
+// 1) Sessão REAL do Supabase (email/senha, Google ou GitHub) — manda mais
+//    que qualquer flag local; é o que faz o portal não reaparecer depois
+//    do redirect de volta do Google/GitHub, e nem numa aba nova.
+// 2) Flag local (visitante) — sem conta de verdade, só teatro, do jeito
+//    que sempre foi.
+// O Header (botão Sair) continua escutando as mesmas chaves.
 export const ENTERED_KEY = 'kaua-portal-entered';
 export const NAME_KEY = 'kaua-adventurer';
 export const AUTH_EVENT = 'kaua-auth-changed';
+
+function persistLocal(email?: string) {
+  try {
+    localStorage.setItem(ENTERED_KEY, '1');
+    if (email) localStorage.setItem(NAME_KEY, email.split('@')[0]);
+  } catch {
+    // navegação privada sem storage — segue o jogo
+  }
+  window.dispatchEvent(new Event(AUTH_EVENT));
+}
 
 export default function LoginGate() {
   const [open, setOpen] = useState(false);
 
   // Só abre pra quem ainda não entrou (e nunca no servidor → SEO intacto)
   useEffect(() => {
-    try {
-      const entered =
-        localStorage.getItem(ENTERED_KEY) ?? sessionStorage.getItem(ENTERED_KEY);
-      if (!entered) setOpen(true);
-    } catch {
-      setOpen(true);
-    }
+    let alive = true;
+    const supabase = createClient();
+
+    (async () => {
+      // Sessão real primeiro: cobre o caso de voltar do OAuth (Google/
+      // GitHub) e o de já ter conta numa visita anterior, mesmo sem a
+      // flag local (ex.: outro navegador com o mesmo login).
+      if (supabase) {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          persistLocal(data.session.user.email ?? undefined);
+          if (alive) setOpen(false);
+          return;
+        }
+      }
+      try {
+        const entered =
+          localStorage.getItem(ENTERED_KEY) ?? sessionStorage.getItem(ENTERED_KEY);
+        if (alive) setOpen(!entered);
+      } catch {
+        if (alive) setOpen(true);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
   }, []);
 
   // Trava o scroll do site enquanto o portal está aberto
@@ -40,14 +74,7 @@ export default function LoginGate() {
   }, [open]);
 
   const finish = (email?: string) => {
-    try {
-      localStorage.setItem(ENTERED_KEY, '1');
-      // Com email = "conta" (Sair aparece no Header); visitante entra sem nome
-      if (email) localStorage.setItem(NAME_KEY, email.split('@')[0]);
-    } catch {
-      // navegação privada sem storage — segue o jogo
-    }
-    window.dispatchEvent(new Event(AUTH_EVENT));
+    persistLocal(email);
     setOpen(false);
   };
 
@@ -65,32 +92,39 @@ export default function LoginGate() {
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          key="gate"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Portal de entrada do site"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.04 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] overflow-y-auto bg-background"
-        >
-          <AuthComponent
-            brandName="Kauã Artx"
-            logo={
-              <span className="inline-flex rounded-md bg-[#DAF1DE] p-1.5 text-[#051F20]">
-                <Mountain className="h-4 w-4" />
-              </span>
-            }
-            onComplete={(email) => finish(email)}
-            onGuest={() => finish()}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>,
+    // O wrapper (fora do AnimatePresence) trava o pointer-events em "auto"/
+    // "none" na hora, seguindo `open` diretamente — não espera a animação
+    // de saída terminar. Sem isso, se a animação de saída nunca completar
+    // (aba em segundo plano, navegador lento), um overlay invisível ficaria
+    // bloqueando cliques no site inteiro por trás dele.
+    <div style={{ pointerEvents: open ? 'auto' : 'none' }}>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="gate"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Portal de entrada do site"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.04 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[100] overflow-y-auto bg-background"
+          >
+            <AuthComponent
+              brandName="Kauã Artx"
+              logo={
+                <span className="inline-flex rounded-md bg-[#DAF1DE] p-1.5 text-[#051F20]">
+                  <Mountain className="h-4 w-4" />
+                </span>
+              }
+              onComplete={(email) => finish(email)}
+              onGuest={() => finish()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>,
     document.body
   );
 }

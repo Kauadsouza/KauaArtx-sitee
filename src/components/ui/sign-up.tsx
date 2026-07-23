@@ -8,6 +8,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { ArrowRight, Mail, Gem, Lock, Eye, EyeOff, ArrowLeft, X, AlertCircle, PartyPopper, Loader } from "lucide-react";
 // Animações
 import { AnimatePresence, motion, useInView, Variants, Transition } from "framer-motion";
+// Auth real — mesmo cliente que o painel /admin já usa
+import { createClient } from "@/lib/supabase/client";
 
 // --- CONFETE ---
 import type { GlobalOptions as ConfettiGlobalOptions, CreateTypes as ConfettiInstance, Options as ConfettiOptions } from "canvas-confetti";
@@ -176,6 +178,10 @@ export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", 
   const [modalStatus, setModalStatus] = useState<'closed' | 'loading' | 'error' | 'success'>('closed');
   const [modalErrorMessage, setModalErrorMessage] = useState('');
   const confettiRef = useRef<ConfettiRef>(null);
+  // Mesmo cliente do painel /admin. Fica null se as env vars do Supabase
+  // não estiverem configuradas — nesse caso o cadastro segue teatral
+  // (não trava o preview local nem quebra sem as chaves).
+  const [supabase] = useState(() => createClient());
 
   const isEmailValid = /\S+@\S+\.\S+/.test(email);
   const isPasswordValid = password.length >= 6;
@@ -183,6 +189,47 @@ export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", 
 
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
+
+  // Google/GitHub: navegação de página inteira até o provedor e volta pra
+  // /auth/callback, que troca o código pela sessão e manda pra "next".
+  const handleOAuth = async (provider: 'google' | 'github') => {
+    if (!supabase) return;
+    const next = window.location.pathname + window.location.search;
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+    });
+  };
+
+  // Email/senha reais: tenta criar a conta; se o e-mail já existir, tenta
+  // entrar com a senha digitada. "Confirm email" está desligado no projeto,
+  // então signUp já devolve sessão ativa na hora — sem espera de e-mail.
+  const realEmailAuth = async (
+    emailValue: string,
+    passwordValue: string
+  ): Promise<{ ok: true } | { ok: false; message: string }> => {
+    if (!supabase) return { ok: true }; // sem env vars: segue teatral
+
+    const { data, error } = await supabase.auth.signUp({ email: emailValue, password: passwordValue });
+
+    if (error) {
+      if (/already registered|already exists/i.test(error.message)) {
+        const signIn = await supabase.auth.signInWithPassword({ email: emailValue, password: passwordValue });
+        if (signIn.error) {
+          return { ok: false, message: "Esse e-mail já tem conta e a senha não confere. Tente de novo ou entre com Google/GitHub." };
+        }
+        return { ok: true };
+      }
+      return { ok: false, message: error.message };
+    }
+
+    // Fallback defensivo: se por algum motivo não veio sessão junto do cadastro
+    if (!data.session) {
+      const signIn = await supabase.auth.signInWithPassword({ email: emailValue, password: passwordValue });
+      if (signIn.error) return { ok: false, message: signIn.error.message };
+    }
+    return { ok: true };
+  };
 
   const fireSideCanons = () => {
     const fire = confettiRef.current?.fire;
@@ -194,7 +241,7 @@ export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", 
     }
   };
 
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (modalStatus !== 'closed' || authStep !== 'confirmPassword') return;
 
@@ -205,10 +252,20 @@ export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", 
         setModalStatus('loading');
         const loadingStepsCount = modalSteps.length - 1;
         const totalDuration = loadingStepsCount * TEXT_LOOP_INTERVAL * 1000;
-        setTimeout(() => {
-            fireSideCanons();
-            setModalStatus('success');
-        }, totalDuration);
+        // A conta é criada de verdade em paralelo com a animação teatral —
+        // as duas correm juntas, então o resultado só chega quando a
+        // encenação (mais longa) também termina.
+        const [result] = await Promise.all([
+            realEmailAuth(email, password),
+            new Promise((resolve) => setTimeout(resolve, totalDuration)),
+        ]);
+        if (!result.ok) {
+            setModalErrorMessage(result.message);
+            setModalStatus('error');
+            return;
+        }
+        fireSideCanons();
+        setModalStatus('success');
     }
   };
 
@@ -319,8 +376,8 @@ useEffect(() => {
                         <BlurFade delay={0.25 * 1} className="w-full"><div className="text-center"><p className="font-serif font-light text-4xl sm:text-5xl md:text-6xl tracking-tight text-foreground whitespace-nowrap">Comece a jornada</p></div></BlurFade>
                         <BlurFade delay={0.25 * 2}><p className="text-sm font-medium text-muted-foreground">Continue com</p></BlurFade>
                         <BlurFade delay={0.25 * 3}><div className="flex items-center justify-center gap-4 w-full">
-                            <GlassButton contentClassName="flex items-center justify-center gap-2" size="sm"><GoogleIcon /><span className="font-semibold text-foreground">Google</span></GlassButton>
-                            <GlassButton contentClassName="flex items-center justify-center gap-2" size="sm"><GitHubIcon /><span className="font-semibold text-foreground">GitHub</span></GlassButton>
+                            <GlassButton type="button" onClick={() => handleOAuth('google')} contentClassName="flex items-center justify-center gap-2" size="sm"><GoogleIcon /><span className="font-semibold text-foreground">Google</span></GlassButton>
+                            <GlassButton type="button" onClick={() => handleOAuth('github')} contentClassName="flex items-center justify-center gap-2" size="sm"><GitHubIcon /><span className="font-semibold text-foreground">GitHub</span></GlassButton>
                         </div></BlurFade>
                         <BlurFade delay={0.25 * 4} className="w-[300px]"><div className="flex items-center w-full gap-2 py-2"><hr className="w-full border-border"/><span className="text-xs font-semibold text-muted-foreground">OU</span><hr className="w-full border-border"/></div></BlurFade>
                     </motion.div>}
