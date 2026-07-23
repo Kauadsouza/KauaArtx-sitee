@@ -2,9 +2,27 @@
   "nav": {
     "about": "Sobre",
     "blog": "Blog",
+    "map": "Mapa",
     "contact": "Contato",
     "youtube": "YouTube",
-    "logout": "Sair"
+    "logout": "Sair",
+    "greeting": "Olá, {name} 👋"
+  },
+  "map": {
+    "kicker": "A jornada no mapa",
+    "title": "Mapa da jornada",
+    "subtitle": "Cada pino é um capítulo: onde eu tô, onde já pisei e onde ainda vou pisar. O mapa cresce junto com a história.",
+    "map_alt": "Mapa-múndi com os lugares da jornada do Kauã marcados",
+    "status_lived": "Base",
+    "status_visited": "Visitado",
+    "status_planned": "Na mira",
+    "stats_visited": "Lugares",
+    "stats_countries": "Países",
+    "stats_planned": "Na mira",
+    "list_title": "As paradas",
+    "soon_note": "Mais lugares chegando — a mochila tá sempre pronta.",
+    "cta_trail": "Ver a trilha completa",
+    "cta_contact": "Fale comigo"
   },
   "hero": {
     "name": "Kauã Souza",
@@ -213,7 +231,19 @@
     "sidebar_cta_title": "Quer trocar uma ideia?",
     "sidebar_cta_desc": "Proposta, parceria ou dúvida — respondo em até 24h.",
     "sidebar_cta_button": "Falar comigo",
-    "by_author": "por"
+    "by_author": "por",
+    "share_title": "Compartilhar:",
+    "share_copy": "Copiar link",
+    "share_copied": "Link copiado!",
+    "post_nav_label": "Outros posts",
+    "prev_post": "Post anterior",
+    "next_post": "Próximo post",
+    "related_title": "Continue a jornada",
+    "filter_all": "Todos",
+    "filter_label": "Filtrando por",
+    "filter_clear": "Limpar filtro",
+    "filter_empty_title": "Nada por aqui (ainda)",
+    "filter_empty_desc": "Nenhum post nessa categoria por enquanto. Dá uma olhada nas outras!"
   },
   "contact": {
     "title": "Fale comigo",

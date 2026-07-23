@@ -16,6 +16,15 @@ const LOCALES = [
 
 const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
 
+// O que fica salvo é o começo do email ("joao.silva87"). Vira um nome
+// apresentável: primeiro pedaço antes de ponto/traço, sem números soltos
+// no fim, com a primeira letra maiúscula → "Joao".
+function friendlyName(raw: string): string {
+  const first = raw.split(/[._-]/)[0].replace(/\d+$/, '') || raw;
+  const trimmed = first.slice(0, 16);
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
 interface HeaderProps {
   locale: string;
 }
@@ -29,6 +38,7 @@ export default function Header({ locale }: HeaderProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
+  const [guestName, setGuestName] = useState('');
   // Quando o portal fecha, a barra desliza de cima junto com a cascata do
   // Hero — em carregamento normal (entrance = 0) ela nem se mexe.
   const [entrance, setEntrance] = useState(0);
@@ -48,17 +58,20 @@ export default function Header({ locale }: HeaderProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // "Conta vinculada" (por enquanto): entrou pelo portal COM nome de
-  // nômade salvo. Quando a Supabase for ligada, este check vira a
-  // sessão real. O portal avisa via evento quando o login muda.
+  // Conta vinculada = entrou pelo portal com email (direto ou OAuth) e o
+  // nome de nômade ficou salvo. O portal avisa via evento quando muda.
+  // O nome vira a saudação "Olá, Fulano" — o site reconhece a pessoa.
   useEffect(() => {
     const check = () => {
       try {
         const entered =
           localStorage.getItem(ENTERED_KEY) ?? sessionStorage.getItem(ENTERED_KEY);
-        setHasAccount(!!entered && !!localStorage.getItem(NAME_KEY));
+        const saved = localStorage.getItem(NAME_KEY);
+        setHasAccount(!!entered && !!saved);
+        setGuestName(saved ? friendlyName(saved) : '');
       } catch {
         setHasAccount(false);
+        setGuestName('');
       }
     };
     check();
@@ -88,6 +101,7 @@ export default function Header({ locale }: HeaderProps) {
   const navLinks = [
     { href: '/about', label: t('about') },
     { href: '/blog', label: t('blog') },
+    { href: '/mapa', label: t('map') },
     { href: '/contact', label: t('contact') },
   ];
 
@@ -173,6 +187,12 @@ export default function Header({ locale }: HeaderProps) {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Saudação discreta pra quem tem conta — o site reconhece a pessoa */}
+            {hasAccount && guestName && (
+              <span className="hidden lg:inline-block max-w-[170px] truncate text-sm text-foreground-muted pr-1">
+                {t('greeting', { name: guestName })}
+              </span>
+            )}
             {/* Language switcher */}
             <div className="relative">
               <button
@@ -241,6 +261,11 @@ export default function Header({ locale }: HeaderProps) {
               )}
             >
               <nav className="px-2 py-4 flex flex-col gap-1">
+                {hasAccount && guestName && (
+                  <span className="px-4 pb-2 text-sm text-foreground-muted">
+                    {t('greeting', { name: guestName })}
+                  </span>
+                )}
                 {navLinks.map((link, i) => (
                   <motion.div
                     key={link.href}

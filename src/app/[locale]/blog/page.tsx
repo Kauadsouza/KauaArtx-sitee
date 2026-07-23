@@ -7,8 +7,10 @@ import { formatDate } from '@/lib/utils';
 import PostCover from '@/components/blog/PostCover';
 import type { Post } from '@/lib/supabase/types';
 
-// Revalida a cada 60s — posts novos aparecem sozinhos
-export const revalidate = 60;
+// Renderiza a cada visita: o filtro ?categoria= depende da URL da hora e
+// uma página em cache ignoraria a query (o filtro funcionaria no preview e
+// falharia no ar). Posts novos também aparecem na hora, de brinde.
+export const dynamic = 'force-dynamic';
 
 const SOCIALS = [
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram', handle: '@kauaartx' },
@@ -27,13 +29,53 @@ export async function generateMetadata({
   return { title: t('title'), description: t('subtitle') };
 }
 
-function CategoryTag({ category }: { category: string | null }) {
+// A etiqueta agora é clicável: leva pro blog filtrado pela categoria.
+// Nos cards (que são um link inteiro) ela flutua ACIMA do link do card
+// (z-[2] sobre o overlay z-[1]) — clicar nela filtra, clicar no resto abre
+// o post. Links aninhados são HTML inválido, por isso o overlay.
+function CategoryTag({ category, asLink = false }: { category: string | null; asLink?: boolean }) {
   if (!category) return null;
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-strong bg-background/60 text-[11px] font-medium text-accent-deep">
+  const base =
+    'inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-strong bg-background/60 text-[11px] font-medium text-accent-deep';
+  const inner = (
+    <>
       <span aria-hidden className="w-1 h-1 rounded-full bg-accent-bright" />
       {category}
-    </span>
+    </>
+  );
+  if (!asLink) return <span className={base}>{inner}</span>;
+  return (
+    <Link
+      href={{ pathname: '/blog', query: { categoria: category } }}
+      className={`relative z-[2] ${base} hover:border-accent hover:text-accent-bright transition-colors`}
+    >
+      {inner}
+    </Link>
+  );
+}
+
+// Pill da fileira de filtros no topo do blog
+function CategoryPill({
+  href,
+  label,
+  active,
+}: {
+  href: { pathname: '/blog'; query?: { categoria: string } };
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={`inline-flex items-center px-4 py-1.5 rounded-full border text-xs font-semibold transition-colors duration-300 ${
+        active
+          ? 'bg-accent text-[color:var(--ink-on-accent)] border-accent'
+          : 'bg-surface border-border text-foreground-muted hover:text-foreground hover:border-border-strong'
+      }`}
+    >
+      {label}
+    </Link>
   );
 }
 
@@ -66,19 +108,32 @@ function SectionRule({ label }: { label: string }) {
 
 export default async function BlogPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ categoria?: string }>;
 }) {
   const { locale } = await params;
+  const { categoria } = await searchParams;
   const t = await getTranslations({ locale, namespace: 'blog' });
-  const posts = await getPublishedPosts();
+  const allPosts = await getPublishedPosts();
   const dateLocale = locale === 'pt' ? 'pt-BR' : 'en-US';
   const when = (p: Post) => formatDate(new Date(p.created_at), dateLocale);
+
+  // Categorias reais dos posts publicados → viram a fileira de filtros.
+  // ?categoria=X só vale se existir de verdade; qualquer coisa estranha na
+  // URL cai de volta em "todos" (então a lista filtrada nunca fica vazia).
+  const categories = [
+    ...new Set(allPosts.map((p) => p.category).filter(Boolean)),
+  ] as string[];
+  const active = categoria && categories.includes(categoria) ? categoria : null;
+  const posts = active ? allPosts.filter((p) => p.category === active) : allPosts;
 
   // O layout de revista se adapta à quantidade de posts: destaque, apoio
   // e o resto vira feed. Com poucos posts as seções somem sozinhas.
   const [featured, secondary, ...rest] = posts;
-  const recent = posts.slice(0, 5);
+  // A barra lateral segue mostrando o site inteiro, mesmo com filtro ativo
+  const recent = allPosts.slice(0, 5);
 
   return (
     <div className="min-h-screen pt-24 relative overflow-hidden">
@@ -113,6 +168,25 @@ export default async function BlogPage({
           </div>
           {/* Filete grosso sob o título, como o do layout de revista */}
           <div aria-hidden className="mt-10 h-0.5 w-full hairline-gradient opacity-60" />
+
+          {/* Fileira de categorias — clicou, filtrou */}
+          {categories.length > 0 && (
+            <nav aria-label={t('filter_label')} className="mt-6 flex flex-wrap items-center gap-2">
+              <CategoryPill
+                href={{ pathname: '/blog' }}
+                label={t('filter_all')}
+                active={!active}
+              />
+              {categories.map((c) => (
+                <CategoryPill
+                  key={c}
+                  href={{ pathname: '/blog', query: { categoria: c } }}
+                  label={c}
+                  active={active === c}
+                />
+              ))}
+            </nav>
+          )}
         </header>
 
         {posts.length === 0 ? (
@@ -137,13 +211,17 @@ export default async function BlogPage({
                 }`}
               >
 
-                {/* Texto do post em destaque */}
-                <Link
-                  href={`/blog/${featured.slug}`}
-                  className="group flex flex-col justify-center rounded-2xl bg-surface border border-border p-7 hover:border-border-strong transition-colors duration-300"
-                >
+                {/* Texto do post em destaque — o card inteiro é um link
+                       (overlay) e a etiqueta de categoria flutua por cima
+                       com o link de filtro dela */}
+                <div className="group relative flex flex-col justify-center rounded-2xl bg-surface border border-border p-7 hover:border-border-strong transition-colors duration-300">
+                  <Link
+                    href={`/blog/${featured.slug}`}
+                    aria-label={featured.title}
+                    className="absolute inset-0 z-[1] rounded-2xl"
+                  />
                   <div className="mb-4">
-                    <CategoryTag category={featured.category} />
+                    <CategoryTag category={featured.category} asLink />
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight mb-4 group-hover:text-accent-deep transition-colors">
                     {featured.title}
@@ -156,7 +234,7 @@ export default async function BlogPage({
                   <div className="mt-auto pt-5 border-t border-border">
                     <Byline date={when(featured)} />
                   </div>
-                </Link>
+                </div>
 
                 {/* Capa grande do destaque */}
                 <Link
@@ -178,10 +256,12 @@ export default async function BlogPage({
                        ele a grade já é de duas colunas e o convite pra conversa
                        fica só na barra lateral, sem repetir. */}
                 {secondary && (
-                  <Link
-                    href={`/blog/${secondary.slug}`}
-                    className="group flex flex-col rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong transition-colors duration-300"
-                  >
+                  <div className="group relative flex flex-col rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong transition-colors duration-300">
+                    <Link
+                      href={`/blog/${secondary.slug}`}
+                      aria-label={secondary.title}
+                      className="absolute inset-0 z-[1]"
+                    />
                     <div className="relative h-40 overflow-hidden">
                       <PostCover
                         src={secondary.cover_url}
@@ -191,7 +271,7 @@ export default async function BlogPage({
                     </div>
                     <div className="flex flex-col flex-1 p-6">
                       <div className="mb-3">
-                        <CategoryTag category={secondary.category} />
+                        <CategoryTag category={secondary.category} asLink />
                       </div>
                       <h3 className="text-lg font-bold tracking-tight text-foreground leading-snug mb-3 group-hover:text-accent-deep transition-colors">
                         {secondary.title}
@@ -205,7 +285,7 @@ export default async function BlogPage({
                         {when(secondary)}
                       </span>
                     </div>
-                  </Link>
+                  </div>
                 )}
               </div>
             </section>
@@ -221,11 +301,15 @@ export default async function BlogPage({
                 ) : (
                   <div className="space-y-5">
                     {rest.map((post) => (
-                      <Link
+                      <div
                         key={post.id}
-                        href={`/blog/${post.slug}`}
-                        className="group grid grid-cols-1 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)] gap-5 rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong hover:-translate-y-0.5 transition-all duration-300"
+                        className="group relative grid grid-cols-1 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)] gap-5 rounded-2xl bg-surface border border-border overflow-hidden hover:border-border-strong hover:-translate-y-0.5 transition-all duration-300"
                       >
+                        <Link
+                          href={`/blog/${post.slug}`}
+                          aria-label={post.title}
+                          className="absolute inset-0 z-[1]"
+                        />
                         <div className="relative h-48 sm:h-full min-h-[180px] overflow-hidden">
                           <PostCover
                             src={post.cover_url}
@@ -235,7 +319,7 @@ export default async function BlogPage({
                         </div>
                         <div className="flex flex-col p-6 sm:pl-0 sm:py-7 sm:pr-7">
                           <div className="mb-3">
-                            <CategoryTag category={post.category} />
+                            <CategoryTag category={post.category} asLink />
                           </div>
                           <h3 className="text-xl font-bold tracking-tight text-foreground leading-snug mb-2.5 group-hover:text-accent-deep transition-colors">
                             {post.title}
@@ -249,7 +333,7 @@ export default async function BlogPage({
                             <Byline date={when(post)} />
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}

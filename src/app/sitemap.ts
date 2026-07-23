@@ -3,7 +3,7 @@ import { getPublishedPosts } from '@/lib/supabase/server';
 import { SITE_URL } from '@/lib/site';
 
 // PT é o idioma padrão (sem prefixo); EN vive em /en
-const STATIC_PATHS = ['', '/about', '/blog', '/contact'];
+const STATIC_PATHS = ['', '/about', '/blog', '/mapa', '/contact'];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

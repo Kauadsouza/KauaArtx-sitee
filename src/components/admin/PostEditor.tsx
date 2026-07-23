@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Eye, Pencil, AlertCircle, ImagePlus, Link2, LogIn } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Pencil, AlertCircle, ImagePlus, Link2, LogIn, Send, CheckCircle2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
@@ -112,6 +112,9 @@ export default function PostEditor({ post }: PostEditorProps) {
   const [error, setError] = useState<string | null>(null);
   // Aviso amarelo: salvou, mas alguma coluna nova ainda não existe no banco
   const [notice, setNotice] = useState<string | null>(null);
+  // Aviso por email pros inscritos do portal (rota /api/notify-post)
+  const [notifying, setNotifying] = useState(false);
+  const [notifyResult, setNotifyResult] = useState<string | null>(null);
 
   // Inserção de imagem e link direto no conteúdo
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -289,6 +292,40 @@ export default function PostEditor({ post }: PostEditorProps) {
     }
   };
 
+  // Dispara o email de "post novo" pra todo mundo cadastrado no portal.
+  // Cada clique é um envio de verdade — por isso a confirmação na frente.
+  const handleNotify = async () => {
+    if (!post) return;
+    const ok = confirm(
+      'Avisar por email todo mundo que criou conta no site sobre este post?\n\nCada clique dispara um envio novo — use uma vez só por post.'
+    );
+    if (!ok) return;
+    setNotifying(true);
+    setNotifyResult(null);
+    setError(null);
+    try {
+      const res = await fetch('/api/notify-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId: post.id }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setError(body.error ?? 'Falha ao enviar os avisos.');
+      } else if (body.total === 0) {
+        setNotifyResult('Ninguém cadastrado ainda — nenhum email pra enviar.');
+      } else {
+        setNotifyResult(
+          `Aviso enviado: ${body.sent} de ${body.total} emails saíram` +
+            (body.failed ? ` (${body.failed} falharam — veja o log da Vercel).` : '.')
+        );
+      }
+    } catch {
+      setError('Não consegui falar com o servidor pra enviar os avisos.');
+    }
+    setNotifying(false);
+  };
+
   return (
     <div className="min-h-screen">
       {/* Top bar */}
@@ -302,6 +339,18 @@ export default function PostEditor({ post }: PostEditorProps) {
             Voltar
           </Link>
           <div className="flex items-center gap-3">
+            {/* Só em post existente e publicado — rascunho não tem o que avisar */}
+            {post && published && (
+              <button
+                onClick={handleNotify}
+                disabled={notifying}
+                title="Manda um email de aviso pra todo mundo que criou conta no site"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm text-foreground-muted hover:text-accent-bright hover:bg-surface-elevated transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <Send size={14} />
+                <span className="hidden sm:inline">{notifying ? 'Enviando...' : 'Avisar inscritos'}</span>
+              </button>
+            )}
             <button
               onClick={() => setPreview(!preview)}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-all"
@@ -350,6 +399,12 @@ export default function PostEditor({ post }: PostEditorProps) {
           <div className="flex items-start gap-2 text-amber-200 text-sm mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/25">
             <AlertCircle size={16} className="mt-0.5 shrink-0" />
             <span>{notice}</span>
+          </div>
+        )}
+        {notifyResult && (
+          <div className="flex items-center gap-2 text-accent-bright text-sm mb-6 p-4 rounded-xl bg-accent/10 border border-accent/25">
+            <CheckCircle2 size={15} className="shrink-0" />
+            {notifyResult}
           </div>
         )}
 

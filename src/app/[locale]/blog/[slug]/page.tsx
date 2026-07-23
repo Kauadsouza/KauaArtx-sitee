@@ -2,13 +2,16 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { getPostBySlug } from '@/lib/supabase/server';
+import { getPostBySlug, getPublishedPosts } from '@/lib/supabase/server';
+import { SITE_URL } from '@/lib/site';
 import { formatDate } from '@/lib/utils';
 import RawHtmlContent from '@/components/blog/RawHtmlContent';
 import PostCover from '@/components/blog/PostCover';
+import SharePost from '@/components/blog/SharePost';
+import type { Post } from '@/lib/supabase/types';
 
 // Revalida a cada 60s — edições aparecem sozinhas
 export const revalidate = 60;
@@ -21,6 +24,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return {};
+  // A capa entra no metadata — é ela que aparece quando o link do post é
+  // colado no WhatsApp, X, LinkedIn etc. Sem isso o compartilhamento sai
+  // "pelado", só texto.
+  const cover = post.cover_url ?? undefined;
   return {
     title: post.title,
     description: post.excerpt ?? undefined,
@@ -28,8 +35,43 @@ export async function generateMetadata({
       title: post.title,
       description: post.excerpt ?? undefined,
       type: 'article',
+      publishedTime: post.created_at,
+      ...(cover ? { images: [{ url: cover, alt: post.title }] } : {}),
+    },
+    twitter: {
+      card: cover ? 'summary_large_image' : 'summary',
+      title: post.title,
+      description: post.excerpt ?? undefined,
+      ...(cover ? { images: [cover] } : {}),
     },
   };
+}
+
+// Vizinhos e relacionados: se o post tem categoria com mais posts, a
+// navegação anda DENTRO da série (é o caso dos Nômades Digitais); senão,
+// anda na linha do tempo geral. Relacionados completam com o resto.
+function buildTrail(post: Post, all: Post[]) {
+  const sameCat = post.category
+    ? all.filter((p) => p.category === post.category)
+    : [];
+  const pool = sameCat.length > 1 ? sameCat : all;
+  const idx = pool.findIndex((p) => p.id === post.id);
+  // Lista vem em created_at DESC → mais novo antes. "Anterior" = mais
+  // antigo (idx+1); "próximo" = mais novo (idx-1).
+  const older = idx >= 0 ? (pool[idx + 1] ?? null) : null;
+  const newer = idx >= 0 ? (pool[idx - 1] ?? null) : null;
+
+  const seen = new Set(
+    [post.id, older?.id, newer?.id].filter(Boolean) as string[]
+  );
+  const related: Post[] = [];
+  for (const p of [...sameCat, ...all]) {
+    if (seen.has(p.id)) continue;
+    seen.add(p.id);
+    related.push(p);
+    if (related.length === 3) break;
+  }
+  return { older, newer, related };
 }
 
 export default async function BlogPostPage({
@@ -43,6 +85,11 @@ export default async function BlogPostPage({
 
   const t = await getTranslations({ locale, namespace: 'blog' });
   const dateLocale = locale === 'pt' ? 'pt-BR' : 'en-US';
+
+  const all = await getPublishedPosts();
+  const { older, newer, related } = buildTrail(post, all);
+  // Link canônico do post pro compartilhamento (PT é a raiz, EN tem /en)
+  const shareUrl = `${SITE_URL}${locale === 'pt' ? '' : `/${locale}`}/blog/${post.slug}`;
 
   // Post em HTML traz layout próprio (cards, grades, seções largas), então
   // ganha mais espaço; texto corrido continua na largura boa de leitura.
@@ -85,10 +132,13 @@ export default async function BlogPostPage({
             />
             <div className="relative w-full p-6 sm:p-10">
               {post.category && (
-                <span className="inline-flex items-center gap-1.5 mb-4 px-3 py-1 rounded-full border border-white/25 bg-black/30 backdrop-blur-sm text-[11px] font-semibold text-white">
+                <Link
+                  href={{ pathname: '/blog', query: { categoria: post.category } }}
+                  className="inline-flex items-center gap-1.5 mb-4 px-3 py-1 rounded-full border border-white/25 bg-black/30 backdrop-blur-sm text-[11px] font-semibold text-white hover:border-accent-bright hover:text-accent-bright transition-colors"
+                >
                   <span aria-hidden className="w-1 h-1 rounded-full bg-accent-bright" />
                   {post.category}
-                </span>
+                </Link>
               )}
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight max-w-3xl [text-shadow:0_2px_18px_rgba(0,0,0,0.85)]">
                 {post.title}
@@ -115,6 +165,84 @@ export default async function BlogPostPage({
             )}
           </div>
         </div>
+
+        {/* ── Compartilhar: o post acabou, bora fazer ele circular ── */}
+        <div className="mt-8 flex justify-center sm:justify-start">
+          <SharePost url={shareUrl} title={post.title} />
+        </div>
+
+        {/* ── Anterior / Próximo: dentro da série quando há categoria ── */}
+        {(older || newer) && (
+          <nav aria-label={t('post_nav_label')} className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {older ? (
+              <Link
+                href={`/blog/${older.slug}`}
+                className="group flex flex-col gap-2 rounded-2xl bg-surface border border-border p-5 hover:border-accent/40 hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-foreground-subtle">
+                  <ArrowLeft size={13} className="transition-transform group-hover:-translate-x-1" />
+                  {t('prev_post')}
+                </span>
+                <span className="font-bold text-foreground leading-snug line-clamp-2 group-hover:text-accent-deep transition-colors">
+                  {older.title}
+                </span>
+              </Link>
+            ) : (
+              <span aria-hidden className="hidden sm:block" />
+            )}
+            {newer && (
+              <Link
+                href={`/blog/${newer.slug}`}
+                className="group flex flex-col items-end text-right gap-2 rounded-2xl bg-surface border border-border p-5 hover:border-accent/40 hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-foreground-subtle">
+                  {t('next_post')}
+                  <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
+                </span>
+                <span className="font-bold text-foreground leading-snug line-clamp-2 group-hover:text-accent-deep transition-colors">
+                  {newer.title}
+                </span>
+              </Link>
+            )}
+          </nav>
+        )}
+
+        {/* ── Continue a jornada: mais leituras ── */}
+        {related.length > 0 && (
+          <section className="mt-14">
+            <div className="flex items-center gap-4 mb-7">
+              <h2 className="font-pixel text-[10px] tracking-[0.3em] uppercase text-foreground whitespace-nowrap">
+                <span className="text-accent-bright">#</span> {t('related_title')}
+              </h2>
+              <span aria-hidden className="flex-1 h-px bg-border" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              {related.map((p) => (
+                <Link
+                  key={p.id}
+                  href={`/blog/${p.slug}`}
+                  className="group flex flex-col rounded-2xl overflow-hidden bg-surface border border-border hover:border-border-strong hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <PostCover
+                      src={p.cover_url}
+                      position={p.cover_position}
+                      className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-1 p-4">
+                    <h3 className="text-sm font-bold text-foreground leading-snug line-clamp-2 mb-2 group-hover:text-accent-deep transition-colors">
+                      {p.title}
+                    </h3>
+                    <span className="mt-auto text-xs text-foreground-subtle">
+                      {formatDate(new Date(p.created_at), dateLocale)}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </article>
     </div>
   );

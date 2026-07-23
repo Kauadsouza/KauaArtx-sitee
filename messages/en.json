@@ -2,9 +2,27 @@
   "nav": {
     "about": "About",
     "blog": "Blog",
+    "map": "Map",
     "contact": "Contact",
     "youtube": "YouTube",
-    "logout": "Log out"
+    "logout": "Log out",
+    "greeting": "Hi, {name} 👋"
+  },
+  "map": {
+    "kicker": "The journey on the map",
+    "title": "Journey map",
+    "subtitle": "Every pin is a chapter: where I am, where I've been, and where I'm headed next. The map grows with the story.",
+    "map_alt": "World map with the places of Kauã's journey marked",
+    "status_lived": "Home base",
+    "status_visited": "Visited",
+    "status_planned": "Up next",
+    "stats_visited": "Places",
+    "stats_countries": "Countries",
+    "stats_planned": "Up next",
+    "list_title": "The stops",
+    "soon_note": "More places coming — the backpack is always ready.",
+    "cta_trail": "See the full trail",
+    "cta_contact": "Talk to me"
   },
   "hero": {
     "name": "Kauã Souza",
@@ -213,7 +231,19 @@
     "sidebar_cta_title": "Want to talk?",
     "sidebar_cta_desc": "A proposal, a partnership, or a question — I reply within 24h.",
     "sidebar_cta_button": "Talk to me",
-    "by_author": "by"
+    "by_author": "by",
+    "share_title": "Share:",
+    "share_copy": "Copy link",
+    "share_copied": "Link copied!",
+    "post_nav_label": "More posts",
+    "prev_post": "Previous post",
+    "next_post": "Next post",
+    "related_title": "Keep exploring",
+    "filter_all": "All",
+    "filter_label": "Filtering by",
+    "filter_clear": "Clear filter",
+    "filter_empty_title": "Nothing here (yet)",
+    "filter_empty_desc": "No posts in this category yet. Check out the others!"
   },
   "contact": {
     "title": "Talk to me",
