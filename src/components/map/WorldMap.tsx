@@ -74,7 +74,6 @@ const sameSelection = (a: Selection | null, b: Selection | null) => {
 };
 
 const GRATICULE = geoGraticule10();
-const SPHERE = { type: 'Sphere' } as const;
 
 const ROUTE =
   TRAVELS.length > 1
@@ -255,6 +254,11 @@ export default function WorldMap() {
   const hitsRef = useRef<Hit[]>([]);
   const cityHitsRef = useRef<Hit[]>([]);
   const occRef = useRef<{ cols: number; rows: number; buf: Uint8Array } | null>(null);
+  // Céu + oceano + atmosfera já pintados, prontos pra colar
+  const skyRef = useRef<{ key: string; canvas: HTMLCanvasElement } | null>(null);
+  // Densidade real da tela, e se o desenho está no modo econômico
+  const dprFullRef = useRef(1);
+  const emBaixaRef = useRef(false);
   const cardBox = useRef<{ key: string; h: number }>({ key: '', h: 0 });
   const flatBase = useRef<{ w: number; h: number; s: number; t: [number, number] } | null>(null);
   const flyRef = useRef<{
@@ -342,21 +346,27 @@ export default function WorldMap() {
   );
 
   // ── Projeção do quadro atual ────────────────────────────────────────
-  const buildProjection = useCallback((): GeoProjection => {
-    const { w, h } = size.current;
-    const v = view.current;
+  // `precisaoMinima` deixa o desenho pedir um traço mais grosseiro enquanto a
+  // câmera está em movimento.
+  const buildProjection = useCallback(
+    (precisaoMinima = 0): GeoProjection => {
+      const { w, h } = size.current;
+      const v = view.current;
+      const precisao = Math.max(precisionForZoom(v.zoom), precisaoMinima);
 
-    if (modeRef.current === 'globe') {
-      return geoOrthographic()
-        .rotate([v.rot[0], v.rot[1], 0])
-        .translate([w / 2 + v.pan[0], h / 2 + v.pan[1]])
-        .scale((Math.min(w, h) / 2 - 12) * v.zoom)
-        .clipAngle(90)
-        .precision(precisionForZoom(v.zoom));
-    }
+      if (modeRef.current === 'globe') {
+        return geoOrthographic()
+          .rotate([v.rot[0], v.rot[1], 0])
+          .translate([w / 2 + v.pan[0], h / 2 + v.pan[1]])
+          .scale((Math.min(w, h) / 2 - 12) * v.zoom)
+          .clipAngle(90)
+          .precision(precisao);
+      }
 
-    return flatProjection(v.zoom, v.pan);
-  }, [flatProjection]);
+      return flatProjection(v.zoom, v.pan).precision(precisao);
+    },
+    [flatProjection]
+  );
 
   // ── O desenho de um quadro ──────────────────────────────────────────
   const paint = useCallback(
@@ -370,33 +380,16 @@ export default function WorldMap() {
 
       const v = view.current;
       const isGlobe = modeRef.current === 'globe';
-      const projection = buildProjection();
+      const mexendo = ts - lastMoveRef.current < 200;
+      // `precision` é o capricho com que a projeção acompanha uma curva. Em
+      // movimento, um traço um pouco mais reto não é percebido e poupa
+      // milhares de pontos por quadro.
+      const projection = buildProjection(mexendo ? 2 : 0.5);
       const path = geoPath(projection, ctx);
       const still = reduceMotion.current;
       const selection = selRef.current;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, w, h);
-
-      // Fundo: a laje escura do site + um halo verde bem difuso
-      ctx.fillStyle = theme.deep;
-      ctx.fillRect(0, 0, w, h);
-      const bg = ctx.createRadialGradient(w / 2, h * 0.45, 0, w / 2, h * 0.45, Math.max(w, h) * 0.65);
-      bg.addColorStop(0, alpha(theme.accent2, 0.28));
-      bg.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, w, h);
-
-      // Estrelas (só no modo globo — no planisfério o mapa ocupa tudo)
-      if (isGlobe) {
-        for (const st of STARS) {
-          const tw = still ? 0.55 : 0.45 + 0.35 * Math.sin(ts / 1400 + st.phase);
-          ctx.beginPath();
-          ctx.arc(st.x * w, st.y * h, st.r, 0, Math.PI * 2);
-          ctx.fillStyle = alpha(theme.accentBright, 0.28 * tw);
-          ctx.fill();
-        }
-      }
 
       const R = projection.scale();
       const cx = w / 2 + v.pan[0];
@@ -406,33 +399,77 @@ export default function WorldMap() {
       // vista, e aí desenhar a esfera inteira é trabalho jogado fora.
       const edgeVisible = !isGlobe || R < Math.hypot(w, h);
 
-      if (isGlobe) {
-        // Atmosfera: o brilho que escapa da borda do planeta
-        if (edgeVisible) {
-          const atmo = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.35);
-          atmo.addColorStop(0, alpha(theme.accent, 0.22));
-          atmo.addColorStop(0.45, alpha(theme.accent2, 0.12));
-          atmo.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.beginPath();
-          ctx.arc(cx, cy, R * 1.35, 0, Math.PI * 2);
-          ctx.fillStyle = atmo;
-          ctx.fill();
-        }
+      // ── Céu, estrelas, atmosfera e oceano ──
+      // Nada disso depende de PRA ONDE o globo está virado: só do tamanho da
+      // caixa e do raio. Eram quatro pinturas de tela cheia por quadro (duas
+      // em degradê, que é o tipo de coisa que a placa de vídeo cobra caro).
+      // Agora é pintado uma vez num canvas de rascunho e daí em diante é só
+      // colar — girar o globo virou uma colagem só.
+      const skyKey = `${w}|${h}|${dpr}|${isGlobe}|${Math.round(R)}|${Math.round(cx)}|${Math.round(cy)}`;
+      if (!skyRef.current || skyRef.current.key !== skyKey) {
+        const off = skyRef.current?.canvas ?? document.createElement('canvas');
+        off.width = Math.round(w * dpr);
+        off.height = Math.round(h * dpr);
+        const sc = off.getContext('2d');
+        if (sc) {
+          sc.setTransform(dpr, 0, 0, dpr, 0, 0);
+          sc.clearRect(0, 0, w, h);
+          sc.fillStyle = theme.deep;
+          sc.fillRect(0, 0, w, h);
+          const bg = sc.createRadialGradient(w / 2, h * 0.45, 0, w / 2, h * 0.45, Math.max(w, h) * 0.65);
+          bg.addColorStop(0, alpha(theme.accent2, 0.28));
+          bg.addColorStop(1, 'rgba(0,0,0,0)');
+          sc.fillStyle = bg;
+          sc.fillRect(0, 0, w, h);
 
-        // O oceano — mais claro de um lado, como se pegasse luz de fora
-        const sea = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
-        sea.addColorStop(0, alpha(theme.surface, 0.95));
-        sea.addColorStop(0.75, alpha(theme.deep, 0.92));
-        sea.addColorStop(1, alpha(theme.deep, 0.98));
-        ctx.fillStyle = sea;
-        if (edgeVisible) {
-          ctx.beginPath();
-          path(SPHERE);
-          ctx.fill();
-        } else {
-          ctx.fillRect(0, 0, w, h); // o planeta cobre a tela toda: é só pintar
+          if (isGlobe) {
+            for (const st of STARS) {
+              sc.beginPath();
+              sc.arc(st.x * w, st.y * h, st.r, 0, Math.PI * 2);
+              sc.fillStyle = alpha(theme.accentBright, 0.28 * (0.45 + 0.35 * Math.sin(st.phase)));
+              sc.fill();
+            }
+
+            if (edgeVisible) {
+              const atmo = sc.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.35);
+              atmo.addColorStop(0, alpha(theme.accent, 0.22));
+              atmo.addColorStop(0.45, alpha(theme.accent2, 0.12));
+              atmo.addColorStop(1, 'rgba(0,0,0,0)');
+              sc.beginPath();
+              sc.arc(cx, cy, R * 1.35, 0, Math.PI * 2);
+              sc.fillStyle = atmo;
+              sc.fill();
+            }
+
+            // O oceano — mais claro de um lado, como se pegasse luz de fora.
+            // Em projeção ortográfica o planeta é um círculo exato, então dá
+            // pra desenhar com arc() em vez de mandar a esfera pela projeção.
+            const sea = sc.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+            sea.addColorStop(0, alpha(theme.surface, 0.95));
+            sea.addColorStop(0.75, alpha(theme.deep, 0.92));
+            sea.addColorStop(1, alpha(theme.deep, 0.98));
+            sc.fillStyle = sea;
+            if (edgeVisible) {
+              sc.beginPath();
+              sc.arc(cx, cy, R, 0, Math.PI * 2);
+              sc.fill();
+            } else {
+              sc.fillRect(0, 0, w, h); // o planeta cobre a tela toda
+            }
+
+            // Borda do planeta
+            if (edgeVisible) {
+              sc.beginPath();
+              sc.arc(cx, cy, R, 0, Math.PI * 2);
+              sc.strokeStyle = alpha(theme.accent, 0.5);
+              sc.lineWidth = 1;
+              sc.stroke();
+            }
+          }
         }
+        skyRef.current = { key: skyKey, canvas: off };
       }
+      ctx.drawImage(skyRef.current.canvas, 0, 0, w, h);
 
       // ── Que pedaço do mundo está na tela ──
       const bounds = visibleBounds(projection, w, h);
@@ -443,7 +480,6 @@ export default function WorldMap() {
       // médio. O contorno 10m tem dezenas de milhares de pontos por país e
       // redesenhá-lo 60 vezes por segundo é o que fazia travar no arrasto.
       // Parou de mexer, ele entra — que é quando você repara no detalhe.
-      const mexendo = ts - lastMoveRef.current < 200;
       let wantDetail = detailForZoom(v.zoom);
       if ((!bounds || mexendo) && wantDetail === 10) wantDetail = 50;
       ensureDetail(wantDetail, onLayerReady.current);
@@ -485,21 +521,19 @@ export default function WorldMap() {
       }
       ctx.fillStyle = alpha(theme.accent, 0.07);
       ctx.fill();
-      ctx.save();
-      // O brilho no contorno é a assinatura do mapa — mas ele custa um
-      // borrão da tela inteira. De perto, onde o traço é milhares de pontos,
-      // sai o borrão e entra um traço um pouco mais forte: mesma leitura,
-      // sem derrubar os quadros.
-      const glowOk = v.zoom < 3.5;
-      if (glowOk) {
-        ctx.shadowColor = alpha(theme.accentBright, 0.5);
-        ctx.shadowBlur = 7;
-      }
-      ctx.strokeStyle = line;
-      ctx.lineWidth = glowOk ? 0.75 : 1;
+
+      // O brilho do contorno é a assinatura do mapa, mas `shadowBlur` cobra
+      // um borrão da TELA INTEIRA a cada quadro — era o que derrubava os
+      // quadros pra 10-15 por segundo. O mesmo brilho sai de duas passadas
+      // do traço: uma larga e apagada por baixo, uma fina e nítida por cima.
+      // Custa duas linhas em vez de um desfoque.
       ctx.lineJoin = 'round';
+      ctx.strokeStyle = alpha(theme.accentBright, 0.14);
+      ctx.lineWidth = 3;
       ctx.stroke();
-      ctx.restore();
+      ctx.strokeStyle = line;
+      ctx.lineWidth = 0.85;
+      ctx.stroke();
 
       // ── Divisões internas: estados, províncias, departamentos ──
       // Aparecem quando você chega perto o bastante pra elas quererem dizer
@@ -527,14 +561,7 @@ export default function WorldMap() {
         ctx.stroke();
       }
 
-      // Borda do planeta
-      if (isGlobe) {
-        ctx.beginPath();
-        path(SPHERE);
-        ctx.strokeStyle = alpha(theme.accent, 0.5);
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
+      // (a borda do planeta já veio colada junto com o céu)
 
       // Rota da jornada — um sinal viajando pela linha pontilhada
       if (ROUTE) {
@@ -544,10 +571,12 @@ export default function WorldMap() {
         ctx.setLineDash([1.6, 8]);
         ctx.lineDashOffset = still ? 0 : -(ts / 42) % 1000;
         ctx.lineCap = 'round';
+        // Mesmo truque do contorno: brilho por sobreposição, não por desfoque
+        ctx.strokeStyle = alpha(theme.accentBright, 0.18);
+        ctx.lineWidth = 5;
+        ctx.stroke();
         ctx.strokeStyle = line;
         ctx.lineWidth = 1.8;
-        ctx.shadowColor = alpha(theme.accentBright, 0.6);
-        ctx.shadowBlur = 8;
         ctx.stroke();
         ctx.restore();
       }
@@ -632,7 +661,7 @@ export default function WorldMap() {
         ctx.lineJoin = 'round';
         ctx.lineWidth = 3;
         ctx.strokeStyle = alpha(theme.deep, 0.85);
-        ctx.strokeText(name.toUpperCase(), p[0], p[1]);
+        if (!mexendo) ctx.strokeText(name.toUpperCase(), p[0], p[1]);
         ctx.fillStyle = alpha(
           selectedCountry === c.id ? theme.fg : theme.fgMuted,
           selectedCountry === c.id ? 1 : 0.55 * countryFade
@@ -741,7 +770,10 @@ export default function WorldMap() {
           ctx.stroke();
         }
 
-        // Nomes — o espaço de cada um já foi reservado lá em cima
+        // Nomes — o espaço de cada um já foi reservado lá em cima.
+        // O contorno escuro por trás é o que garante ler o nome em cima de
+        // qualquer coisa, mas contornar letra é caro: em movimento ele sai e
+        // fica só o preenchimento.
         ctx.textBaseline = 'middle';
         ctx.lineJoin = 'round';
         ctx.lineWidth = 3;
@@ -754,7 +786,7 @@ export default function WorldMap() {
             curFont = font;
           }
           const x0 = c.x + c.r + 4;
-          ctx.strokeText(c.city[0], x0, c.y + 0.5);
+          if (!mexendo) ctx.strokeText(c.city[0], x0, c.y + 0.5);
           ctx.fillStyle = c.sel
             ? theme.fg
             : alpha(theme.fg, c.px >= 12.5 ? 0.95 : c.cap ? 0.9 : 0.75);
@@ -792,9 +824,21 @@ export default function WorldMap() {
           ctx.fill();
         }
 
+        // Brilho do pino em círculos concêntricos translúcidos, no lugar do
+        // desfoque — três círculos custam quase nada, o desfoque custa uma
+        // passada de borrão por pino
         ctx.save();
-        ctx.shadowColor = alpha(isPlanned ? theme.accent : GLOW_GREEN, 0.85);
-        ctx.shadowBlur = isActive ? 16 : 9;
+        for (const [raio, opacidade] of isActive
+          ? ([
+              [10, 0.16],
+              [7.5, 0.24],
+            ] as const)
+          : ([[8, 0.14]] as const)) {
+          ctx.beginPath();
+          ctx.arc(x, y, raio, 0, Math.PI * 2);
+          ctx.fillStyle = alpha(isPlanned ? theme.accent : GLOW_GREEN, opacidade);
+          ctx.fill();
+        }
         ctx.beginPath();
         ctx.arc(x, y, (isLived ? 5.5 : 4.5) + (isActive ? 1.4 : 0), 0, Math.PI * 2);
         ctx.fillStyle = fill;
@@ -819,7 +863,11 @@ export default function WorldMap() {
 
       // Tem algo se mexendo sozinho na tela? Só então o próximo quadro
       // precisa ser desenhado sem ninguém ter mexido em nada.
-      animRef.current = !still && ((isGlobe && v.zoom < 3) || stopHits.length > 0);
+      //
+      // De perto isso é proibido: repintar 130 nomes 20 vezes por segundo só
+      // pra animar o pulso de um pino é o troco mais caro do mapa. Aproximou
+      // pra ler, o mapa fica parado de verdade — zero trabalho até você mexer.
+      animRef.current = !still && v.zoom < 3 && (isGlobe || stopHits.length > 0);
 
       // ── O cartão segue o que está escolhido ──
       // Mexido direto no DOM pra não disparar re-render a cada quadro
@@ -871,6 +919,27 @@ export default function WorldMap() {
     setLoadingData(citiesLoading());
   };
 
+  // Só em desenvolvimento: deixa medir o custo de um quadro pelo console,
+  // sem depender do navegador estar compondo imagem.
+  //   __medirMapa(40) → milissegundos por quadro
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return;
+    const w = window as unknown as Record<string, unknown>;
+    w.__medirMapa = (n = 40, mexendo = false) => {
+      const t0 = performance.now();
+      for (let i = 0; i < n; i++) {
+        const agora = performance.now();
+        if (mexendo) lastMoveRef.current = agora; // simula câmera em movimento
+        paint(agora);
+      }
+      const ms = (performance.now() - t0) / n;
+      return { msPorQuadro: +ms.toFixed(2), fps: Math.round(1000 / ms), zoom: +view.current.zoom.toFixed(2) };
+    };
+    return () => {
+      delete w.__medirMapa;
+    };
+  }, [paint]);
+
   // ── Loop de animação ────────────────────────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -891,9 +960,11 @@ export default function WorldMap() {
       const w = Math.max(1, Math.round(rect.width));
       const h = Math.max(1, Math.round(rect.height));
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      size.current = { w, h, dpr };
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
+      dprFullRef.current = dpr;
+      const escala = emBaixaRef.current ? 1 : dpr;
+      size.current = { w, h, dpr: escala };
+      canvas.width = Math.round(w * escala);
+      canvas.height = Math.round(h * escala);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       flatBase.current = null;
@@ -949,6 +1020,22 @@ export default function WorldMap() {
           v.rot = [(v.rot[0] - SPIN_DEG_PER_SEC * dt + 540) % 360 - 180, v.rot[1]];
           dirtyRef.current = true;
           lastMoveRef.current = ts;
+        }
+
+        // ── Resolução: alta parada, baixa em movimento ──
+        // Numa tela retina cada quadro pinta 4x mais pixel do que a tela
+        // mostra. Enquanto a câmera se mexe ninguém enxerga essa diferença,
+        // então o mapa desenha em resolução de tela e volta ao capricho
+        // quando a mão para. Só troca na virada — não a cada quadro.
+        const mexendoAgora = ts - lastMoveRef.current < 200;
+        if (mexendoAgora !== emBaixaRef.current && dprFullRef.current > 1.05) {
+          emBaixaRef.current = mexendoAgora;
+          const escala = mexendoAgora ? 1 : dprFullRef.current;
+          const { w, h } = size.current;
+          size.current = { w, h, dpr: escala };
+          canvas.width = Math.round(w * escala);
+          canvas.height = Math.round(h * escala);
+          dirtyRef.current = true; // trocar o tamanho apaga o desenho
         }
 
         // Nada mudou e nada está se mexendo? Então não gasta um quadro à toa.
