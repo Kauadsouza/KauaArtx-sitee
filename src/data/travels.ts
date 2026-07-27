@@ -36,15 +36,15 @@ export interface TravelStop {
 
 export const TRAVELS: TravelStop[] = [
   {
-    id: 'brasil-base',
-    name: { pt: 'Brasil', en: 'Brazil' },
+    id: 'uberlandia',
+    name: { pt: 'Uberlândia', en: 'Uberlândia' },
     country: { pt: 'Brasil', en: 'Brazil' },
-    coords: [-43.94, -19.92],
+    coords: [-48.2772, -18.9186],
     year: 'hoje',
     status: 'lived',
     note: {
-      pt: 'A base. Onde tudo começa — trabalho, projetos e o plano de ir mais longe.',
-      en: 'Home base. Where it all starts — work, projects, and the plan to go further.',
+      pt: 'É daqui que eu saio. A base hoje — trabalho, projetos e o plano de ir mais longe.',
+      en: "This is where I'm setting off from. Home base today — work, projects, and the plan to go further.",
     },
   },
   {
