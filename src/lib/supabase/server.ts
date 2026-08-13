@@ -12,23 +12,28 @@ function createPublicClient() {
   });
 }
 
+function isLegacyNomadSlug(slug: string) {
+  return /nomade|visto-remoto|visto-d8/i.test(slug);
+}
+
 export async function getPublishedPosts(limit?: number): Promise<Post[]> {
   const supabase = createPublicClient();
   if (!supabase) return [];
   // select('*'): resiliente a colunas novas (ex.: cover_position) — o blog
   // não quebra se uma migração ainda não foi rodada; o campo só vem vazio.
-  let query = supabase
+  const query = supabase
     .from('posts')
     .select('*')
     .eq('published', true)
     .order('created_at', { ascending: false });
-  if (limit) query = query.limit(limit);
   const { data, error } = await query;
   if (error) return [];
-  return data ?? [];
+  const currentPosts = (data ?? []).filter((post) => !isLegacyNomadSlug(post.slug));
+  return limit ? currentPosts.slice(0, limit) : currentPosts;
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
+  if (isLegacyNomadSlug(slug)) return null;
   const supabase = createPublicClient();
   if (!supabase) return null;
   const { data, error } = await supabase
