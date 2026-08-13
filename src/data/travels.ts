@@ -36,37 +36,37 @@ export interface TravelStop {
 
 export const TRAVELS: TravelStop[] = [
   {
+    id: 'oxford',
+    name: { pt: 'Oxford', en: 'Oxford' },
+    country: { pt: 'Reino Unido', en: 'United Kingdom' },
+    coords: [-1.2577, 51.752],
+    status: 'lived',
+    note: {
+      pt: 'Onde eu moro hoje. Meu ponto de partida pra conhecer mais do mundo.',
+      en: 'Where I live today. My starting point for seeing more of the world.',
+    },
+  },
+  {
     id: 'uberlandia',
     name: { pt: 'Uberlândia', en: 'Uberlândia' },
     country: { pt: 'Brasil', en: 'Brazil' },
     coords: [-48.2772, -18.9186],
-    year: 'hoje',
     status: 'lived',
     note: {
-      pt: 'É daqui que eu saio. A base hoje — trabalho, projetos e o plano de ir mais longe.',
-      en: "This is where I'm setting off from. Home base today — work, projects, and the plan to go further.",
+      pt: 'Onde eu nasci e cresci. O começo de tudo.',
+      en: 'Where I was born and raised. Where everything started.',
     },
   },
   {
-    id: 'londres',
-    name: { pt: 'Londres', en: 'London' },
-    country: { pt: 'Reino Unido', en: 'United Kingdom' },
-    coords: [-0.1276, 51.5072],
-    status: 'planned',
+    id: 'sao-paulo',
+    name: { pt: 'São Paulo', en: 'São Paulo' },
+    country: { pt: 'Brasil', en: 'Brazil' },
+    coords: [-46.6333, -23.5505],
+    year: '2026',
+    status: 'visited',
     note: {
-      pt: 'A próxima parada da jornada.',
-      en: 'The next stop of the journey.',
-    },
-  },
-  {
-    id: 'nova-york',
-    name: { pt: 'Nova York', en: 'New York' },
-    country: { pt: 'Estados Unidos', en: 'United States' },
-    coords: [-74.006, 40.7128],
-    status: 'planned',
-    note: {
-      pt: 'De Londres pra Nova York — o passo seguinte da rota.',
-      en: 'From London to New York — the next leg of the route.',
+      pt: 'Uma viagem que fez parte da minha história antes da mudança pra Inglaterra.',
+      en: 'A trip that became part of my story before moving to England.',
     },
   },
 ];

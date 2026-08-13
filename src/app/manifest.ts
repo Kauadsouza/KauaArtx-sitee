@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Kauã Souza — Criador em Oxford',
+    name: 'Kauã Souza — Viagens e vida real',
     short_name: 'Kauã Artx',
     description:
-      'Kauã Souza mora em Oxford, constrói o canal @KauaArtx e se prepara para estudar.',
+      'Viagens, histórias e vida real no canal @KauaArtx.',
     start_url: '/',
     display: 'standalone',
     background_color: '#04100a',
@@ -16,4 +16,3 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   };
 }
-

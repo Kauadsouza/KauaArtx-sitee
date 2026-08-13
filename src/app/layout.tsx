@@ -13,18 +13,18 @@ const pixelFont = Press_Start_2P({
 });
 
 const DESCRIPTION =
-  'Kauã Souza mora em Oxford, constrói o canal @KauaArtx e se prepara para estudar.';
+  'Viagens, histórias e vida real no canal @KauaArtx.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Criador em Oxford`,
+    default: `${SITE_NAME} — Viagens e vida real`,
     template: `%s | ${SITE_NAME}`,
   },
   description: DESCRIPTION,
   keywords: [
-    'Kauã Souza', 'Oxford', 'YouTube', 'KauaArtx', 'Criador de conteúdo',
-    'Estudos', 'Inglaterra', 'Crescimento pessoal',
+    'Kauã Souza', 'Viagens', 'YouTube', 'KauaArtx', 'Criador de conteúdo',
+    'Inglaterra', 'Mundo', 'Histórias de viagem',
   ],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     alternateLocale: 'en_US',
     url: SITE_URL,
-    title: `${SITE_NAME} — Criador em Oxford`,
+    title: `${SITE_NAME} — Viagens e vida real`,
     description: DESCRIPTION,
     siteName: SITE_NAME,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — Criador em Oxford`,
+    title: `${SITE_NAME} — Viagens e vida real`,
     description: DESCRIPTION,
     creator: '@KauaArtx',
   },
@@ -73,4 +73,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-

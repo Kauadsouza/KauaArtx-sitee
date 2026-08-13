@@ -74,7 +74,7 @@ export default function AdventureSplit() {
             <div className="absolute inset-0 bg-gradient-to-tr from-[#04191A]/75 via-[#04191A]/10 to-transparent" />
             <div className="absolute bottom-4 left-4 boarding-tag text-xs">
               <Mountain size={13} className="text-accent-bright" />
-              BRA → MUNDO · GO FAR
+              OXFORD → MUNDO · GO FAR
             </div>
           </motion.div>
         </div>

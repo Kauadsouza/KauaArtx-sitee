@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Handshake, Youtube, Instagram, Compass } from 'lucide-react';
+import { MapPin, Youtube, Compass, Camera } from 'lucide-react';
 
 // Seção 1 da estrutura de aventura: à ESQUERDA as três frentes (casa com o
 // título "Três frentes"); à DIREITA duas artes verticais em destaque
@@ -11,9 +11,9 @@ import { Handshake, Youtube, Instagram, Compass } from 'lucide-react';
 // Conteúdo aponta pro canal e Aventura pro Instagram — por isso os ícones
 // são os das próprias plataformas.
 const FEATURES = [
-  { icon: Handshake, k: 'sales' },
+  { icon: MapPin, k: 'sales' },
   { icon: Youtube, k: 'content' },
-  { icon: Instagram, k: 'adventure' },
+  { icon: Camera, k: 'adventure' },
 ] as const;
 
 const HIGHLIGHTS = [
