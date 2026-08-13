@@ -12,9 +12,7 @@ function createPublicClient() {
   });
 }
 
-function isLegacyNomadSlug(slug: string) {
-  return /nomade|visto-remoto|visto-d8/i.test(slug);
-}
+const CURRENT_PHASE_STARTED_AT = '2026-08-13T00:00:00.000Z';
 
 export async function getPublishedPosts(limit?: number): Promise<Post[]> {
   const supabase = createPublicClient();
@@ -25,15 +23,14 @@ export async function getPublishedPosts(limit?: number): Promise<Post[]> {
     .from('posts')
     .select('*')
     .eq('published', true)
+    .gte('created_at', CURRENT_PHASE_STARTED_AT)
     .order('created_at', { ascending: false });
   const { data, error } = await query;
   if (error) return [];
-  const currentPosts = (data ?? []).filter((post) => !isLegacyNomadSlug(post.slug));
-  return limit ? currentPosts.slice(0, limit) : currentPosts;
+  return limit ? (data ?? []).slice(0, limit) : (data ?? []);
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  if (isLegacyNomadSlug(slug)) return null;
   const supabase = createPublicClient();
   if (!supabase) return null;
   const { data, error } = await supabase
@@ -41,6 +38,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     .select('*')
     .eq('slug', slug)
     .eq('published', true)
+    .gte('created_at', CURRENT_PHASE_STARTED_AT)
     .single();
   if (error) return null;
   return data;
