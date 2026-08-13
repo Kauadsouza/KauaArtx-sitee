@@ -13,18 +13,18 @@ const pixelFont = Press_Start_2P({
 });
 
 const DESCRIPTION =
-  'Vendedor na Loog.ai, CEO do Facility e nômade documentando a jornada pelo mundo.';
+  'Kauã Souza mora em Oxford, constrói o canal @KauaArtx e se prepara para estudar.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Nômade & Vendedor`,
+    default: `${SITE_NAME} — Criador em Oxford`,
     template: `%s | ${SITE_NAME}`,
   },
   description: DESCRIPTION,
   keywords: [
-    'Kauã Souza', 'Vendedor', 'Nômade', 'Empreendedor', 'Facility',
-    'Loog.ai', 'YouTube', 'Viagens', 'Crescimento pessoal',
+    'Kauã Souza', 'Oxford', 'YouTube', 'KauaArtx', 'Criador de conteúdo',
+    'Estudos', 'Inglaterra', 'Crescimento pessoal',
   ],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
@@ -33,15 +33,14 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     alternateLocale: 'en_US',
     url: SITE_URL,
-    title: `${SITE_NAME} — Nômade & Vendedor`,
+    title: `${SITE_NAME} — Criador em Oxford`,
     description: DESCRIPTION,
     siteName: SITE_NAME,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — Nômade & Vendedor`,
-    description:
-      'Vendedor, CEO do Facility e nômade documentando a jornada pelo mundo.',
+    title: `${SITE_NAME} — Criador em Oxford`,
+    description: DESCRIPTION,
     creator: '@KauaArtx',
   },
   robots: { index: true, follow: true },
@@ -54,8 +53,7 @@ const personJsonLd = {
   name: SITE_NAME,
   url: SITE_URL,
   image: `${SITE_URL}/images/kaua-pixel.png`,
-  jobTitle: 'Nômade & Vendedor',
-  worksFor: { '@type': 'Organization', name: 'Loog.ai' },
+  jobTitle: 'Criador de conteúdo',
   sameAs: SOCIAL_PROFILES,
 };
 
@@ -75,3 +73,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

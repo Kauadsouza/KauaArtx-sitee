@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Kauã Souza — Nômade & Vendedor',
+    name: 'Kauã Souza — Criador em Oxford',
     short_name: 'Kauã Artx',
     description:
-      'Vendedor na Loog.ai, CEO do Facility e nômade documentando a jornada pelo mundo.',
+      'Kauã Souza mora em Oxford, constrói o canal @KauaArtx e se prepara para estudar.',
     start_url: '/',
     display: 'standalone',
     background_color: '#04100a',
@@ -16,3 +16,4 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   };
 }
+
