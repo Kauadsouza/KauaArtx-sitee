@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 interface RawHtmlContentProps {
   html: string;
   className?: string;
+  title?: string;
 }
 
 // Tira cercas de código markdown (```html ... ```) que vêm junto quando o
@@ -24,12 +25,16 @@ export function stripCodeFences(raw: string): string {
 // como está isolado, nada disso escapa pro resto da página.
 const BASE_CSS = `
   *, *::before, *::after { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: transparent; }
+  html {
+    color-scheme: dark;
+    background: #0B2B26;
+  }
+  html, body { margin: 0; padding: 0; background: #0B2B26; }
   body {
-    color: #DAF1DE;
+    color: #C7E0CD;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 17px;
-    line-height: 1.8;
+    font-size: 18px;
+    line-height: 1.82;
     overflow-x: hidden;
     word-wrap: break-word;
   }
@@ -39,6 +44,29 @@ const BASE_CSS = `
   a { color: #8EB69B; text-underline-offset: 3px; }
   a:hover { color: #DAF1DE; }
   h1, h2, h3, h4 { line-height: 1.2; }
+`;
+
+// Os oito posts antigos repetem um herói próprio antes do texto. A página do
+// artigo já tem capa, título, categoria e data, então escondemos só essa peça
+// duplicada e deixamos o restante do layout do post intacto. O texto corrido
+// também fica numa medida confortável, sem estreitar cards, tabelas e alertas.
+const READING_CSS = `
+  body > .post { max-width: 800px !important; }
+  body > .post > .hero { display: none !important; }
+  body > .post > :is(p, h2, h3, h4, ul, ol) {
+    max-width: 68ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  body > .post > h2,
+  body > .post > h3,
+  body > .post > h4 {
+    margin-top: 2.75rem;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 640px) {
+    body { font-size: 17px; }
+  }
 `;
 
 // Script que roda DENTRO do iframe: mede a altura do conteúdo e avisa a
@@ -74,7 +102,7 @@ const RESIZE_JS = `
 //
 // `base target="_parent"` faz os links do post navegarem a aba de verdade
 // em vez de abrirem presos dentro do quadro.
-export default function RawHtmlContent({ html, className }: RawHtmlContentProps) {
+export default function RawHtmlContent({ html, className, title = 'Conteúdo do post' }: RawHtmlContentProps) {
   const frameId = useId();
   const ref = useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = useState(320);
@@ -91,6 +119,7 @@ export default function RawHtmlContent({ html, className }: RawHtmlContentProps)
 </head>
 <body>
 ${body}
+<style>${READING_CSS}</style>
 <script>${RESIZE_JS.replace('__FRAME_ID__', frameId)}<\/script>
 </body>
 </html>`;
@@ -109,7 +138,7 @@ ${body}
   return (
     <iframe
       ref={ref}
-      title="Conteúdo do post"
+      title={title}
       srcDoc={srcDoc}
       // sem allow-same-origin de propósito: o post não alcança o site.
       // allow-scripts mantém o JS do post funcionando; a navegação por
@@ -117,7 +146,7 @@ ${body}
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       scrolling="no"
       className={`w-full block border-0 ${className ?? ''}`}
-      style={{ height }}
+      style={{ height, backgroundColor: '#0B2B26', colorScheme: 'dark' }}
     />
   );
 }

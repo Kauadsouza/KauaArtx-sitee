@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { AlertTriangle, ArrowLeft, ArrowRight, Radio } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, CalendarDays, Clock3, Radio } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getPostBySlug, getPublishedPosts } from '@/lib/supabase/server';
@@ -13,6 +13,7 @@ import PostCover from '@/components/blog/PostCover';
 import SharePost from '@/components/blog/SharePost';
 import type { Post } from '@/lib/supabase/types';
 import { getBlogMeta } from '@/data/blog-curation';
+import { estimateReadingMinutes } from '@/lib/blog-reading';
 
 // Revalida a cada 60s — edições aparecem sozinhas
 export const revalidate = 60;
@@ -90,6 +91,8 @@ export default async function BlogPostPage({
   const all = await getPublishedPosts();
   const { older, newer, related } = buildTrail(post, all);
   const blogMeta = getBlogMeta(post);
+  const readingMinutes = estimateReadingMinutes(post.content);
+  const isPt = locale === 'pt';
   // Link canônico do post pro compartilhamento (PT é a raiz, EN tem /en)
   const shareUrl = `${SITE_URL}${locale === 'pt' ? '' : `/${locale}`}/blog/${post.slug}`;
 
@@ -150,14 +153,21 @@ export default async function BlogPostPage({
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight max-w-3xl [text-shadow:0_2px_18px_rgba(0,0,0,0.85)]">
                 {post.title}
               </h1>
-              <p className="mt-4 text-sm text-white/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
-                {t('published_on')} {formatDate(new Date(post.created_at), dateLocale)}
-              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/90 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
+                <span className="inline-flex items-center gap-1.5">
+                  <CalendarDays size={15} aria-hidden />
+                  {t('published_on')} {formatDate(new Date(post.created_at), dateLocale)}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock3 size={15} aria-hidden />
+                  {readingMinutes} {isPt ? 'min de leitura' : 'min read'}
+                </span>
+              </div>
             </div>
           </div>
 
           {blogMeta.coverCredit && (
-            <p className="border-t border-border bg-background/45 px-6 py-3 text-xs leading-relaxed text-foreground-subtle sm:px-10">
+            <p className="border-t border-border bg-background/45 px-6 py-3 text-sm leading-relaxed text-foreground-muted sm:px-10">
               Imagem ilustrativa · Foto:{' '}
               <a
                 href={blogMeta.coverCredit.sourceUrl}
@@ -192,12 +202,12 @@ export default async function BlogPostPage({
               </div>
             )}
             {post.excerpt && (
-              <p className="text-lg text-foreground-muted leading-relaxed mb-8 pb-8 border-b border-border">
+              <p className="mx-auto mb-10 max-w-[68ch] border-b border-border pb-9 text-lg leading-[1.8] text-[#C7E0CD]">
                 {post.excerpt}
               </p>
             )}
             {isHtml ? (
-              <RawHtmlContent html={post.content} />
+              <RawHtmlContent html={post.content} title={post.title} />
             ) : (
               <div className="prose-post">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
@@ -251,8 +261,8 @@ export default async function BlogPostPage({
         {related.length > 0 && (
           <section className="mt-14">
             <div className="flex items-center gap-4 mb-7">
-              <h2 className="font-pixel text-[10px] tracking-[0.3em] uppercase text-foreground whitespace-nowrap">
-                <span className="text-accent-bright">#</span> {t('related_title')}
+              <h2 className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.2em] text-foreground">
+                <span className="font-pixel text-accent-bright">#</span> {t('related_title')}
               </h2>
               <span aria-hidden className="flex-1 h-px bg-border" />
             </div>

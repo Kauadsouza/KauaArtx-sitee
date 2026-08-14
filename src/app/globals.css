@@ -394,9 +394,11 @@
 
   /* Prosa dos posts do blog */
   .prose-post {
-    color: var(--fg-muted);
-    line-height: 1.8;
-    font-size: 1.0625rem;
+    max-width: 68ch;
+    margin-inline: auto;
+    color: #C7E0CD;
+    line-height: 1.85;
+    font-size: 1.125rem;
     overflow-wrap: break-word;
   }
   .prose-post table {
@@ -414,12 +416,12 @@
   .prose-post th { background: var(--surface-el); color: var(--fg); }
   .prose-post h1, .prose-post h2, .prose-post h3 {
     color: var(--fg);
-    margin: 2rem 0 0.75rem;
+    margin: 2.75rem 0 1rem;
   }
   .prose-post h1 { font-size: 1.875rem; }
   .prose-post h2 { font-size: 1.5rem; }
   .prose-post h3 { font-size: 1.25rem; }
-  .prose-post p  { margin: 1rem 0; }
+  .prose-post p  { margin: 1.125rem 0; }
   .prose-post a  {
     color: var(--accent-deep);
     text-decoration: underline;
@@ -434,7 +436,7 @@
     border-left: 3px solid var(--accent-bright);
     padding-left: 1rem;
     margin: 1.5rem 0;
-    color: var(--fg-muted);
+    color: #C7E0CD;
     font-style: italic;
   }
   .prose-post img { border-radius: 1rem; margin: 1.5rem 0; max-width: 100%; }

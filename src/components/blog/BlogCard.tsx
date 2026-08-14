@@ -1,6 +1,7 @@
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Clock3 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { getBlogMeta } from '@/data/blog-curation';
+import { estimateReadingMinutes } from '@/lib/blog-reading';
 import { formatDate } from '@/lib/utils';
 import type { Post } from '@/lib/supabase/types';
 import PostCover from './PostCover';
@@ -16,6 +17,7 @@ export default function BlogCard({ post, locale, featured = false, priority = fa
   const meta = getBlogMeta(post);
   const dateLocale = locale === 'pt' ? 'pt-BR' : 'en-US';
   const date = formatDate(new Date(post.updated_at), dateLocale);
+  const readingMinutes = estimateReadingMinutes(post.content);
 
   return (
     <article
@@ -51,14 +53,21 @@ export default function BlogCard({ post, locale, featured = false, priority = fa
         </div>
 
         <div className="mt-auto pt-24">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/65">
-            {post.category ?? (meta.kind === 'story' ? 'História' : 'Guia')} · {date}
-          </p>
+          <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium uppercase tracking-[0.16em] text-white/85">
+            <span>{post.category ?? (meta.kind === 'story' ? 'História' : 'Guia')}</span>
+            <span aria-hidden>·</span>
+            <span>{date}</span>
+            <span aria-hidden>·</span>
+            <span className="inline-flex items-center gap-1 normal-case tracking-normal">
+              <Clock3 size={12} aria-hidden />
+              {readingMinutes} min
+            </span>
+          </div>
           <h2 className={`${featured ? 'text-3xl sm:text-4xl' : 'text-2xl'} max-w-3xl font-bold leading-tight tracking-tight text-white`}>
             {post.title}
           </h2>
           {post.excerpt && (
-            <p className={`mt-4 max-w-2xl leading-relaxed text-white/75 ${featured ? 'text-base' : 'line-clamp-3 text-sm'}`}>
+            <p className={`mt-4 max-w-2xl leading-relaxed text-white/85 ${featured ? 'text-base' : 'line-clamp-3 text-sm'}`}>
               {post.excerpt}
             </p>
           )}

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrowRight, BookOpen, Compass, Radio } from 'lucide-react';
+import { ArrowRight, BookOpen, Compass, ListChecks, Map as MapIcon, Plane, Radio } from 'lucide-react';
 import BlogCard from '@/components/blog/BlogCard';
 import BlogTabs from '@/components/blog/BlogTabs';
 import {
@@ -12,6 +12,42 @@ import { Link } from '@/i18n/navigation';
 import { getPublishedPosts } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
+
+const START_ROUTES = [
+  {
+    number: '01',
+    icon: ListChecks,
+    title: { pt: 'Começar do zero', en: 'Start from zero' },
+    description: {
+      pt: 'Organize o básico antes de comprar a passagem.',
+      en: 'Organize the basics before buying the ticket.',
+    },
+    slugs: ['checklist-real-para-comecar-a-viajar-e-trabalhar-remoto'],
+  },
+  {
+    number: '02',
+    icon: Plane,
+    title: { pt: 'Viajar para o Reino Unido', en: 'Travel to the United Kingdom' },
+    description: {
+      pt: 'Leia a ETA e depois entenda a regra sobre trabalho remoto como visitante.',
+      en: 'Read about the ETA, then understand the rule on remote work as a visitor.',
+    },
+    slugs: [
+      'uk-eta-para-brasileiros-o-que-mudou-em-2026',
+      'trabalho-remoto-como-visitante-no-reino-unido',
+    ],
+  },
+  {
+    number: '03',
+    icon: MapIcon,
+    title: { pt: 'Entender a Europa em 2026', en: 'Understand Europe in 2026' },
+    description: {
+      pt: 'Um guia direto para separar EES de ETIAS.',
+      en: 'A direct guide to tell EES and ETIAS apart.',
+    },
+    slugs: ['ees-e-etias-o-que-muda-na-europa-em-2026'],
+  },
+] as const;
 
 export async function generateMetadata({
   params,
@@ -60,6 +96,14 @@ export default async function BlogPage({
   const feed = filteredPosts.filter((post) => !featuredSlugs.has(post.slug));
   const isPt = locale === 'pt';
   const activeTab = activeKind ?? 'all';
+  const postsBySlug = new Map(allPosts.map((post) => [post.slug, post]));
+  const counts = allPosts.reduce(
+    (result, post) => {
+      result[getBlogMeta(post).kind] += 1;
+      return result;
+    },
+    { story: 0, guide: 0, news: 0 }
+  );
 
   const sectionTitle = categoryExists
     ? categoria
@@ -146,6 +190,66 @@ export default async function BlogPage({
           </section>
         )}
 
+        {!activeKind && !categoryExists && (
+          <section aria-labelledby="start-route-heading" className="mb-24">
+            <div className="mb-8 max-w-2xl">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+                {isPt ? 'Painel antes de viajar' : 'Before-you-travel panel'}
+              </p>
+              <h2 id="start-route-heading" className="text-3xl font-bold tracking-tight text-foreground">
+                {isPt ? 'Escolha o que você precisa resolver agora' : 'Choose what you need to solve now'}
+              </h2>
+            </div>
+
+            <div className="border-y border-border">
+              {START_ROUTES.map((route) => {
+                const routePosts = route.slugs.flatMap((slug) => {
+                  const post = postsBySlug.get(slug);
+                  return post ? [post] : [];
+                });
+                if (routePosts.length === 0) return null;
+                const Icon = route.icon;
+
+                return (
+                  <article
+                    key={route.number}
+                    className="grid gap-5 border-b border-border py-7 last:border-b-0 md:grid-cols-[72px_minmax(220px,0.8fr)_minmax(0,1.2fr)] md:items-start"
+                  >
+                    <div className="flex items-center gap-3 text-accent md:block">
+                      <Icon size={22} aria-hidden />
+                      <span className="font-mono text-xs md:mt-3 md:block">ROTA {route.number}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">
+                        {isPt ? route.title.pt : route.title.en}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-foreground-muted">
+                        {isPt ? route.description.pt : route.description.en}
+                      </p>
+                    </div>
+                    <div className="divide-y divide-border rounded-2xl border border-border bg-surface/70 px-5">
+                      {routePosts.map((post) => (
+                        <Link
+                          key={post.id}
+                          href={`/blog/${post.slug}`}
+                          className="group flex items-center justify-between gap-5 py-4 text-sm font-semibold leading-snug text-foreground transition-colors hover:text-accent-bright"
+                        >
+                          <span>{post.title}</span>
+                          <ArrowRight
+                            size={15}
+                            aria-hidden
+                            className="shrink-0 transition-transform group-hover:translate-x-1"
+                          />
+                        </Link>
+                      ))}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <section aria-labelledby="feed-heading">
           <div className="mb-8 flex items-center gap-4">
             <h2 id="feed-heading" className="whitespace-nowrap text-2xl font-bold tracking-tight text-foreground">
@@ -172,28 +276,46 @@ export default async function BlogPage({
           )}
         </section>
 
-        <section className="mt-24 grid gap-px overflow-hidden rounded-3xl border border-border bg-border md:grid-cols-3">
-          <div className="bg-surface p-7">
+        <section aria-label={isPt ? 'Tipos de conteúdo' : 'Content types'} className="mt-24 grid gap-px overflow-hidden rounded-3xl border border-border bg-border md:grid-cols-3">
+          <Link href={{ pathname: '/blog', query: { tipo: 'historias' } }} className="group bg-surface p-7 transition-colors hover:bg-surface-elevated">
             <BookOpen className="mb-5 text-accent" size={23} />
-            <h2 className="text-lg font-bold text-foreground">{isPt ? 'Histórias' : 'Stories'}</h2>
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-bold text-foreground">{isPt ? 'Histórias' : 'Stories'}</h2>
+              <span className="font-mono text-sm text-accent">{counts.story}</span>
+            </div>
             <p className="mt-2 text-sm leading-relaxed text-foreground-muted">
               {isPt ? 'Só entram como relato as viagens que eu realmente fiz.' : 'Only trips I actually took are published as personal stories.'}
             </p>
-          </div>
-          <div className="bg-surface p-7">
+            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent group-hover:text-accent-bright">
+              {isPt ? 'Ver histórias' : 'View stories'} <ArrowRight size={14} />
+            </span>
+          </Link>
+          <Link href={{ pathname: '/blog', query: { tipo: 'guias' } }} className="group bg-surface p-7 transition-colors hover:bg-surface-elevated">
             <Compass className="mb-5 text-accent" size={23} />
-            <h2 className="text-lg font-bold text-foreground">{isPt ? 'Guias' : 'Guides'}</h2>
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-bold text-foreground">{isPt ? 'Guias' : 'Guides'}</h2>
+              <span className="font-mono text-sm text-accent">{counts.guide}</span>
+            </div>
             <p className="mt-2 text-sm leading-relaxed text-foreground-muted">
               {isPt ? 'Planejamento prático, separado da minha experiência pessoal.' : 'Practical planning, kept separate from my personal experience.'}
             </p>
-          </div>
-          <div className="bg-surface p-7">
+            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent group-hover:text-accent-bright">
+              {isPt ? 'Ver guias' : 'View guides'} <ArrowRight size={14} />
+            </span>
+          </Link>
+          <Link href="/blog/noticias" className="group bg-surface p-7 transition-colors hover:bg-surface-elevated">
             <Radio className="mb-5 text-[#F5C97B]" size={23} />
-            <h2 className="text-lg font-bold text-foreground">{isPt ? 'Notícias' : 'News'}</h2>
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-bold text-foreground">{isPt ? 'Notícias' : 'News'}</h2>
+              <span className="font-mono text-sm text-[#F5C97B]">{counts.news}</span>
+            </div>
             <p className="mt-2 text-sm leading-relaxed text-foreground-muted">
               {isPt ? 'Data de checagem visível e fonte oficial em cada atualização.' : 'Visible check date and an official source in every update.'}
             </p>
-          </div>
+            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#F5C97B] group-hover:text-foreground">
+              {isPt ? 'Abrir Radar Nômade' : 'Open Nomad Radar'} <ArrowRight size={14} />
+            </span>
+          </Link>
         </section>
 
         <div className="mt-16 flex flex-col items-start justify-between gap-6 rounded-3xl border border-border-strong bg-[linear-gradient(120deg,var(--surface),var(--surface-el))] p-7 sm:flex-row sm:items-center sm:p-9">
