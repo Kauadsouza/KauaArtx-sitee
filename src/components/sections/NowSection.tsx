@@ -10,6 +10,7 @@ const COPY = {
     description:
       'Moro aqui com a minha família, estou construindo o @KauaArtx e me preparando para estudar.',
     action: 'Ver no mapa',
+    historyAction: 'Ver histórico',
     route: 'OXFORD · REINO UNIDO',
   },
   en: {
@@ -20,6 +21,7 @@ const COPY = {
     description:
       'I live here with my family, I am building @KauaArtx, and I am preparing to study.',
     action: 'See it on the map',
+    historyAction: 'View history',
     route: 'OXFORD · UNITED KINGDOM',
   },
 } as const;
@@ -62,13 +64,22 @@ export default function NowSection({ locale }: { locale: string }) {
                 <span>{copy.route}</span>
                 <span aria-hidden className="h-2 w-2 rounded-full bg-accent" />
               </div>
-              <Link href="/mapa" className="group btn-pill-secondary text-sm">
-                {copy.action}
-                <ArrowRight
-                  size={14}
-                  className="transition-transform group-hover:translate-x-1"
-                />
-              </Link>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/mapa" className="group btn-pill-secondary text-sm">
+                  {copy.action}
+                  <ArrowRight
+                    size={14}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
+                </Link>
+                <Link href="/agora" className="group btn-pill-secondary text-sm">
+                  {copy.historyAction}
+                  <ArrowRight
+                    size={14}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -76,4 +87,3 @@ export default function NowSection({ locale }: { locale: string }) {
     </section>
   );
 }
-

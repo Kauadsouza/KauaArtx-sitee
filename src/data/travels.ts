@@ -47,6 +47,6 @@ export const TRAVELS: TravelStop[] = [
       pt: 'Minha primeira viagem internacional e onde eu moro hoje.',
       en: 'My first international trip and where I live today.',
     },
-    storyHref: '/blog/oxford-o-primeiro-ponto-do-meu-mapa',
+    storyHref: '/viagens/oxford',
   },
 ];

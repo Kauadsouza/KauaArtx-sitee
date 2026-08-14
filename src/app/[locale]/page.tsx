@@ -7,6 +7,7 @@ import AdventureGrid from '@/components/sections/AdventureGrid';
 import AdventureSpotlight from '@/components/sections/AdventureSpotlight';
 import LatestYouTube from '@/components/sections/LatestYouTube';
 import NowSection from '@/components/sections/NowSection';
+import ExploreSection from '@/components/sections/ExploreSection';
 import LoginGate from '@/components/gate/LoginGate';
 import { getPublishedPosts } from '@/lib/supabase/server';
 import { getLatestYouTubeVideo } from '@/lib/youtube';
@@ -51,6 +52,7 @@ export default async function HomePage({
       <AdventureSplit />
       <LatestYouTube locale={locale} state={latestYouTube} />
       <AdventureGrid posts={posts} />
+      <ExploreSection locale={locale} />
       <AdventureSpotlight />
     </>
   );
