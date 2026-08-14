@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight, BookOpen, Check, Clock3, MapPin } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, Check, Clock3, MapPin, Navigation } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { EDITORIAL_POSTS } from '@/data/editorial-posts';
 import { OXFORD_COPY, OXFORD_STORY_SLUG, type OxfordLocale } from '@/data/oxford-page';
@@ -14,6 +14,28 @@ export default function OxfordOverview({ loc }: { loc: OxfordLocale }) {
 
   const [longitude, latitude] = oxford.coords;
   const coordinatesLabel = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+  const location =
+    loc === 'pt'
+      ? {
+          route: 'TRAJETO SIMBÓLICO',
+          title: 'Da minha origem ao primeiro ponto internacional',
+          description:
+            'Uberlândia é onde a minha história começou. Oxford é o primeiro destino internacional registrado nesta jornada — e o único publicado até agora.',
+          origin: 'De onde eu vim',
+          destination: 'Primeiro ponto internacional',
+          note: 'Uma linha da jornada, não uma rota aérea exata.',
+          mapNote: 'Só entram no mapa viagens que realmente aconteceram.',
+        }
+      : {
+          route: 'SYMBOLIC ROUTE',
+          title: 'From my roots to the first international point',
+          description:
+            'Uberlândia is where my story began. Oxford is the first international destination recorded in this journey — and the only one published so far.',
+          origin: 'Where I came from',
+          destination: 'First international point',
+          note: 'A line through the journey, not an exact flight route.',
+          mapNote: 'Only trips that really happened are added to the map.',
+        };
 
   return (
     <>
@@ -155,64 +177,88 @@ export default function OxfordOverview({ loc }: { loc: OxfordLocale }) {
         </aside>
       </section>
 
-      <section className="deep-band -mx-4 overflow-hidden border-y border-border px-4 py-16 sm:-mx-6 sm:px-6 sm:py-20 lg:-mx-8 lg:px-8">
-        <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:items-center">
-          <div>
+      <section
+        aria-labelledby="oxford-location-title"
+        className="deep-band -mx-4 overflow-hidden border-y border-border px-4 py-16 sm:-mx-6 sm:px-6 sm:py-20 lg:-mx-8 lg:px-8"
+      >
+        <div className="mx-auto max-w-5xl">
+          <div className="max-w-3xl">
             <div className="mb-4 flex items-center gap-2.5">
-              <MapPin size={15} className="text-accent-bright" aria-hidden />
+              <Navigation size={15} className="text-accent-bright" aria-hidden />
               <span className="font-pixel text-[9px] tracking-[0.28em] text-accent-deep">
-                {copy.locationKicker}
+                {location.route}
               </span>
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              {copy.locationTitle}
+            <h2
+              id="oxford-location-title"
+              className="text-3xl font-bold tracking-[-0.035em] text-foreground sm:text-5xl"
+            >
+              {location.title}
             </h2>
-            <p className="mt-5 leading-relaxed text-foreground-muted">{copy.locationDescription}</p>
-            <Link href="/mapa" className="btn-pill-primary mt-7 text-sm">
-              {copy.openMap}
-              <ArrowRight size={14} aria-hidden />
-            </Link>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-foreground-muted sm:text-lg">
+              {location.description}
+            </p>
           </div>
 
-          <div className="relative min-h-[360px] overflow-hidden rounded-3xl border border-border-strong bg-[#051F20] p-6 sm:p-8">
-            <div
-              aria-hidden
-              className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(142,182,155,0.13)_1px,transparent_1px),linear-gradient(90deg,rgba(142,182,155,0.13)_1px,transparent_1px)] [background-size:36px_36px]"
-            />
-            <div
-              aria-hidden
-              className="absolute left-[18%] top-[22%] h-56 w-56 rounded-full border border-accent/10 shadow-[0_0_100px_rgba(142,182,155,0.14)] sm:h-64 sm:w-64"
-            />
-            <div
-              aria-hidden
-              className="absolute left-[10%] right-[10%] top-1/2 -rotate-6 border-t-2 border-dashed border-accent/30"
-            />
+          <div className="relative mt-10 overflow-hidden rounded-[2rem] border border-accent/25 bg-[linear-gradient(135deg,#092c29_0%,#061e1d_58%,#041817_100%)] p-5 shadow-[0_28px_80px_-40px_rgba(126,211,155,0.45)] sm:p-8">
+            <div aria-hidden className="absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
 
-            <div className="relative flex h-full min-h-[300px] flex-col justify-between">
-              <div className="flex items-start justify-between gap-4">
-                <span className="rounded-full border border-accent/25 bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent-bright">
-                  {copy.currentBase}
-                </span>
-                <span className="text-right font-mono text-xs text-foreground-subtle">
-                  {copy.coordinates}
-                  <br />
-                  <strong className="text-foreground-muted">{coordinatesLabel}</strong>
+            <div className="relative flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
+              <span className="w-fit rounded-full border border-accent/25 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-accent-bright">
+                {location.route}
+              </span>
+              <p className="text-xs text-foreground-subtle">
+                {copy.coordinates}:{' '}
+                <strong className="font-mono font-medium text-foreground-muted">{coordinatesLabel}</strong>
+              </p>
+            </div>
+
+            <div className="relative grid py-7 md:grid-cols-[minmax(0,0.8fr)_minmax(7rem,0.45fr)_minmax(0,1fr)] md:items-center md:py-10">
+              <div className="rounded-2xl border border-white/10 bg-black/10 p-5 sm:p-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground-subtle">
+                  {location.origin}
+                </p>
+                <div className="mt-4 flex items-center gap-3">
+                  <span className="h-3 w-3 rounded-full border-2 border-accent-bright bg-[#071f1d] shadow-[0_0_0_6px_rgba(218,241,222,0.08)]" />
+                  <div>
+                    <p className="text-xl font-bold text-foreground">Uberlândia</p>
+                    <p className="mt-0.5 text-sm text-foreground-muted">Brasil</p>
+                  </div>
+                </div>
+              </div>
+
+              <div aria-hidden className="relative flex h-20 items-center justify-center md:h-auto">
+                <span className="absolute inset-y-0 left-1/2 border-l border-dashed border-accent/40 md:inset-x-0 md:inset-y-auto md:top-1/2 md:border-l-0 md:border-t" />
+                <span className="relative flex h-9 w-9 items-center justify-center rounded-full border border-accent/30 bg-[#0a2b28] text-accent-bright shadow-lg">
+                  <Navigation size={15} className="rotate-[135deg] md:rotate-45" />
                 </span>
               </div>
 
-              <div className="self-center text-center">
-                <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-accent-bright bg-accent text-[#051F20] shadow-[0_0_40px_rgba(218,241,222,0.35)]">
-                  <MapPin size={27} aria-hidden />
-                </span>
-                <p className="mt-4 text-2xl font-bold text-foreground">{oxford.name[loc]}</p>
-                <p className="mt-1 text-sm text-foreground-muted">{oxford.country[loc]}</p>
+              <div className="relative overflow-hidden rounded-2xl border border-accent/35 bg-accent/[0.09] p-5 sm:p-6">
+                <div className="flex items-start gap-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-accent-bright bg-accent text-[#05201e] shadow-[0_0_30px_rgba(218,241,222,0.22)]">
+                    <MapPin size={21} aria-hidden />
+                  </span>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent-bright">
+                      {location.destination}
+                    </p>
+                    <p className="mt-2 text-2xl font-bold text-foreground">{oxford.name[loc]}</p>
+                    <p className="mt-1 text-sm text-foreground-muted">{oxford.country[loc]}</p>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <div className="flex items-center justify-between gap-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground-subtle">
-                <span>51° N</span>
-                <span className="h-px flex-1 bg-border" />
-                <span>1° W</span>
+            <div className="relative flex flex-col gap-5 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs text-foreground-subtle">{location.note}</p>
+                <p className="mt-1 text-sm text-foreground-muted">{location.mapNote}</p>
               </div>
+              <Link href="/mapa" className="btn-pill-primary shrink-0 text-sm">
+                {copy.openMap}
+                <ArrowRight size={14} aria-hidden />
+              </Link>
             </div>
           </div>
         </div>
