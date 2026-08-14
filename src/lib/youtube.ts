@@ -1,4 +1,4 @@
-const CHANNEL_URL = 'https://www.youtube.com/@KauartX';
+const CHANNEL_URL = 'https://www.youtube.com/@KauaArtx';
 const CHANNEL_CACHE_SECONDS = 60 * 60 * 24;
 const FEED_CACHE_SECONDS = 60 * 15;
 

@@ -10,7 +10,7 @@ import {
   Sparkles, Wrench, School, Check, Lock, Flag, Footprints,
 } from 'lucide-react';
 
-const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
+const YOUTUBE_URL = 'https://www.youtube.com/@KauaArtx';
 
 // A jornada é uma trilha estilo game (tipo Duolingo): paradas concluídas,
 // paradas em andamento, a parada ATUAL (onde o Kauã está, com a arte dele

@@ -101,5 +101,5 @@ KauaArtx
 ## Nome e links
 
 - Nome de exibição: `KauaArtx`.
-- Canal atual: `https://www.youtube.com/@KauartX`.
+- Canal atual: `https://www.youtube.com/@KauaArtx`.
 - Enquanto o handle não for confirmado em todas as plataformas, preservar o endereço real nos links e usar `@KauaArtx` como assinatura editorial.

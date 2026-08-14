@@ -14,7 +14,7 @@ const LOCALES = [
   { code: 'en', label: 'EN', flag: '🇺🇸' },
 ];
 
-const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
+const YOUTUBE_URL = 'https://www.youtube.com/@KauaArtx';
 
 // O que fica salvo é o começo do email ("joao.silva87"). Vira um nome
 // apresentável: primeiro pedaço antes de ponto/traço, sem números soltos

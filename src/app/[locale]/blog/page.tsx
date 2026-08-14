@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 const SOCIALS = [
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram', handle: '@kauaartx' },
   { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X', handle: '@KauaArtx' },
-  { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube', handle: '@KauartX' },
+  { href: 'https://www.youtube.com/@KauaArtx', icon: Youtube, label: 'YouTube', handle: '@KauaArtx' },
   { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
 ];
 
@@ -155,7 +155,7 @@ export default async function BlogPage({
                   <ArrowRight size={14} />
                 </Link>
                 <a
-                  href="https://www.youtube.com/@KauartX"
+                  href="https://www.youtube.com/@KauaArtx"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-sm text-foreground-muted hover:text-foreground hover:border-border-strong transition-all"

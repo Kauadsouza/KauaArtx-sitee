@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Youtube, ArrowRight, Mountain } from 'lucide-react';
 
-const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
+const YOUTUBE_URL = 'https://www.youtube.com/@KauaArtx';
 
 // Seção 2 da estrutura de aventura: painel de TEXTO à esquerda + FOTO
 // grande de paisagem à direita. Espelha o split do print.
