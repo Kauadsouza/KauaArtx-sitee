@@ -1,5 +1,6 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { EDITORIAL_POSTS, getEditorialPostBySlug } from '@/data/editorial-posts';
+import { applyBlogCuration } from '@/data/blog-curation';
 import type { Post } from './types';
 
 // Cliente público (somente leitura via RLS) para páginas do site.
@@ -21,10 +22,10 @@ function mergePublishedPosts(databasePosts: Post[]): Post[] {
   const bySlug = new Map<string, Post>();
 
   for (const post of EDITORIAL_POSTS) {
-    if (post.published) bySlug.set(post.slug, post);
+    if (post.published) bySlug.set(post.slug, applyBlogCuration(post));
   }
   for (const post of databasePosts) {
-    bySlug.set(post.slug, post);
+    bySlug.set(post.slug, applyBlogCuration(post));
   }
 
   return [...bySlug.values()].sort(
@@ -54,13 +55,13 @@ export async function getPublishedPosts(limit?: number): Promise<Post[]> {
 export async function getPostBySlug(slug: string): Promise<Post | null> {
   const supabase = createPublicClient();
   const editorialPost = getEditorialPostBySlug(slug);
-  if (!supabase) return editorialPost;
+  if (!supabase) return editorialPost ? applyBlogCuration(editorialPost) : null;
   const { data, error } = await supabase
     .from('posts')
     .select('*')
     .eq('slug', slug)
     .eq('published', true)
     .single();
-  if (error || !data) return editorialPost;
-  return data;
+  if (error || !data) return editorialPost ? applyBlogCuration(editorialPost) : null;
+  return applyBlogCuration(data);
 }

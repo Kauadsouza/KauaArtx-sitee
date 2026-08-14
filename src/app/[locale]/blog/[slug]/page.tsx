@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Radio } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getPostBySlug, getPublishedPosts } from '@/lib/supabase/server';
@@ -12,6 +12,7 @@ import RawHtmlContent from '@/components/blog/RawHtmlContent';
 import PostCover from '@/components/blog/PostCover';
 import SharePost from '@/components/blog/SharePost';
 import type { Post } from '@/lib/supabase/types';
+import { getBlogMeta } from '@/data/blog-curation';
 
 // Revalida a cada 60s — edições aparecem sozinhas
 export const revalidate = 60;
@@ -88,6 +89,7 @@ export default async function BlogPostPage({
 
   const all = await getPublishedPosts();
   const { older, newer, related } = buildTrail(post, all);
+  const blogMeta = getBlogMeta(post);
   // Link canônico do post pro compartilhamento (PT é a raiz, EN tem /en)
   const shareUrl = `${SITE_URL}${locale === 'pt' ? '' : `/${locale}`}/blog/${post.slug}`;
 
@@ -124,6 +126,7 @@ export default async function BlogPostPage({
             <PostCover
               src={post.cover_url}
               position={post.cover_position}
+              priority
               className="absolute inset-0 w-full h-full"
             />
             <div
@@ -133,7 +136,11 @@ export default async function BlogPostPage({
             <div className="relative w-full p-6 sm:p-10">
               {post.category && (
                 <Link
-                  href={{ pathname: '/blog', query: { categoria: post.category } }}
+                  href={
+                    blogMeta.kind === 'news'
+                      ? '/blog/noticias'
+                      : { pathname: '/blog', query: { categoria: post.category } }
+                  }
                   className="inline-flex items-center gap-1.5 mb-4 px-3 py-1 rounded-full border border-white/25 bg-black/30 backdrop-blur-sm text-[11px] font-semibold text-white hover:border-accent-bright hover:text-accent-bright transition-colors"
                 >
                   <span aria-hidden className="w-1 h-1 rounded-full bg-accent-bright" />
@@ -149,8 +156,41 @@ export default async function BlogPostPage({
             </div>
           </div>
 
+          {blogMeta.coverCredit && (
+            <p className="border-t border-border bg-background/45 px-6 py-3 text-xs leading-relaxed text-foreground-subtle sm:px-10">
+              Imagem ilustrativa · Foto:{' '}
+              <a
+                href={blogMeta.coverCredit.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground-muted underline decoration-border-strong underline-offset-4 hover:text-foreground"
+              >
+                {blogMeta.coverCredit.author}
+              </a>{' '}
+              · {blogMeta.coverCredit.license}
+            </p>
+          )}
+
           {/* Conteúdo */}
           <div className="p-6 sm:p-10">
+            {blogMeta.kind === 'news' && (
+              <div className="mb-8 flex gap-3 rounded-2xl border border-[#F5C97B]/30 bg-[#F5C97B]/8 p-4 text-sm leading-relaxed text-foreground-muted">
+                <Radio size={18} className="mt-0.5 shrink-0 text-[#F5C97B]" />
+                <p>
+                  <strong className="text-foreground">Radar verificado:</strong>{' '}
+                  informações conferidas em fontes oficiais na data indicada. Confirme novamente antes de viajar.
+                </p>
+              </div>
+            )}
+            {blogMeta.archive && (
+              <div className="mb-8 flex gap-3 rounded-2xl border border-border-strong bg-background/35 p-4 text-sm leading-relaxed text-foreground-muted">
+                <AlertTriangle size={18} className="mt-0.5 shrink-0 text-[#F5C97B]" />
+                <p>
+                  <strong className="text-foreground">Guia do arquivo:</strong>{' '}
+                  regras de visto, residência e impostos podem ter mudado desde a publicação. Use como ponto de partida e confirme no governo do destino.
+                </p>
+              </div>
+            )}
             {post.excerpt && (
               <p className="text-lg text-foreground-muted leading-relaxed mb-8 pb-8 border-b border-border">
                 {post.excerpt}
