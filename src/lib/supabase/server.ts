@@ -12,22 +12,20 @@ function createPublicClient() {
   });
 }
 
-const CURRENT_PHASE_STARTED_AT = '2026-08-13T00:00:00.000Z';
-
 export async function getPublishedPosts(limit?: number): Promise<Post[]> {
   const supabase = createPublicClient();
   if (!supabase) return [];
   // select('*'): resiliente a colunas novas (ex.: cover_position) — o blog
   // não quebra se uma migração ainda não foi rodada; o campo só vem vazio.
-  const query = supabase
+  let query = supabase
     .from('posts')
     .select('*')
     .eq('published', true)
-    .gte('created_at', CURRENT_PHASE_STARTED_AT)
     .order('created_at', { ascending: false });
+  if (limit) query = query.limit(limit);
   const { data, error } = await query;
   if (error) return [];
-  return limit ? (data ?? []).slice(0, limit) : (data ?? []);
+  return data ?? [];
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
@@ -38,7 +36,6 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     .select('*')
     .eq('slug', slug)
     .eq('published', true)
-    .gte('created_at', CURRENT_PHASE_STARTED_AT)
     .single();
   if (error) return null;
   return data;
