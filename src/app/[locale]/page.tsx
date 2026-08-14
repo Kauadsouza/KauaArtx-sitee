@@ -5,8 +5,11 @@ import AdventureFeatures from '@/components/sections/AdventureFeatures';
 import AdventureSplit from '@/components/sections/AdventureSplit';
 import AdventureGrid from '@/components/sections/AdventureGrid';
 import AdventureSpotlight from '@/components/sections/AdventureSpotlight';
+import LatestYouTube from '@/components/sections/LatestYouTube';
+import NowSection from '@/components/sections/NowSection';
 import LoginGate from '@/components/gate/LoginGate';
 import { getPublishedPosts } from '@/lib/supabase/server';
+import { getLatestYouTubeVideo } from '@/lib/youtube';
 
 // Revalida a cada 60s — posts novos aparecem sozinhos
 export const revalidate = 60;
@@ -24,8 +27,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function HomePage() {
-  const posts = await getPublishedPosts(4);
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const [posts, latestYouTube] = await Promise.all([
+    getPublishedPosts(4),
+    getLatestYouTubeVideo(),
+  ]);
 
   return (
     <>
@@ -35,8 +46,10 @@ export default async function HomePage() {
           escopo enviado pelo Kauã: features + 2 destaques, split texto/foto,
           grade do blog e bloco de 2 cards + CTA grande. */}
       <Hero />
+      <NowSection locale={locale} />
       <AdventureFeatures />
       <AdventureSplit />
+      <LatestYouTube locale={locale} state={latestYouTube} />
       <AdventureGrid posts={posts} />
       <AdventureSpotlight />
     </>

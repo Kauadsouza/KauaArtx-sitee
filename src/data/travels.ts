@@ -32,6 +32,8 @@ export interface TravelStop {
   year?: string; // "2024" ou "2019 — hoje"
   status: TravelStatus;
   note?: { pt: string; en: string };
+  storyHref?: string;
+  videoUrl?: string;
 }
 
 export const TRAVELS: TravelStop[] = [
@@ -42,31 +44,9 @@ export const TRAVELS: TravelStop[] = [
     coords: [-1.2577, 51.752],
     status: 'lived',
     note: {
-      pt: 'Onde eu moro hoje. Meu ponto de partida pra conhecer mais do mundo.',
-      en: 'Where I live today. My starting point for seeing more of the world.',
+      pt: 'Minha primeira viagem internacional e onde eu moro hoje.',
+      en: 'My first international trip and where I live today.',
     },
-  },
-  {
-    id: 'uberlandia',
-    name: { pt: 'Uberlândia', en: 'Uberlândia' },
-    country: { pt: 'Brasil', en: 'Brazil' },
-    coords: [-48.2772, -18.9186],
-    status: 'lived',
-    note: {
-      pt: 'Onde eu nasci e cresci. O começo de tudo.',
-      en: 'Where I was born and raised. Where everything started.',
-    },
-  },
-  {
-    id: 'sao-paulo',
-    name: { pt: 'São Paulo', en: 'São Paulo' },
-    country: { pt: 'Brasil', en: 'Brazil' },
-    coords: [-46.6333, -23.5505],
-    year: '2026',
-    status: 'visited',
-    note: {
-      pt: 'Uma viagem que fez parte da minha história antes da mudança pra Inglaterra.',
-      en: 'A trip that became part of my story before moving to England.',
-    },
+    storyHref: '/blog/oxford-o-primeiro-ponto-do-meu-mapa',
   },
 ];
