@@ -19,22 +19,29 @@ export default function AdminLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setError(null);
     setLoading(true);
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (authError) {
-      setError('Email ou senha incorretos.');
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (authError) {
+        setError(authError.code === 'invalid_credentials'
+          ? 'Email ou senha incorretos.'
+          : 'Não foi possível entrar. Confira a conexão e tente novamente.');
+        return;
+      }
+      router.push('/admin');
+      router.refresh();
+    } catch {
+      setError('O serviço de acesso está indisponível. Tente novamente em instantes.');
+    } finally {
+      setPassword('');
       setLoading(false);
-      return;
     }
-
-    router.push('/admin');
-    router.refresh();
   };
 
   return (

@@ -115,6 +115,7 @@ export default function PostEditor({ post }: PostEditorProps) {
   // Aviso por email pros inscritos do portal (rota /api/notify-post)
   const [notifying, setNotifying] = useState(false);
   const [notifyResult, setNotifyResult] = useState<string | null>(null);
+  const newsletterEnabled = process.env.NEXT_PUBLIC_NEWSLETTER_ENABLED === 'true';
 
   // Inserção de imagem e link direto no conteúdo
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -340,7 +341,7 @@ export default function PostEditor({ post }: PostEditorProps) {
           </Link>
           <div className="flex items-center gap-3">
             {/* Só em post existente e publicado — rascunho não tem o que avisar */}
-            {post && published && (
+            {newsletterEnabled && post && published && (
               <button
                 onClick={handleNotify}
                 disabled={notifying}

@@ -45,6 +45,24 @@ export interface Bounds {
   wrap: boolean;
 }
 
+/**
+ * Esse pedaço do mundo cabe todo fora da tela? Então nem desenha.
+ *
+ * A pegadinha mora nas caixas que dão a volta pela linha de data: a Rússia
+ * começa em 19° L e termina em 169° O, ou seja, o "oeste" dela é um número
+ * MAIOR que o "leste". Quem trata isso como caixa comum conclui que ela está
+ * fora de qualquer tela e apaga a Rússia do mapa — foi exatamente o que
+ * aconteceu. Fiji tem o mesmo problema.
+ */
+export const boxOutside = (b: Bounds, box: [number, number, number, number]) => {
+  const [oeste, sul, leste, norte] = box;
+  if (norte < b.lat0 || sul > b.lat1) return true;
+  // Caixa que passa pela linha de data vale de `oeste` até 180° E TAMBÉM de
+  // -180° até `leste`
+  if (oeste > leste) return b.lon1 < oeste && b.lon0 > leste;
+  return leste < b.lon0 || oeste > b.lon1;
+};
+
 // ── Países ──────────────────────────────────────────────────────────
 const infoByNumeric = countriesInfo as Record<string, CountryInfo>;
 const infoByAlpha2 = new Map<string, CountryInfo>(
@@ -175,10 +193,41 @@ export function ensureAdmin1(onReady?: () => void) {
 
 /** As divisas dos países que aparecem na janela (vazio se ainda não baixou). */
 export function admin1InView(dentro: (box: [number, number, number, number]) => boolean) {
-  if (!admin1) return [];
+  return recorta(admin1, dentro);
+}
+
+// ── Divisa de município (Brasil, do IBGE) ───────────────────────────
+// Um degrau abaixo do estado: só desce quando o zoom chega perto de verdade,
+// porque é a camada mais fina do mapa. Guardada por estado.
+let municipios: Record<string, Admin1Entry> | null = null;
+let municipiosLoading = false;
+
+export function ensureMunicipios(onReady?: () => void) {
+  if (municipios || municipiosLoading) return;
+  municipiosLoading = true;
+  import('@/data/map/municipios-br.json')
+    .then((mod) => {
+      municipios = ((mod as { default?: unknown }).default ?? mod) as Record<string, Admin1Entry>;
+      municipiosLoading = false;
+      onReady?.();
+    })
+    .catch(() => {
+      municipiosLoading = false;
+    });
+}
+
+export function municipiosInView(dentro: (box: [number, number, number, number]) => boolean) {
+  return recorta(municipios, dentro);
+}
+
+function recorta(
+  fonte: Record<string, Admin1Entry> | null,
+  dentro: (box: [number, number, number, number]) => boolean
+) {
+  if (!fonte) return [];
   const saida: Admin1Entry['linhas'][] = [];
-  for (const k in admin1) {
-    const e = admin1[k];
+  for (const k in fonte) {
+    const e = fonte[k];
     if (dentro(e.box)) saida.push(e.linhas);
   }
   return saida;
@@ -235,6 +284,117 @@ export function ensureCities(tier: number, onReady?: () => void) {
 
 export const citiesReady = (tier: number) => tiersLoaded.has(tier);
 export const citiesLoading = () => tiersLoading.size > 0;
+
+// ── Busca por nome ──────────────────────────────────────────────────
+const semAcento = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim();
+
+/**
+ * Os nomes vêm como se escrevem no lugar ("Tokyo", "Moscow", "Köln"), então
+ * quem digita em português não acharia. Esta lista cobre os apelidos que o
+ * português consagrou — não é chute de tradução, é o nome que a gente usa.
+ */
+const APELIDOS_PT: Record<string, string> = {
+  toquio: 'tokyo',
+  londres: 'london',
+  'novayork': 'new york city',
+  'novaiorque': 'new york city',
+  pequim: 'beijing',
+  moscou: 'moscow',
+  moscovo: 'moscow',
+  'cidadedomexico': 'mexico city',
+  roma: 'rome',
+  milao: 'milan',
+  genebra: 'geneva',
+  copenhague: 'copenhagen',
+  zurique: 'zurich',
+  munique: 'munich',
+  colonia: 'cologne',
+  varsovia: 'warsaw',
+  praga: 'prague',
+  atenas: 'athens',
+  estocolmo: 'stockholm',
+  viena: 'vienna',
+  bruxelas: 'brussels',
+  haia: 'the hague',
+  berna: 'bern',
+  'novadelhi': 'new delhi',
+  xangai: 'shanghai',
+  seul: 'seoul',
+  bancoc: 'bangkok',
+  cingapura: 'singapore',
+  joanesburgo: 'johannesburg',
+  argel: 'algiers',
+  tunis: 'tunis',
+  damasco: 'damascus',
+  bagda: 'baghdad',
+  teera: 'tehran',
+  jerusalem: 'jerusalem',
+  'cidadedocabo': 'cape town',
+  'baixasaxonia': 'hannover',
+  genova: 'genoa',
+  florenca: 'florence',
+  veneza: 'venice',
+  napoles: 'naples',
+  turim: 'turin',
+  sevilha: 'seville',
+  saragoca: 'zaragoza',
+  'corunha': 'a coruña',
+  bordeus: 'bordeaux',
+  marselha: 'marseille',
+  lyon: 'lyon',
+  toulouse: 'toulouse',
+  edimburgo: 'edinburgh',
+  dublim: 'dublin',
+  helsinque: 'helsinki',
+  oslo: 'oslo',
+  riade: 'riyadh',
+  'hanoi': 'hanoi',
+  cantao: 'guangzhou',
+  'hongkong': 'hong kong',
+  macau: 'macau',
+};
+
+export interface Achado {
+  city: City;
+  /** país da cidade, já no idioma do site */
+  pais: string;
+}
+
+/**
+ * Procura um lugar pelo nome entre as cidades já baixadas.
+ *
+ * Ordem: quem COMEÇA com o que foi digitado vem antes de quem só contém, e
+ * dentro disso a maior população primeiro — é o que faz "sao" achar São Paulo
+ * antes de São Gabriel do Oeste.
+ */
+export function searchCities(termo: string, idioma: 'pt' | 'en', limite = 8): Achado[] {
+  const q0 = semAcento(termo);
+  if (q0.length < 2 || !cells.size) return [];
+  const q = APELIDOS_PT[q0.replace(/\s/g, '')] ?? q0;
+
+  const comeca: City[] = [];
+  const contem: City[] = [];
+  for (const arr of cells.values()) {
+    for (const c of arr) {
+      const nome = semAcento(c[0]);
+      if (nome.startsWith(q)) comeca.push(c);
+      else if (nome.includes(q)) contem.push(c);
+    }
+  }
+  const porPop = (a: City, b: City) => b[3] - a[3];
+  comeca.sort(porPop);
+  contem.sort(porPop);
+
+  return [...comeca, ...contem].slice(0, limite).map((city) => ({
+    city,
+    pais: countryByAlpha2(city[4])?.[idioma] ?? city[4],
+  }));
+}
 
 /** Cidades acima de `minPop` dentro da janela visível. */
 export function queryCities(b: Bounds | null, minPop: number, limit: number): City[] {

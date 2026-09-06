@@ -10,7 +10,7 @@ export const SITE_URL =
 export const SITE_NAME = 'Kauã Souza';
 
 export const SOCIAL_PROFILES = [
-  'https://www.youtube.com/@KauartX',
+  'https://www.youtube.com/@KauaArtx',
   'https://www.instagram.com/kauaartx/',
   'https://www.linkedin.com/in/kauadsouza/',
   'https://x.com/KauaArtx',

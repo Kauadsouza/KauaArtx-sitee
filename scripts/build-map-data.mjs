@@ -32,6 +32,12 @@ import countries from 'world-countries';
 import { topology } from 'topojson-server';
 import { mesh } from 'topojson-client';
 import { presimplify, simplify } from 'topojson-simplify';
+import {
+  chaveCidade,
+  nomeEmPortuguesBR,
+  semAcento,
+  separaMunicipioEstado,
+} from './map-data-helpers.mjs';
 
 const MIN_AREA = 0.0015;
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data', 'map');
@@ -115,12 +121,6 @@ async function baixarAllTheCities() {
 }
 
 // ── IBGE: população do Censo 2022, município por município ──────────
-const semAcento = (s) =>
-  s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
 
 /**
  * Liga o código de estado do GeoNames (BR.31, BR.27…) à sigla do IBGE.
@@ -160,11 +160,10 @@ async function baixarIBGE() {
   // que evita dar a população de uma Bom Jesus pra outra Bom Jesus.
   const pop = new Map();
   for (const s of series) {
-    const bruto = String(s.localidade.nome);
-    const m = bruto.match(/^(.*?)\s*-\s*([A-Z]{2})$/);
-    if (!m) continue;
+    const partes = separaMunicipioEstado(s.localidade.nome);
+    if (!partes) continue;
     const valor = Number(Object.values(s.serie)[0]);
-    if (valor > 0) pop.set(`${semAcento(m[1])}|${m[2]}`, valor);
+    if (valor > 0) pop.set(chaveCidade(partes.municipio, partes.uf), valor);
   }
   return { pop, ponte };
 }
@@ -186,7 +185,7 @@ try {
   let semPar = 0;
   for (const c of brasileiras) {
     const uf = ponte.get(c.admin1);
-    const novo = uf ? pop.get(`${semAcento(c.name)}|${uf}`) : undefined;
+    const novo = uf ? pop.get(chaveCidade(c.name, uf)) : undefined;
     if (!novo) {
       semPar++;
       continue;
@@ -264,23 +263,8 @@ const REGIOES_PT = {
 
 // O mapa-múndi (world-atlas) identifica cada país por um número (o código
 // ISO 3166-1 numérico) — a chave aqui é esse mesmo número.
-// O world-countries traduz pra português de PORTUGAL — "Quénia", "Arménia",
-// "Polónia". O site é brasileiro, então o nome vem do CLDR em pt-BR, que o
-// próprio Node carrega. Exceção: quando o CLDR usa aquele formato de lista
-// com hífen ("Congo - Kinshasa"), que num mapa fica estranho — aí fica o
-// nome por extenso mesmo.
+// O nome em português do Brasil vem do CLDR (ver map-data-helpers.mjs).
 const nomesBR = new Intl.DisplayNames(['pt-BR'], { type: 'region' });
-const emPortuguesBR = (c) => {
-  const dePortugal = c.translations.por?.common ?? c.name.common;
-  let doBrasil;
-  try {
-    doBrasil = nomesBR.of(c.cca2);
-  } catch {
-    /* país sem nome no CLDR */
-  }
-  if (!doBrasil || doBrasil === c.cca2 || doBrasil.includes(' - ')) return dePortugal;
-  return doBrasil;
-};
 
 const info = {};
 const semTraducao = new Set();
@@ -288,7 +272,7 @@ for (const c of countries) {
   const regiao = c.subregion || c.region || null;
   if (regiao && !REGIOES_PT[regiao]) semTraducao.add(regiao);
   info[c.ccn3] = {
-    pt: emPortuguesBR(c),
+    pt: nomeEmPortuguesBR(c.cca2, c.translations.por?.common ?? c.name.common, nomesBR),
     en: c.name.common,
     cca2: c.cca2,
     capital: c.capital?.[0] ?? null,
@@ -366,6 +350,68 @@ try {
   );
 } catch (erro) {
   console.warn(`⚠ divisões estaduais falharam (${erro.message}) — o mapa segue sem elas`);
+}
+
+// ── Divisa de município, só no Brasil ───────────────────────────────
+// O Natural Earth para no estado. Pra divisa de cidade a fonte é o IBGE, que
+// publica o contorno dos 5.570 municípios. Agrupado por ESTADO: quem está
+// olhando Minas não precisa das divisas do Amazonas na mão.
+try {
+  const url =
+    'https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR' +
+    '?formato=application/vnd.geo+json&qualidade=minima&intrarregiao=municipio';
+  console.log('baixando divisa de município do IBGE …');
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`IBGE malhas respondeu ${res.status}`);
+  const fc = await res.json();
+  if (!fc.features?.length) throw new Error('malha veio vazia');
+
+  // Os dois primeiros dígitos do código do município são o código do estado
+  const porEstado = new Map();
+  for (const f of fc.features) {
+    const uf = String(f.properties?.codarea ?? '').slice(0, 2);
+    if (!uf || !f.geometry) continue;
+    if (!porEstado.has(uf)) porEstado.set(uf, []);
+    porEstado.get(uf).push({ type: 'Feature', properties: {}, geometry: f.geometry });
+  }
+
+  const saida = {};
+  let divisas = 0;
+  for (const [uf, features] of porEstado) {
+    if (features.length < 2) continue;
+    const topo = simplify(
+      presimplify(topology({ m: { type: 'FeatureCollection', features } })),
+      MIN_AREA / 4 // divisa de município é detalhe fino: simplifica menos
+    );
+    const linhas = mesh(topo, topo.objects.m, (a, b) => a !== b);
+    if (!linhas.coordinates?.length) continue;
+    let oeste = 180;
+    let leste = -180;
+    let sul = 90;
+    let norte = -90;
+    for (const linha of linhas.coordinates) {
+      for (let i = 0; i < linha.length; i++) {
+        linha[i] = [Math.round(linha[i][0] * 1e4) / 1e4, Math.round(linha[i][1] * 1e4) / 1e4];
+        const [lon, lat] = linha[i];
+        if (lon < oeste) oeste = lon;
+        if (lon > leste) leste = lon;
+        if (lat < sul) sul = lat;
+        if (lat > norte) norte = lat;
+      }
+    }
+    divisas += features.length;
+    saida[uf] = { box: [oeste, sul, leste, norte].map((n) => Math.round(n * 100) / 100), linhas };
+  }
+
+  const texto = JSON.stringify(saida);
+  writeFileSync(join(OUT, 'municipios-br.json'), texto);
+  console.log(
+    `municipios-br.json  ${divisas} municípios em ${Object.keys(saida).length} estados → ${Math.round(
+      texto.length / 1024
+    )} KB`
+  );
+} catch (erro) {
+  console.warn(`⚠ divisa de município falhou (${erro.message}) — o mapa segue sem ela`);
 }
 
 const textoPaises = JSON.stringify(info);

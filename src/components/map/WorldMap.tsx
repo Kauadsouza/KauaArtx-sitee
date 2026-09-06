@@ -12,12 +12,14 @@ import {
   geoPath,
 } from 'd3-geo';
 import type { GeoProjection } from 'd3-geo';
-import { Globe2, Map as MapIcon, Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react';
+import { Globe2, Map as MapIcon, Minus, Pause, Play, Plus, RotateCcw, Search } from 'lucide-react';
 import { TRAVELS, type TravelStatus } from '@/data/travels';
 import {
   COUNTRY_LABELS,
   admin1InView,
+  boxOutside,
   citiesLoading,
+  searchCities,
   countryByAlpha2,
   countryByNumeric,
   currentLand,
@@ -25,6 +27,8 @@ import {
   ensureAdmin1,
   ensureCities,
   ensureDetail,
+  ensureMunicipios,
+  municipiosInView,
   minPopForZoom,
   queryCities,
   tierForZoom,
@@ -190,16 +194,6 @@ function visibleBounds(projection: GeoProjection, w: number, h: number): Bounds 
   };
 }
 
-/** O país cabe fora da janela visível? Então nem desenha. */
-const boxOutside = (b: Bounds, box: [number, number, number, number]) => {
-  const [oeste, sul, leste, norte] = box;
-  if (norte < b.lat0 || sul > b.lat1) return true;
-  // Caixa que dá a volta pela linha de data (Rússia, Fiji): ela vale de
-  // `oeste` até 180° E TAMBÉM de -180° até `leste`
-  if (oeste > leste) return b.lon1 < oeste && b.lon0 > leste;
-  return leste < b.lon0 || oeste > b.lon1;
-};
-
 interface Hit {
   x: number;
   y: number;
@@ -228,6 +222,11 @@ export default function WorldMap() {
   const [dragging, setDragging] = useState(false);
   const [scrollHint, setScrollHint] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  const [query, setQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  // Sobe de um a cada camada de dados que chega — é o que manda a busca
+  // refazer a conta quando o mundo termina de baixar
+  const [dataVersion, setDataVersion] = useState(0);
   // No celular não existe "Ctrl + roda" — a dica precisa falar de pinça
   const [touch, setTouch] = useState(false);
   useEffect(() => {
@@ -235,6 +234,13 @@ export default function WorldMap() {
   }, []);
 
   const nf = useMemo(() => new Intl.NumberFormat(locale === 'pt' ? 'pt-BR' : 'en-US'), [locale]);
+
+  // Resultados da busca. `dataVersion` entra na conta de propósito: quando uma
+  // camada nova de cidades termina de baixar, a lista precisa ser refeita.
+  const results = useMemo(
+    () => (dataVersion >= 0 ? searchCities(query, locale, 8) : []),
+    [query, locale, dataVersion]
+  );
 
   // Onde a câmera começa: centrada no lugar onde ele mora hoje
   const base = useMemo(() => TRAVELS.find((s) => s.status === 'lived') ?? TRAVELS[0], []);
@@ -405,7 +411,13 @@ export default function WorldMap() {
       // em degradê, que é o tipo de coisa que a placa de vídeo cobra caro).
       // Agora é pintado uma vez num canvas de rascunho e daí em diante é só
       // colar — girar o globo virou uma colagem só.
-      const skyKey = `${w}|${h}|${dpr}|${isGlobe}|${Math.round(R)}|${Math.round(cx)}|${Math.round(cy)}`;
+      // Durante zoom/voo, arredondar o céu a cada 6 px evita recriar dois
+      // gradientes de tela cheia em todos os quadros. Parado volta ao pixel
+      // exato. No planisfério o fundo nem depende da câmera.
+      const skyStep = mexendo ? 6 : 1;
+      const skyKey = isGlobe
+        ? `${w}|${h}|${dpr}|g|${Math.round(R / skyStep)}|${Math.round(cx / skyStep)}|${Math.round(cy / skyStep)}`
+        : `${w}|${h}|${dpr}|f`;
       if (!skyRef.current || skyRef.current.key !== skyKey) {
         const off = skyRef.current?.canvas ?? document.createElement('canvas');
         off.width = Math.round(w * dpr);
@@ -481,7 +493,11 @@ export default function WorldMap() {
       // redesenhá-lo 60 vezes por segundo é o que fazia travar no arrasto.
       // Parou de mexer, ele entra — que é quando você repara no detalhe.
       let wantDetail = detailForZoom(v.zoom);
-      if ((!bounds || mexendo) && wantDetail === 10) wantDetail = 50;
+      // Interação pede resposta imediata, não litoral microscópico. O traço
+      // leve mantém a silhueta do país durante o gesto; ao soltar, o detalhe
+      // volta no quadro seguinte.
+      if (mexendo) wantDetail = 110;
+      else if (!bounds && wantDetail === 10) wantDetail = 50;
       ensureDetail(wantDetail, onLayerReady.current);
       const land = currentLand(wantDetail);
 
@@ -538,14 +554,32 @@ export default function WorldMap() {
       // ── Divisões internas: estados, províncias, departamentos ──
       // Aparecem quando você chega perto o bastante pra elas quererem dizer
       // alguma coisa, e entram desbotando pra não pipocar na tela.
-      if (v.zoom >= 2.2) {
+      const naJanela = (box: [number, number, number, number]) =>
+        !bounds || !boxOutside(bounds, box);
+
+      if (!mexendo && v.zoom >= 2.2) {
         ensureAdmin1(onLayerReady.current);
-        const grupos = admin1InView((box) => !bounds || !boxOutside(bounds, box));
+        const grupos = admin1InView(naJanela);
         if (grupos.length) {
           ctx.beginPath();
           for (const g of grupos) path(g);
           ctx.strokeStyle = alpha(theme.accent, 0.12 + 0.26 * clamp((v.zoom - 2.2) / 1.6, 0, 1));
           ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+
+      // Divisa de município: a camada mais fina, e por isso a última a
+      // aparecer. Traço mais apagado que a do estado, senão as duas competem e
+      // você não sabe mais o que está olhando.
+      if (!mexendo && v.zoom >= 5.5) {
+        ensureMunicipios(onLayerReady.current);
+        const grupos = municipiosInView(naJanela);
+        if (grupos.length) {
+          ctx.beginPath();
+          for (const g of grupos) path(g);
+          ctx.strokeStyle = alpha(theme.accent, 0.1 + 0.14 * clamp((v.zoom - 5.5) / 3, 0, 1));
+          ctx.lineWidth = 0.45;
           ctx.stroke();
         }
       }
@@ -642,6 +676,7 @@ export default function WorldMap() {
       // Somem devagar conforme as cidades tomam conta da tela
       const countryFade = v.zoom < 1.6 ? 1 : clamp(1 - (v.zoom - 1.6) / 4.5, 0.3, 1);
       for (const c of COUNTRY_LABELS) {
+        if (mexendo && c.area * R * R < 18000) continue;
         if (!onGlobeFace(c.center[0], c.center[1])) continue;
         const info = countryByNumeric(c.id);
         if (!info) continue;
@@ -682,7 +717,7 @@ export default function WorldMap() {
         // foi o que sumia com Washington e enchia a tela de cidadezinha.
         // Então junta tudo que passa do corte de população e só ORDENA
         // depois; quem decide quem entra é o tamanho, nunca a posição.
-        const found = queryCities(bounds, minPop, 20000);
+        const found = queryCities(bounds, minPop, mexendo ? 5000 : 20000);
         found.sort((a, b) => b[3] - a[3]);
         const selectedCity = selection?.kind === 'city' ? selection.city : null;
 
@@ -699,7 +734,7 @@ export default function WorldMap() {
         };
         // Escrever texto é a parte mais cara do quadro: durante o arrasto
         // sai menos nome, e tudo volta assim que a mão para
-        const tetoNomes = mexendo ? 55 : MAX_CITY_LABELS;
+        const tetoNomes = mexendo ? 28 : MAX_CITY_LABELS;
         const drawn: Drawn[] = [];
         for (const city of found) {
           if (drawn.length >= tetoNomes) break;
@@ -917,6 +952,7 @@ export default function WorldMap() {
   onLayerReady.current = () => {
     dirtyRef.current = true; // camada nova chegou: redesenha com ela
     setLoadingData(citiesLoading());
+    setDataVersion((n) => n + 1); // e a busca passa a achar os nomes novos
   };
 
   // Só em desenvolvimento: deixa medir o custo de um quadro pelo console,
@@ -1071,23 +1107,21 @@ export default function WorldMap() {
     // paint muda com o idioma; o resto do loop é estável
   }, [paint]);
 
-  // ── Voar até um lugar ───────────────────────────────────────────────
-  const flyTo = useCallback(
-    (id: string) => {
-      const stop = TRAVELS.find((s) => s.id === id);
-      if (!stop) return;
+  // ── Voar até um ponto qualquer do mundo ─────────────────────────────
+  const flyToCoords = useCallback(
+    (coords: [number, number], zoomMinimo: number, escolha: Selection | null) => {
       const v = view.current;
       const { w, h } = size.current;
-      const toZoom = Math.max(v.zoom, modeRef.current === 'globe' ? 1.75 : 2.2);
+      const toZoom = Math.max(v.zoom, zoomMinimo);
 
       let toPan: [number, number] = [0, 0];
       let dRot: [number, number] = [0, 0];
 
       if (modeRef.current === 'globe') {
-        dRot = [shortestAngle(v.rot[0], -stop.coords[0]), shortestAngle(v.rot[1], -stop.coords[1])];
+        dRot = [shortestAngle(v.rot[0], -coords[0]), shortestAngle(v.rot[1], -coords[1])];
       } else {
         // No planisfério a câmera não gira: desloca até o ponto ficar no meio
-        const p = flatProjection(toZoom, [0, 0])(stop.coords);
+        const p = flatProjection(toZoom, [0, 0])(coords);
         if (p) toPan = [w / 2 - p[0], h / 2 - p[1]];
       }
 
@@ -1101,9 +1135,54 @@ export default function WorldMap() {
         fromPan: [...v.pan] as [number, number],
         toPan,
       };
-      select({ kind: 'stop', id });
+      select(escolha);
     },
     [flatProjection, select]
+  );
+
+  /** Voa até uma parada da jornada (os atalhos e o clique no pino). */
+  const flyTo = useCallback(
+    (id: string) => {
+      const stop = TRAVELS.find((s) => s.id === id);
+      if (!stop) return;
+      flyToCoords(stop.coords, modeRef.current === 'globe' ? 1.75 : 2.2, { kind: 'stop', id });
+    },
+    [flyToCoords]
+  );
+
+  /** O pino leva direto ao relato ou vídeo real ligado àquele lugar. */
+  const openStop = useCallback(
+    (id: string) => {
+      const stop = TRAVELS.find((item) => item.id === id);
+      if (!stop) return;
+
+      if (stop.videoUrl) {
+        window.location.assign(stop.videoUrl);
+        return;
+      }
+
+      if (!stop.storyHref) {
+        flyTo(id);
+        return;
+      }
+
+      const localizedDestination = locale === 'en' ? `/en${stop.storyHref}` : stop.storyHref;
+      window.location.assign(localizedDestination);
+    },
+    [flyTo, locale]
+  );
+
+  /** Voa até uma cidade achada na busca — chega perto o suficiente pra ela
+   *  aparecer com as vizinhas em volta, como quem procurou espera. */
+  const flyToCity = useCallback(
+    (city: City) => {
+      // Cidade grande cabe num enquadramento mais largo; vila precisa de mais
+      // zoom pra passar do corte de população e realmente aparecer
+      const pop = city[3];
+      const zoom = pop >= 1_000_000 ? 4.5 : pop >= 200_000 ? 6.5 : pop >= 50_000 ? 9 : 12.5;
+      flyToCoords([city[1], city[2]], zoom, { kind: 'city', city });
+    },
+    [flyToCoords]
   );
 
   const resetView = useCallback(() => {
@@ -1301,7 +1380,7 @@ export default function WorldMap() {
         if (moved < 6) {
           const p = localPos(e);
           const found = pick(p.x, p.y);
-          if (found?.kind === 'stop') flyTo(found.id);
+          if (found?.kind === 'stop') openStop(found.id);
           else select(found ?? pickCountry(p.x, p.y));
         }
       }
@@ -1389,7 +1468,7 @@ export default function WorldMap() {
       window.removeEventListener('pointerup', onWindowUp);
       window.removeEventListener('pointercancel', onWindowUp);
     };
-  }, [buildProjection, clampPan, flyTo, markDirty, resetView, select, zoomBy]);
+  }, [buildProjection, clampPan, markDirty, openStop, resetView, select, zoomBy]);
 
   const statusLabel: Record<TravelStatus, string> = useMemo(
     () => ({
@@ -1597,6 +1676,72 @@ export default function WorldMap() {
                 {label}
               </button>
             ))}
+          </div>
+
+          {/* Busca: digitar qualquer lugar do mundo e voar até ele */}
+          <div className="absolute top-14 left-3 z-30 w-[min(17rem,calc(100%-1.5rem))]">
+            <div className="relative">
+              <Search
+                size={14}
+                aria-hidden
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-subtle pointer-events-none"
+              />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => {
+                  // Só quem vai buscar precisa dos 25 mil nomes — então eles
+                  // descem agora, não no carregamento da página
+                  ensureCities(3, onLayerReady.current);
+                  setSearchOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setQuery('');
+                    setSearchOpen(false);
+                    (e.target as HTMLInputElement).blur();
+                  }
+                  if (e.key === 'Enter' && results[0]) {
+                    flyToCity(results[0].city);
+                    setSearchOpen(false);
+                  }
+                }}
+                placeholder={t('search_placeholder')}
+                aria-label={t('search_placeholder')}
+                className="w-full rounded-xl glass pl-9 pr-3 py-2 text-xs text-foreground placeholder:text-foreground-subtle outline-none focus-visible:border-accent [&::-webkit-search-cancel-button]:hidden"
+              />
+            </div>
+
+            {searchOpen && query.trim().length >= 2 && (
+              <ul className="mt-1.5 max-h-64 overflow-y-auto rounded-xl glass-strong divide-y divide-border/60 shadow-xl shadow-black/40">
+                {results.length === 0 ? (
+                  <li className="px-3 py-2.5 text-xs text-foreground-subtle">
+                    {loadingData ? t('loading_places') : t('search_empty')}
+                  </li>
+                ) : (
+                  results.map(({ city, pais }) => (
+                    <li key={`${city[0]}|${city[1]}|${city[2]}`}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          flyToCity(city);
+                          setSearchOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 transition hover:bg-surface-elevated/70"
+                      >
+                        <span className="block text-xs font-semibold text-foreground">
+                          {city[0]}
+                        </span>
+                        <span className="block text-[11px] text-foreground-subtle">
+                          {pais} · {nf.format(city[3])}
+                        </span>
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            )}
           </div>
 
           {/* Baixando uma camada nova de cidades */}

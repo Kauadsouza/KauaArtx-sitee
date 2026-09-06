@@ -35,6 +35,18 @@ function persistLocal(email?: string) {
 
 export default function LoginGate() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Cria o portal somente depois da primeira montagem, mantendo a primeira
+  // árvore do navegador idêntica ao HTML entregue pelo servidor.
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (window.parent !== window) window.parent.postMessage({
+      type: 'ARTX_SYSTEM_STATUS', system: 'site', state: 'ready',
+      title: 'Site publicado', detail: 'Página pública carregada e pronta para visitantes.',
+    }, 'https://artx-hub.vercel.app');
+  }, []);
 
   // Só abre pra quem ainda não entrou (e nunca no servidor → SEO intacto)
   useEffect(() => {
@@ -46,12 +58,14 @@ export default function LoginGate() {
       // GitHub) e o de já ter conta numa visita anterior, mesmo sem a
       // flag local (ex.: outro navegador com o mesmo login).
       if (supabase) {
-        const { data } = await supabase.auth.getSession();
-        if (data.session?.user) {
-          persistLocal(data.session.user.email ?? undefined);
-          if (alive) setOpen(false);
-          return;
-        }
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data.session?.user) {
+            persistLocal(data.session.user.email ?? undefined);
+            if (alive) setOpen(false);
+            return;
+          }
+        } catch { /* Public browsing remains available during an auth outage. */ }
       }
       try {
         const entered =
@@ -96,7 +110,7 @@ export default function LoginGate() {
      
   }, [open]);
 
-  if (typeof document === 'undefined') return null;
+  if (!mounted || typeof document === 'undefined') return null;
 
   return createPortal(
     // O wrapper (fora do AnimatePresence) trava o pointer-events em "auto"/
@@ -136,6 +150,7 @@ export default function LoginGate() {
                 logo={null}
                 brandName={<>Kauã <span className="text-gradient">Artx</span></>}
                 backgroundImageUrl="/images/login-leaves-bg.webp"
+                visitorOnly
                 onComplete={(email) => finish(email)}
                 onGuest={() => finish()}
               />

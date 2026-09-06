@@ -32,41 +32,21 @@ export interface TravelStop {
   year?: string; // "2024" ou "2019 — hoje"
   status: TravelStatus;
   note?: { pt: string; en: string };
+  storyHref?: string;
+  videoUrl?: string;
 }
 
 export const TRAVELS: TravelStop[] = [
   {
-    id: 'uberlandia',
-    name: { pt: 'Uberlândia', en: 'Uberlândia' },
-    country: { pt: 'Brasil', en: 'Brazil' },
-    coords: [-48.2772, -18.9186],
-    year: 'hoje',
+    id: 'oxford',
+    name: { pt: 'Oxford', en: 'Oxford' },
+    country: { pt: 'Reino Unido', en: 'United Kingdom' },
+    coords: [-1.2577, 51.752],
     status: 'lived',
     note: {
-      pt: 'É daqui que eu saio. A base hoje — trabalho, projetos e o plano de ir mais longe.',
-      en: "This is where I'm setting off from. Home base today — work, projects, and the plan to go further.",
+      pt: 'Minha primeira viagem internacional e onde eu moro hoje.',
+      en: 'My first international trip and where I live today.',
     },
-  },
-  {
-    id: 'londres',
-    name: { pt: 'Londres', en: 'London' },
-    country: { pt: 'Reino Unido', en: 'United Kingdom' },
-    coords: [-0.1276, 51.5072],
-    status: 'planned',
-    note: {
-      pt: 'A próxima parada da jornada.',
-      en: 'The next stop of the journey.',
-    },
-  },
-  {
-    id: 'nova-york',
-    name: { pt: 'Nova York', en: 'New York' },
-    country: { pt: 'Estados Unidos', en: 'United States' },
-    coords: [-74.006, 40.7128],
-    status: 'planned',
-    note: {
-      pt: 'De Londres pra Nova York — o passo seguinte da rota.',
-      en: 'From London to New York — the next leg of the route.',
-    },
+    storyHref: '/viagens/oxford',
   },
 ];

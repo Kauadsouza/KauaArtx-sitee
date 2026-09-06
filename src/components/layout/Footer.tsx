@@ -9,7 +9,7 @@ const SOCIAL_LINKS = [
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram' },
   { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn' },
   { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X' },
-  { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube' },
+  { href: 'https://www.youtube.com/@KauaArtx', icon: Youtube, label: 'YouTube' },
   { href: 'mailto:kauaartx@gmail.com', icon: Mail, label: 'Email' },
 ];
 
@@ -85,7 +85,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               {[
-                { href: 'https://www.youtube.com/@KauartX', label: 'YouTube — @KauartX' },
+                { href: 'https://www.youtube.com/@KauaArtx', label: 'YouTube — @KauaArtx' },
                 { href: 'https://www.linkedin.com/in/kauadsouza/', label: 'LinkedIn — kauadsouza' },
                 { href: 'https://x.com/KauaArtx', label: 'Twitter / X — @KauaArtx' },
                 { href: 'https://www.instagram.com/kauaartx/', label: 'Instagram — @kauaartx' },

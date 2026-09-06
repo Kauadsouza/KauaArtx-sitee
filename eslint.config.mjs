@@ -10,6 +10,18 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    ignores: [
+      '.next/**',
+      '.claude/**',
+      'node_modules/**',
+      'out/**',
+      'build/**',
+      'coverage/**',
+      'next-env.d.ts',
+      'scripts/make-fuji-cutout.js',
+    ],
+  },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
 ];
 

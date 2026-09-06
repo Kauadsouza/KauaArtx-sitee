@@ -8,17 +8,15 @@ import { Menu, X, Globe, Youtube, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTERED_KEY, NAME_KEY, AUTH_EVENT, SITE_ENTER_EVENT } from '@/components/gate/LoginGate';
 import { createClient } from '@/lib/supabase/client';
+import { HeaderExploreMenu, MobileExploreLinks } from './HeaderExploreMenu';
 
 const LOCALES = [
   { code: 'pt', label: 'PT', flag: '🇧🇷' },
   { code: 'en', label: 'EN', flag: '🇺🇸' },
 ];
 
-const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
+const YOUTUBE_URL = 'https://www.youtube.com/@KauaArtx';
 
-// O que fica salvo é o começo do email ("joao.silva87"). Vira um nome
-// apresentável: primeiro pedaço antes de ponto/traço, sem números soltos
-// no fim, com a primeira letra maiúscula → "Joao".
 function friendlyName(raw: string): string {
   const first = raw.split(/[._-]/)[0].replace(/\d+$/, '') || raw;
   const trimmed = first.slice(0, 16);
@@ -31,7 +29,6 @@ interface HeaderProps {
 
 export default function Header({ locale }: HeaderProps) {
   const t = useTranslations('nav');
-  // usePathname from @/i18n/navigation returns path WITHOUT locale prefix
   const pathname = usePathname();
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,8 +36,6 @@ export default function Header({ locale }: HeaderProps) {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
   const [guestName, setGuestName] = useState('');
-  // Quando o portal fecha, a barra desliza de cima junto com a cascata do
-  // Hero — em carregamento normal (entrance = 0) ela nem se mexe.
   const [entrance, setEntrance] = useState(0);
 
   useEffect(() => {
@@ -58,9 +53,6 @@ export default function Header({ locale }: HeaderProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Conta vinculada = entrou pelo portal com email (direto ou OAuth) e o
-  // nome de nômade ficou salvo. O portal avisa via evento quando muda.
-  // O nome vira a saudação "Olá, Fulano" — o site reconhece a pessoa.
   useEffect(() => {
     const check = () => {
       try {
@@ -83,10 +75,6 @@ export default function Header({ locale }: HeaderProps) {
     };
   }, []);
 
-  // Sai da conta e volta pra tela de login (o portal reabre na home).
-  // Encerra a sessão REAL do Supabase também — só limpar o storage local
-  // não bastaria pra quem entrou com e-mail/Google/GitHub, já que o
-  // LoginGate checa a sessão do servidor antes de decidir se reabre.
   const logout = async () => {
     try {
       localStorage.removeItem(ENTERED_KEY);
@@ -143,7 +131,7 @@ export default function Header({ locale }: HeaderProps) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -165,6 +153,7 @@ export default function Header({ locale }: HeaderProps) {
                 <span className="relative z-10">{link.label}</span>
               </Link>
             ))}
+            <HeaderExploreMenu locale={locale} />
             <a
               href={YOUTUBE_URL}
               target="_blank"
@@ -238,9 +227,14 @@ export default function Header({ locale }: HeaderProps) {
             {/* Mobile menu button */}
             <button
               type="button"
-              className="md:hidden p-2 rounded-full text-foreground-muted hover:text-foreground transition-colors"
-              onClick={() => setIsMobileOpen(!isMobileOpen)}
-              aria-label="Abrir menu"
+              className="lg:hidden p-2 rounded-full text-foreground-muted hover:text-foreground transition-colors"
+              onClick={() => {
+                setIsMobileOpen(!isMobileOpen);
+                setIsLangOpen(false);
+              }}
+              aria-label={locale === 'pt' ? 'Abrir menu' : 'Open menu'}
+              aria-expanded={isMobileOpen}
+              aria-controls="mobile-navigation"
             >
               {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -256,11 +250,11 @@ export default function Header({ locale }: HeaderProps) {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
               className={cn(
-                'md:hidden overflow-hidden border-t border-border',
+                'lg:hidden overflow-hidden border-t border-border',
                 !isScrolled && 'glass rounded-b-2xl'
               )}
             >
-              <nav className="px-2 py-4 flex flex-col gap-1">
+              <nav id="mobile-navigation" className="px-2 py-4 flex flex-col gap-1">
                 {hasAccount && guestName && (
                   <span className="px-4 pb-2 text-sm text-foreground-muted">
                     {t('greeting', { name: guestName })}
@@ -287,6 +281,10 @@ export default function Header({ locale }: HeaderProps) {
                     </Link>
                   </motion.div>
                 ))}
+                <MobileExploreLinks
+                  locale={locale}
+                  onNavigate={() => setIsMobileOpen(false)}
+                />
                 <a
                   href={YOUTUBE_URL}
                   target="_blank"

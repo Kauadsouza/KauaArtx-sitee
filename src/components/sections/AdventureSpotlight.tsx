@@ -15,7 +15,7 @@ const SMALL = [
     icon: Youtube,
     titleKey: 'spot_youtube_title',
     descKey: 'spot_youtube_desc',
-    href: 'https://www.youtube.com/@KauartX',
+    href: 'https://www.youtube.com/@KauaArtx',
   },
   {
     icon: Instagram,

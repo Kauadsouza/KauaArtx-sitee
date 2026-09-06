@@ -1,7 +1,14 @@
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 import { Link } from '@/i18n/navigation';
-import { MapPin, ArrowRight, Footprints } from 'lucide-react';
+import {
+  MapPin,
+  ArrowRight,
+  BookOpen,
+  Footprints,
+  MessageCircleQuestion,
+  PlayCircle,
+} from 'lucide-react';
 import WorldMap from '@/components/map/WorldMap';
 import { TRAVELS, type TravelStatus } from '@/data/travels';
 
@@ -31,6 +38,28 @@ export default async function MapPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'map' });
   const loc = (locale === 'pt' ? 'pt' : 'en') as 'pt' | 'en';
+  const copy =
+    loc === 'pt'
+      ? {
+          story: 'Abrir página da viagem',
+          video: 'Assistir ao vídeo',
+          videoPending: 'Vídeo ainda não publicado',
+          questionKicker: 'O próximo capítulo',
+          questionTitle: 'O que você quer ver no próximo vídeo?',
+          questionDescription:
+            'Mande sua pergunta ou uma curiosidade. As melhores podem virar parte do próximo roteiro do canal.',
+          questionCta: 'Pergunte para o próximo vídeo',
+        }
+      : {
+          story: 'Open travel page',
+          video: 'Watch the video',
+          videoPending: 'Video not published yet',
+          questionKicker: 'The next chapter',
+          questionTitle: 'What do you want to see in the next video?',
+          questionDescription:
+            'Send a question or something you are curious about. The best ones may become part of the channel\'s next script.',
+          questionCta: 'Ask about the next video',
+        };
 
   const visitedCount = TRAVELS.filter((s) => s.status !== 'planned').length;
   const plannedCount = TRAVELS.filter((s) => s.status === 'planned').length;
@@ -91,7 +120,7 @@ export default async function MapPage({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {TRAVELS.map((stop) => (
-              <div
+              <article
                 key={stop.id}
                 className={`rounded-2xl bg-surface border p-6 ${
                   stop.status === 'planned'
@@ -115,13 +144,94 @@ export default async function MapPage({
                     {stop.note[loc]}
                   </p>
                 )}
-              </div>
+
+                <div className="mt-5 flex flex-wrap items-center gap-2.5">
+                  {stop.storyHref && (
+                    <Link
+                      href={stop.storyHref}
+                      className="group inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-2 text-xs font-semibold text-foreground transition hover:border-accent hover:bg-accent/15"
+                    >
+                      <BookOpen size={14} aria-hidden />
+                      {copy.story}
+                      <ArrowRight
+                        size={12}
+                        aria-hidden
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </Link>
+                  )}
+
+                  {stop.videoUrl ? (
+                    <a
+                      href={stop.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex items-center gap-2 rounded-full border border-border-strong px-3.5 py-2 text-xs font-semibold text-foreground-muted transition hover:border-accent hover:text-foreground"
+                    >
+                      <PlayCircle size={14} aria-hidden />
+                      {copy.video}
+                      <ArrowRight
+                        size={12}
+                        aria-hidden
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </a>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 px-1 text-xs text-foreground-subtle">
+                      <PlayCircle size={14} aria-hidden />
+                      {copy.videoPending}
+                    </span>
+                  )}
+                </div>
+              </article>
             ))}
           </div>
 
           <p className="mt-8 text-center text-sm text-foreground-subtle">
             {t('soon_note')}
           </p>
+        </section>
+
+        {/* O formulário especializado vive na página da viagem; o mapa só encaminha até ele. */}
+        <section
+          aria-labelledby="next-video-question"
+          className="relative mt-16 overflow-hidden rounded-3xl border border-border bg-surface px-6 py-8 sm:px-10 sm:py-10"
+        >
+          <div
+            aria-hidden
+            className="orb -bottom-24 -right-20 h-64 w-64 bg-accent/10 animate-float-slower"
+          />
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 flex items-center gap-2 text-accent-deep">
+                <MessageCircleQuestion size={16} aria-hidden />
+                <span className="font-pixel text-[9px] uppercase tracking-[0.3em]">
+                  {copy.questionKicker}
+                </span>
+              </div>
+              <h2
+                id="next-video-question"
+                className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+              >
+                {copy.questionTitle}
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-foreground-muted sm:text-base">
+                {copy.questionDescription}
+              </p>
+            </div>
+
+            <Link
+              href="/viagens/oxford#pergunte"
+              className="group btn-pill-primary shrink-0 text-sm"
+            >
+              {copy.questionCta}
+              <ArrowRight
+                size={14}
+                aria-hidden
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+          </div>
         </section>
 
         {/* ── Fecho: liga com a trilha do Sobre ── */}

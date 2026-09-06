@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Youtube, Instagram, Linkedin, Twitter, ArrowDown } from 'lucide-react';
 import { SITE_ENTER_EVENT } from '@/components/gate/LoginGate';
 
-const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
+const YOUTUBE_URL = 'https://www.youtube.com/@KauaArtx';
 
 const SOCIALS = [
   { href: YOUTUBE_URL, icon: Youtube, label: 'YouTube' },

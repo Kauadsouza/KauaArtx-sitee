@@ -7,7 +7,7 @@
 // Pode sobrescrever sem mexer no código com a env ADMIN_EMAILS
 // ("a@x.com,b@y.com") na Vercel.
 export const ADMIN_EMAILS = (
-  process.env.ADMIN_EMAILS ?? 'kauaartx@gmail.com,kauadsouza@gmail.com'
+  process.env.ADMIN_EMAILS ?? 'kauaartx@gmail.com'
 )
   .split(',')
   .map((e) => e.trim().toLowerCase())

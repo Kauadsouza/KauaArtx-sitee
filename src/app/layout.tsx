@@ -13,35 +13,38 @@ const pixelFont = Press_Start_2P({
 });
 
 const DESCRIPTION =
-  'Vendedor na Loog.ai, CEO do Facility e nômade documentando a jornada pelo mundo.';
+  'Viagens, histórias e vida real no canal @KauaArtx.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Nômade & Vendedor`,
+    default: `${SITE_NAME} — Viagens e vida real`,
     template: `%s | ${SITE_NAME}`,
   },
   description: DESCRIPTION,
   keywords: [
-    'Kauã Souza', 'Vendedor', 'Nômade', 'Empreendedor', 'Facility',
-    'Loog.ai', 'YouTube', 'Viagens', 'Crescimento pessoal',
+    'Kauã Souza', 'Viagens', 'YouTube', 'KauaArtx', 'Criador de conteúdo',
+    'Inglaterra', 'Mundo', 'Histórias de viagem',
   ],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
+  // Anuncia o feed RSS: leitor de feed e agregador acham sozinhos
+  alternates: {
+    types: { 'application/rss+xml': [{ url: '/feed.xml', title: `${SITE_NAME} — blog` }] },
+  },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
     alternateLocale: 'en_US',
     url: SITE_URL,
-    title: `${SITE_NAME} — Nômade & Vendedor`,
+    title: `${SITE_NAME} — Viagens e vida real`,
     description: DESCRIPTION,
     siteName: SITE_NAME,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — Nômade & Vendedor`,
-    description:
-      'Vendedor, CEO do Facility e nômade documentando a jornada pelo mundo.',
+    title: `${SITE_NAME} — Viagens e vida real`,
+    description: DESCRIPTION,
     creator: '@KauaArtx',
   },
   robots: { index: true, follow: true },
@@ -54,8 +57,7 @@ const personJsonLd = {
   name: SITE_NAME,
   url: SITE_URL,
   image: `${SITE_URL}/images/kaua-pixel.png`,
-  jobTitle: 'Nômade & Vendedor',
-  worksFor: { '@type': 'Organization', name: 'Loog.ai' },
+  jobTitle: 'Criador de conteúdo',
   sameAs: SOCIAL_PROFILES,
 };
 

@@ -171,9 +171,12 @@ interface AuthComponentProps {
   onComplete?: (email: string) => void;
   // Entrada de visitante, sem cadastro — mantém o atalho do portal antigo.
   onGuest?: () => void;
+  // No site público não pedimos conta: o Supabase pertence ao Hub privado.
+  // O mesmo visual vira uma porta de entrada simples para visitantes.
+  visitorOnly?: boolean;
 }
 
-export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", backgroundImageUrl, onComplete, onGuest }: AuthComponentProps) => {
+export const AuthComponent = ({ logo = <DefaultLogo />, brandName = "EaseMize", backgroundImageUrl, onComplete, onGuest, visitorOnly = false }: AuthComponentProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -392,12 +395,14 @@ useEffect(() => {
                 <AnimatePresence mode="wait">
                     {authStep === "email" && <motion.div key="email-content" initial={{ y: 6, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full flex flex-col items-center gap-4">
                         <BlurFade delay={0.25 * 1} className="w-full"><div className="text-center"><p className="font-serif font-light text-4xl sm:text-5xl md:text-6xl tracking-tight text-foreground whitespace-nowrap">Comece a jornada</p></div></BlurFade>
-                        <BlurFade delay={0.25 * 2}><p className="text-sm font-medium text-muted-foreground">Continue com</p></BlurFade>
-                        <BlurFade delay={0.25 * 3}><div className="flex items-center justify-center gap-4 w-full">
+                        <BlurFade delay={0.25 * 2}><p className="text-center text-sm font-medium text-muted-foreground">{visitorOnly ? "Histórias reais, viagens e a vida em Oxford." : "Continue com"}</p></BlurFade>
+                        {!visitorOnly && <>
+                          <BlurFade delay={0.25 * 3}><div className="flex items-center justify-center gap-4 w-full">
                             <GlassButton type="button" onClick={() => handleOAuth('google')} contentClassName="flex items-center justify-center gap-2" size="sm"><GoogleIcon /><span className="font-semibold text-foreground">Google</span></GlassButton>
                             <GlassButton type="button" onClick={() => handleOAuth('github')} contentClassName="flex items-center justify-center gap-2" size="sm"><GitHubIcon /><span className="font-semibold text-foreground">GitHub</span></GlassButton>
-                        </div></BlurFade>
-                        <BlurFade delay={0.25 * 4} className="w-[300px]"><div className="flex items-center w-full gap-2 py-2"><hr className="w-full border-border"/><span className="text-xs font-semibold text-muted-foreground">OU</span><hr className="w-full border-border"/></div></BlurFade>
+                          </div></BlurFade>
+                          <BlurFade delay={0.25 * 4} className="w-[300px]"><div className="flex items-center w-full gap-2 py-2"><hr className="w-full border-border"/><span className="text-xs font-semibold text-muted-foreground">OU</span><hr className="w-full border-border"/></div></BlurFade>
+                        </>}
                     </motion.div>}
                     {authStep === "password" && <motion.div key="password-title" initial={{ y: 6, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full flex flex-col items-center text-center gap-4">
                         <BlurFade delay={0} className="w-full"><div className="text-center"><p className="font-serif font-light text-4xl sm:text-5xl tracking-tight text-foreground whitespace-nowrap">Crie sua senha</p></div></BlurFade>
@@ -409,7 +414,7 @@ useEffect(() => {
                     </motion.div>}
                 </AnimatePresence>
 
-                <form onSubmit={handleFinalSubmit} className="w-[300px] space-y-6">
+                {!visitorOnly && <form onSubmit={handleFinalSubmit} className="w-[300px] space-y-6">
                      <AnimatePresence>
                         {authStep !== 'confirmPassword' && <motion.div key="email-password-fields" exit={{ opacity: 0, filter: 'blur(4px)' }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full space-y-6">
                             <BlurFade delay={authStep === 'email' ? 0.25 * 5 : 0} inView={true} className="w-full">
@@ -463,12 +468,12 @@ useEffect(() => {
                             <BlurFade inView delay={0.2}><button type="button" onClick={handleGoBack} className="mt-4 flex items-center gap-2 text-sm text-foreground/70 hover:text-foreground transition-colors"><ArrowLeft className="w-4 h-4" /> Voltar</button></BlurFade>
                         </BlurFade>}
                     </AnimatePresence>
-                </form>
+                </form>}
 
                 {onGuest && (
                     <BlurFade delay={0.25 * 6}>
                         <button type="button" onClick={onGuest} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                            entrar como visitante →
+                            {visitorOnly ? "Entrar no site →" : "entrar como visitante →"}
                         </button>
                     </BlurFade>
                 )}

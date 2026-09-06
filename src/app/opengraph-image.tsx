@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-export const alt = 'Kauã Souza — Nômade & Vendedor';
+export const alt = 'Kauã Souza — Viagens e vida real';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -80,7 +80,7 @@ export default async function OpenGraphImage() {
               marginBottom: 28,
             }}
           >
-            BRA → MUNDO · GO FAR
+            OXFORD → MUNDO · GO FAR
           </div>
           <div
             style={{
@@ -103,7 +103,7 @@ export default async function OpenGraphImage() {
               color: 'transparent',
             }}
           >
-            Nômade &amp; Vendedor
+            Viagens &amp; vida real
           </div>
           <div
             style={{
@@ -113,7 +113,7 @@ export default async function OpenGraphImage() {
               lineHeight: 1.4,
             }}
           >
-            Vendas na Loog.ai · CEO do Facility · YouTube @KauartX
+            Histórias do caminho · Canal @KauaArtx
           </div>
         </div>
 

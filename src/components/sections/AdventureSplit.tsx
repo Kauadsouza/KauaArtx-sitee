@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Youtube, ArrowRight, Mountain } from 'lucide-react';
 
-const YOUTUBE_URL = 'https://www.youtube.com/@KauartX';
+const YOUTUBE_URL = 'https://www.youtube.com/@KauaArtx';
 
 // Seção 2 da estrutura de aventura: painel de TEXTO à esquerda + FOTO
 // grande de paisagem à direita. Espelha o split do print.
@@ -74,7 +74,7 @@ export default function AdventureSplit() {
             <div className="absolute inset-0 bg-gradient-to-tr from-[#04191A]/75 via-[#04191A]/10 to-transparent" />
             <div className="absolute bottom-4 left-4 boarding-tag text-xs">
               <Mountain size={13} className="text-accent-bright" />
-              BRA → MUNDO · GO FAR
+              OXFORD → MUNDO · GO FAR
             </div>
           </motion.div>
         </div>

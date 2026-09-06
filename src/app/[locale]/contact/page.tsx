@@ -28,7 +28,7 @@ const SOCIALS = [
   { href: 'https://www.instagram.com/kauaartx/', icon: Instagram, label: 'Instagram', handle: '@kauaartx' },
   { href: 'https://www.linkedin.com/in/kauadsouza/', icon: Linkedin, label: 'LinkedIn', handle: 'kauadsouza' },
   { href: 'https://x.com/KauaArtx', icon: Twitter, label: 'Twitter / X', handle: '@KauaArtx' },
-  { href: 'https://www.youtube.com/@KauartX', icon: Youtube, label: 'YouTube', handle: '@KauartX' },
+  { href: 'https://www.youtube.com/@KauaArtx', icon: Youtube, label: 'YouTube', handle: '@KauaArtx' },
 ];
 
 // Os 3 cartões de informação da dobra "vamos conversar".

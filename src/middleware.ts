@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { routing } from './i18n/routing';
 import { isAdminEmail } from './lib/admin';
+import { supabaseFetch } from './lib/supabase/fetch';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -34,6 +35,7 @@ async function adminMiddleware(request: NextRequest) {
   if (!url || !key) return response;
 
   const supabase = createServerClient(url, key, {
+    global: { fetch: supabaseFetch },
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (cookiesToSet) => {
@@ -51,7 +53,7 @@ async function adminMiddleware(request: NextRequest) {
   // getUser() valida o token no servidor do Supabase — não confia só no cookie
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
   const isLoginPage = request.nextUrl.pathname.startsWith('/admin/login');
 

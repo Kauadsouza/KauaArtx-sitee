@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 // terminando num site malicioso. "Vem do nosso próprio código" não protege
 // nada — a URL é pública e qualquer um monta a query que quiser.
 function safeNext(next: string | null): string {
-  if (!next) return '/';
+  if (!next || /[\\\x00-\x20]/.test(next)) return '/';
   if (!next.startsWith('/')) return '/'; // absoluto (https://…) — fora
   if (next.startsWith('//') || next.startsWith('/\\')) return '/'; // protocolo-relativo — fora
   return next;
