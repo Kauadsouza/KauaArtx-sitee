@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { getPostBySlug } from '@/lib/supabase/server';
-import { SITE_NAME } from '@/lib/site';
+import { SITE_BRAND } from '@/lib/site';
 
 // A imagem que aparece quando o link do post é colado no WhatsApp, LinkedIn,
 // X. Post COM capa já usa a capa (ver o generateMetadata da página); esta aqui
@@ -17,7 +17,7 @@ export default async function PostOpenGraphImage({
 }) {
   const { slug } = await params;
   const post = await getPostBySlug(slug).catch(() => null);
-  const titulo = post?.title ?? SITE_NAME;
+  const titulo = post?.title ?? SITE_BRAND;
   const resumo = post?.excerpt ?? null;
 
   // Título comprido pede letra menor, senão estoura o cartão
@@ -79,7 +79,7 @@ export default async function PostOpenGraphImage({
               color: '#8EB69B',
             }}
           >
-            {SITE_NAME}
+            {SITE_BRAND}
           </div>
         </div>
 

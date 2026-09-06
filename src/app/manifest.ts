@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Kauã Souza — Viagens e vida real',
-    short_name: 'Kauã Artx',
+    name: 'Site KauaArtx — Viagens e vida real',
+    short_name: 'Site KauaArtx',
     description:
       'Viagens, histórias e vida real no canal @KauaArtx.',
     start_url: '/',

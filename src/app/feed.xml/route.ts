@@ -1,5 +1,5 @@
 import { getPublishedPosts } from '@/lib/supabase/server';
-import { SITE_NAME, SITE_URL } from '@/lib/site';
+import { SITE_BRAND, SITE_URL } from '@/lib/site';
 
 // Feed RSS do blog. Serve pra quem acompanha por leitor de feed e, mais
 // importante hoje, pra agregadores e newsletters puxarem post novo sozinhos.
@@ -35,7 +35,7 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${escapa(SITE_NAME)} — blog</title>
+    <title>${escapa(SITE_BRAND)} — blog</title>
     <link>${SITE_URL}/pt/blog</link>
     <description>Textos sobre viagens, lugares e histórias do caminho.</description>
     <language>pt-BR</language>

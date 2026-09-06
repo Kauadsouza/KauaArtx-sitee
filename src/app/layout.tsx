@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Press_Start_2P } from 'next/font/google';
-import { SITE_URL, SITE_NAME, SOCIAL_PROFILES } from '@/lib/site';
+import { SITE_URL, SITE_NAME, SITE_BRAND, SOCIAL_PROFILES } from '@/lib/site';
 import './globals.css';
 
 const pixelFont = Press_Start_2P({
@@ -18,8 +18,8 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Viagens e vida real`,
-    template: `%s | ${SITE_NAME}`,
+    default: `${SITE_BRAND} — Viagens e vida real`,
+    template: `%s | ${SITE_BRAND}`,
   },
   description: DESCRIPTION,
   keywords: [
@@ -30,20 +30,20 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   // Anuncia o feed RSS: leitor de feed e agregador acham sozinhos
   alternates: {
-    types: { 'application/rss+xml': [{ url: '/feed.xml', title: `${SITE_NAME} — blog` }] },
+    types: { 'application/rss+xml': [{ url: '/feed.xml', title: `${SITE_BRAND} — blog` }] },
   },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
     alternateLocale: 'en_US',
     url: SITE_URL,
-    title: `${SITE_NAME} — Viagens e vida real`,
+    title: `${SITE_BRAND} — Viagens e vida real`,
     description: DESCRIPTION,
-    siteName: SITE_NAME,
+    siteName: SITE_BRAND,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — Viagens e vida real`,
+    title: `${SITE_BRAND} — Viagens e vida real`,
     description: DESCRIPTION,
     creator: '@KauaArtx',
   },

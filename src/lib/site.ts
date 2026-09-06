@@ -8,6 +8,7 @@ export const SITE_URL =
     : 'http://localhost:3000');
 
 export const SITE_NAME = 'Kauã Souza';
+export const SITE_BRAND = 'Site KauaArtx';
 
 export const SOCIAL_PROFILES = [
   'https://www.youtube.com/@KauaArtx',

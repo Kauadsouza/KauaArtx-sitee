@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     // email individual — ninguém vê o endereço de ninguém.
     for (let i = 0; i < list.length; i += 100) {
       const chunk = list.slice(i, i + 100).map((to) => ({
-        from: 'Kauã Artx <onboarding@resend.dev>',
+        from: 'Site KauaArtx <onboarding@resend.dev>',
         to: [to],
         replyTo: 'kauaartx@gmail.com',
         subject: `Post novo: ${post.title}`,
