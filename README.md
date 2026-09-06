@@ -1,4 +1,4 @@
-# KauaArtx
+# Site KauaArtx
 
 The public platform behind [@KauaArtx](https://www.youtube.com/@KauaArtx): a bilingual space for videos, travel stories, practical guides and the ongoing journey of building a new life in Oxford.
 
